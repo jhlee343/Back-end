@@ -17,8 +17,8 @@ public class RedisConfig {
     private String redisHost;
     @Value("${spring.data.redis.port}")
     private int redisPort1; // jwt 레디스 포트
-//    @Value("${spring.data.redis.password}")
-//    private String redisPassword;
+    @Value("${spring.data.redis.password}")
+    private String redisPassword;
 
 
     // JWT 레디스 빈 등록
@@ -27,7 +27,7 @@ public class RedisConfig {
         RedisStandaloneConfiguration redisConfiguration = new RedisStandaloneConfiguration();
         redisConfiguration.setHostName(redisHost);
         redisConfiguration.setPort(redisPort1);
-//        redisConfiguration.setPassword(redisPassword);
+        redisConfiguration.setPassword(redisPassword);
         return new LettuceConnectionFactory(redisConfiguration);
     }
 
