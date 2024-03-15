@@ -47,6 +47,8 @@ public class OAuth2SuccessHandler {
                 response.setStatus(HttpStatus.OK.value());
                 objectMapper.writeValue(response.getWriter(), buildUserJson(kakaoUserInfo));
             } else {
+                String oldRefreshToken = getTokenFromCookie(request);
+                if (oldRefreshToken != null) tokenProvider.expiredRefreshToken(oldRefreshToken);
                 TokenInfo tokenInfo = tokenProvider.generateToken(authentication);
                 String refreshToken = tokenInfo.getRefreshToken();
                 updateCookie(response, refreshToken, (tokenProperty.getREFRESH_EXPIRE() / 1000) - 1); // 쿠키 만료 시간, 리프레시 토큰의 만료 시간 보다 1분 적게 설정한다.
@@ -81,5 +83,19 @@ public class OAuth2SuccessHandler {
         cookie.setMaxAge(age);
 
         response.addCookie(cookie);
+    }
+
+    private static String getTokenFromCookie(HttpServletRequest request) {
+        String refreshToken = null;
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("refreshToken".equals(cookie.getName())) {
+                    refreshToken = cookie.getValue();
+                    break;
+                }
+            }
+        }
+        return refreshToken;
     }
 }
