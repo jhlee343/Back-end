@@ -53,7 +53,9 @@ public class SecurityConfig {
                                         .requestMatchers( // 인증 없이 접근 허용
                                                 "/login",
                                                 "/error",
-                                                "/api/auth/**"
+                                                "/api/auth/**",
+                                                "/v3/api-docs/**", // swagger 설정
+                                                "/swagger-ui/**" // swagger 설정
                                         ).permitAll()
 
                                         .requestMatchers( // 권환 확인
