@@ -2,10 +2,14 @@ package shootingstar.var.Service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import shootingstar.var.Service.dto.UserProfileDto;
 import shootingstar.var.Service.dto.UserSignupReqDto;
 import shootingstar.var.entity.User;
 import shootingstar.var.entity.UserType;
 import shootingstar.var.repository.UserRepository;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +29,21 @@ public class UserService {
 
         userRepository.save(user);
     }
+
+    public UserProfileDto getProfile(String nickname){
+        User user =findProfileByNickname(nickname);
+        UserProfileDto userProfileDto = new UserProfileDto(user.getNickname(), user.getProfileImgUrl(), user.getDonationPrice(), user.getPoint(), user.getSubscribe(), user.getUserType());
+        return userProfileDto;
+    }
+
+    public User findProfileByNickname(String nickname){
+        Optional<User> optionalUser = userRepository.findByNickname(nickname);
+        if(optionalUser.isEmpty()){
+            throw new RuntimeException();
+        }
+        return optionalUser.get();
+    }
+
 
     public boolean checkNicknameDuplicate(String nickname){
         return userRepository.existsByNickname(nickname);

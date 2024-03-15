@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import shootingstar.var.Service.UserService;
+import shootingstar.var.Service.dto.UserProfileDto;
 import shootingstar.var.Service.dto.UserSignupReqDto;
 
 @RestController
@@ -27,7 +28,11 @@ public class UserController {
         return ResponseEntity.ok(userService.checkNicknameDuplicate(nickname));
     }
 
-
+    @GetMapping("/profile/{nickname}")
+    public ResponseEntity<UserProfileDto> getProfile(@PathVariable String nickname){
+        UserProfileDto profile = userService.getProfile(nickname);
+        return ResponseEntity.ok(profile);
+    }
     @GetMapping("/test")
     public String test() {
         return "접근 성공";
