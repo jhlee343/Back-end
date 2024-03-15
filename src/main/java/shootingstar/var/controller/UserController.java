@@ -22,6 +22,12 @@ public class UserController {
         return ResponseEntity.ok().body("회원가입 성공");
     }
 
+    @GetMapping("/duplicate/{nickname}")
+    public ResponseEntity<Boolean> checkNicknameDuplicate(@PathVariable String nickname){
+        return ResponseEntity.ok(userService.checkNicknameDuplicate(nickname));
+    }
+
+
     @GetMapping("/test")
     public String test() {
         return "접근 성공";
