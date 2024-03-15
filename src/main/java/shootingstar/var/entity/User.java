@@ -3,7 +3,9 @@ package shootingstar.var.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -33,15 +35,15 @@ public class User extends BaseTimeEntity {
     @Email
     private String email;
 
+    @NotBlank
     private String profileImgUrl;
 
+    @NotNull
     @Enumerated(EnumType.STRING)
     private UserType userType;
 
-    @NotBlank
     private Long point;
 
-    @NotBlank
     private Long donationPrice;
 
     private Double rating;
@@ -50,6 +52,7 @@ public class User extends BaseTimeEntity {
 
     private Integer warningCount;
 
+    @Builder
     public User(String kakaoId, String name, String nickname, String phone, String email, String profileImgUrl, UserType userType) {
         this.kakaoId = kakaoId;
         this.name = name;

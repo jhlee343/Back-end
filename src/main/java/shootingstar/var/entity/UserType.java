@@ -1,5 +1,5 @@
 package shootingstar.var.entity;
 
 public enum UserType {
-    ADMIN, VIP, BASIC
+    ROLE_ADMIN, ROLE_VIP, ROLE_BASIC
 }
