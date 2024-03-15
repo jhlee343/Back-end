@@ -25,4 +25,8 @@ public class UserService {
 
         userRepository.save(user);
     }
+
+    public boolean checkNicknameDuplicate(String nickname){
+        return userRepository.existsByNickname(nickname);
+    }
 }
