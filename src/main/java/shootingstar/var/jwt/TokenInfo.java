@@ -1,4 +1,4 @@
-package shootingstar.var.security.jwt;
+package shootingstar.var.jwt;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;

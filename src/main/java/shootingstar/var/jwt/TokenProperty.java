@@ -1,4 +1,4 @@
-package shootingstar.var.security.jwt;
+package shootingstar.var.jwt;
 
 import lombok.Getter;
 import org.springframework.stereotype.Component;
