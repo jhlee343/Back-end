@@ -38,6 +38,8 @@ public class UserController {
     public ResponseEntity<Boolean> checkVIP(@PathVariable String nickname){
         return ResponseEntity.ok(userService.checkVIP(nickname));
     }
+
+
     @GetMapping("/test")
     public String test() {
         return "접근 성공";

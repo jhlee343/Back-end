@@ -10,6 +10,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -52,6 +54,8 @@ public class User extends BaseTimeEntity {
 
     private Integer warningCount;
 
+    @OneToMany(mappedBy = "user")
+    private List<Follow> followList = new ArrayList<>();
     @Builder
     public User(String kakaoId, String name, String nickname, String phone, String email, String profileImgUrl, UserType userType) {
         this.kakaoId = kakaoId;
