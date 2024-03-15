@@ -29,14 +29,29 @@ public class UserService {
 
         userRepository.save(user);
     }
+    public boolean checkNicknameDuplicate(String nickname){
+        return userRepository.existsByNickname(nickname);
+    }
 
+    public boolean checkVIP(String nickname){
+        User user = findByNickname(nickname);
+        if(user.getUserType().equals(UserType.ROLE_VIP)){
+            //vip인 경우 true
+            return true;
+        }
+        else {
+            //vip가 아닌경우 false
+            return false;
+        }
+    }
     public UserProfileDto getProfile(String nickname){
-        User user =findProfileByNickname(nickname);
+        User user =findByNickname(nickname);
         UserProfileDto userProfileDto = new UserProfileDto(user.getNickname(), user.getProfileImgUrl(), user.getDonationPrice(), user.getPoint(), user.getSubscribe(), user.getUserType());
         return userProfileDto;
     }
 
-    public User findProfileByNickname(String nickname){
+
+    public User findByNickname(String nickname){
         Optional<User> optionalUser = userRepository.findByNickname(nickname);
         if(optionalUser.isEmpty()){
             throw new RuntimeException();
@@ -45,7 +60,5 @@ public class UserService {
     }
 
 
-    public boolean checkNicknameDuplicate(String nickname){
-        return userRepository.existsByNickname(nickname);
-    }
+
 }
