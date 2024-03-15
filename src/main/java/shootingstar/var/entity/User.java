@@ -56,6 +56,7 @@ public class User extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "user")
     private List<Follow> followList = new ArrayList<>();
+
     @Builder
     public User(String kakaoId, String name, String nickname, String phone, String email, String profileImgUrl, UserType userType) {
         this.kakaoId = kakaoId;

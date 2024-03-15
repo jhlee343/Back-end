@@ -2,11 +2,16 @@ package shootingstar.var.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import shootingstar.var.Service.UserService;
+import shootingstar.var.Service.dto.FollowingDto;
 import shootingstar.var.Service.dto.UserProfileDto;
 import shootingstar.var.Service.dto.UserSignupReqDto;
+import shootingstar.var.repository.FollowRepository;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -39,7 +44,19 @@ public class UserController {
         return ResponseEntity.ok(userService.checkVIP(nickname));
     }
 
+    @GetMapping("/followingList")
+    public ResponseEntity<?> followingList(@RequestParam("nickname") String nickname){
+        List<FollowingDto> followingList = userService.findAllFollowing(nickname);
+        return ResponseEntity.ok().body(followingList);
+    }
 
+    @DeleteMapping("/unfollow/{followId}/{followingId}")
+    public ResponseEntity<String> unFollow(@PathVariable("followId") Long followId, @PathVariable("followingId") String followingId){
+    /**
+     *
+     */
+    return null;
+    }
     @GetMapping("/test")
     public String test() {
         return "접근 성공";

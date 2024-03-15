@@ -1,21 +1,26 @@
 package shootingstar.var.Service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import shootingstar.var.Service.dto.FollowingDto;
 import shootingstar.var.Service.dto.UserProfileDto;
 import shootingstar.var.Service.dto.UserSignupReqDto;
+import shootingstar.var.entity.Follow;
 import shootingstar.var.entity.User;
 import shootingstar.var.entity.UserType;
+import shootingstar.var.repository.FollowRepository;
 import shootingstar.var.repository.UserRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-
+    private final FollowRepository followRepository;
     public void signup(UserSignupReqDto reqDto) {
         User user = User.builder()
                 .kakaoId(reqDto.getId())
@@ -50,6 +55,14 @@ public class UserService {
         return userProfileDto;
     }
 
+    public List<FollowingDto> findAllFollowing(String nickname){
+        User user = findByNickname(nickname);
+        return followRepository.findByFollowerId(user.getUserId());
+    }
+    @Transactional
+    public void unFollow(Long followId, String followingId){
+
+    }
 
     public User findByNickname(String nickname){
         Optional<User> optionalUser = userRepository.findByNickname(nickname);

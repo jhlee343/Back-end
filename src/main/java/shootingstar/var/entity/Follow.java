@@ -19,10 +19,10 @@ public class Follow {
     private UUID followUUID;
 
     @NotBlank
-    private String followerId;
+    private Long followerId;
 
     @NotBlank
-    private String followingId;
+    private Long followingId;
 
     @ManyToOne
     @JoinColumn(name = "user_Id")
