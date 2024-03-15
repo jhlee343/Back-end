@@ -13,6 +13,7 @@ build/
 **/src/main/resources/application-jwt.yml
 **/src/main/resources/application-port.yml
 **/src/main/resources/application-oauth.yml
+**/src/main/resources/application-redis.yml
 
 ### STS ###
 .apt_generated
