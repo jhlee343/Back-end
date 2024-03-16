@@ -60,10 +60,16 @@ public class UserService {
         return followRepository.findByFollowerId(user.getUserId());
     }
     @Transactional
-    public void unFollow(Long followId, String followingId){
-
+    public void unFollow(String nickname, Long followingId){
+        User user = findByNickname(nickname);
+        Follow follow = findFollowingByFollower(user.getUserId());
+        followRepository.delete(follow);
     }
 
+    private Follow findFollowingByFollower(Long follwerId){
+       //
+        return null;
+    }
     public User findByNickname(String nickname){
         Optional<User> optionalUser = userRepository.findByNickname(nickname);
         if(optionalUser.isEmpty()){

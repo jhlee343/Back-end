@@ -50,12 +50,10 @@ public class UserController {
         return ResponseEntity.ok().body(followingList);
     }
 
-    @DeleteMapping("/unfollow/{followId}/{followingId}")
-    public ResponseEntity<String> unFollow(@PathVariable("followId") Long followId, @PathVariable("followingId") String followingId){
-    /**
-     *
-     */
-    return null;
+    @DeleteMapping("/unfollow/{followingId}")
+    public ResponseEntity<String> unFollow(@PathVariable("followingId") Long followingId){
+
+    return ResponseEntity.ok().body("unfollow success");
     }
     @GetMapping("/test")
     public String test() {
