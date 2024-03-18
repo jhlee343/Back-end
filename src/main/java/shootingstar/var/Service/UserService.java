@@ -57,18 +57,26 @@ public class UserService {
 
     public List<FollowingDto> findAllFollowing(String nickname){
         User user = findByNickname(nickname);
-        return followRepository.findByFollowerId(user.getUserId());
+        return followRepository.findAllByFollowerId(user.getUserId());
     }
     @Transactional
     public void unFollow(String nickname, Long followingId){
         User user = findByNickname(nickname);
         Follow follow = findFollowingByFollower(user.getUserId());
-        followRepository.delete(follow);
+        if(follow.getFollowingId().equals(followingId) & follow.getFollowerId().equals(user.getUserId())) {
+            followRepository.delete(follow);
+        }
+        else{
+            throw new RuntimeException();
+        }
     }
 
     private Follow findFollowingByFollower(Long follwerId){
-       //
-        return null;
+       Optional<Follow> followOptional = followRepository.findByFollowerId(follwerId);
+       if(followOptional.isEmpty()){
+           throw new RuntimeException();
+       }
+        return followOptional.get();
     }
     public User findByNickname(String nickname){
         Optional<User> optionalUser = userRepository.findByNickname(nickname);
