@@ -15,9 +15,7 @@ import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
 import shootingstar.var.repository.UserRepository;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -34,34 +32,33 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
         Optional<User> findUser = userRepository.findByKakaoId(id);
 
         List<GrantedAuthority> authorities;
-        if (findUser.isEmpty()) {
-            authorities = AuthorityUtils.createAuthorityList("ROLE_GUEST");
-        } else {
+        if (findUser.isPresent()) { // 이미 존재하는 사용자인 경우
+            Map<String, Object> attributes = new HashMap<>(oAuth2User.getAttributes());
+
             User user = findUser.get();
             authorities = AuthorityUtils.createAuthorityList(user.getUserType().toString());
+            attributes.put("userId", user.getUserUUID().toString());
+
+            // 사용자 UUID를 기반으로 DefaultOAuth2User 객체를 생성
+            return new DefaultOAuth2User(authorities, attributes, "userId");
         }
+        else { // 새로운 사용자인 경우
+            authorities = AuthorityUtils.createAuthorityList("ROLE_GUEST");
+            String userNameAttributeName = userRequest.getClientRegistration()
+                    .getProviderDetails()
+                    .getUserInfoEndpoint()
+                    .getUserNameAttributeName();
 
-        String userNameAttributeName = userRequest.getClientRegistration()
-                .getProviderDetails()
-                .getUserInfoEndpoint()
-                .getUserNameAttributeName();
-
-        return new DefaultOAuth2User(authorities, oAuth2User.getAttributes(), userNameAttributeName);
+            // 카카오 ID를 기반으로 DefaultOAuth2User 객체를 생성
+            return new DefaultOAuth2User(authorities, oAuth2User.getAttributes(), userNameAttributeName);
+        }
     }
 
-    public User getUserByUUID(String userUUID) {
+    public String getUserAuthorityUUID(String userUUID) {
         Optional<User> optionalUser = userRepository.findByUserUUID(UUID.fromString(userUUID));
         if (optionalUser.isEmpty()) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
-        return optionalUser.get();
-    }
-
-    public UUID getUserUUIDByKakaoId(String id) {
-        Optional<User> optionalUser = userRepository.findByKakaoId(id);
-        if (optionalUser.isEmpty()) {
-            throw new CustomException(ErrorCode.USER_NOT_FOUND);
-        }
-        return optionalUser.get().getUserUUID();
+        return optionalUser.get().getUserType().toString();
     }
 }

@@ -78,10 +78,9 @@ public class JwtTokenProvider {
     // 엑세스 토큰 생성 메서드
     public String generateAccessToken(Authentication authentication, Instant now) {
         Instant accessTokenExpiresIn = now.plus(tokenProperty.getACCESS_EXPIRE(), ChronoUnit.MILLIS); // 30분 후 만료
-        UUID userUUID = oAuth2UserService.getUserUUIDByKakaoId(authentication.getName());
 
         return Jwts.builder()
-                .setSubject(userUUID.toString())
+                .setSubject(authentication.getName())
                 .claim("auth", getAuthoritiesString(authentication.getAuthorities()))
                 .setIssuedAt(Date.from(now))
                 .setExpiration(Date.from(accessTokenExpiresIn))
@@ -91,10 +90,8 @@ public class JwtTokenProvider {
 
     // 리프레시 토큰 생성 메서드
     public String generateRefreshToken(Authentication authentication, Instant now, Instant refreshTokenExpiresIn) {
-        UUID userUUID = oAuth2UserService.getUserUUIDByKakaoId(authentication.getName());
-
         String refreshToken = Jwts.builder()
-                .setSubject(userUUID.toString())
+                .setSubject(authentication.getName())
                 .setIssuedAt(Date.from(now))
                 .setExpiration(Date.from(refreshTokenExpiresIn))
                 .signWith(refreshKey, SignatureAlgorithm.HS256)
@@ -129,9 +126,7 @@ public class JwtTokenProvider {
         GrantedAuthority authority = new SimpleGrantedAuthority(claims.get("auth").toString());
         List<GrantedAuthority> authorities = Collections.singletonList(authority);
 
-        User user = oAuth2UserService.getUserByUUID(subject);
-
-        return new UsernamePasswordAuthenticationToken(user.getKakaoId(), null, authorities);
+        return new UsernamePasswordAuthenticationToken(subject, null, authorities);
     }
 
     // refresh 토큰을 복호화하여 토큰에 들어있는 정보를 꺼내는 메서드
@@ -145,10 +140,10 @@ public class JwtTokenProvider {
 
         String subject = claims.getSubject();
 
-        User user = oAuth2UserService.getUserByUUID(subject);
-        List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(user.getUserType().toString());
+        String authority = oAuth2UserService.getUserAuthorityUUID(subject);
+        List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(authority);
 
-        return new UsernamePasswordAuthenticationToken(user.getKakaoId(), null, authorities);
+        return new UsernamePasswordAuthenticationToken(subject, null, authorities);
     }
 
     // access 토큰 정보를 검증하는 메서드
