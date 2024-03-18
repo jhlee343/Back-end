@@ -25,10 +25,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static shootingstar.var.exception.ErrorCode.*;
 
@@ -80,8 +77,10 @@ public class JwtTokenProvider {
     // 엑세스 토큰 생성 메서드
     public String generateAccessToken(Authentication authentication, Instant now) {
         Instant accessTokenExpiresIn = now.plus(tokenProperty.getACCESS_EXPIRE(), ChronoUnit.MILLIS); // 30분 후 만료
+        UUID userUUID = oAuth2UserService.getUserUUIDById(authentication.getName());
+
         return Jwts.builder()
-                .setSubject(authentication.getName())
+                .setSubject(userUUID.toString())
                 .claim("auth", getAuthoritiesString(authentication.getAuthorities()))
                 .setIssuedAt(Date.from(now))
                 .setExpiration(Date.from(accessTokenExpiresIn))
@@ -91,9 +90,10 @@ public class JwtTokenProvider {
 
     // 리프레시 토큰 생성 메서드
     public String generateRefreshToken(Authentication authentication, Instant now, Instant refreshTokenExpiresIn) {
+        UUID userUUID = oAuth2UserService.getUserUUIDById(authentication.getName());
 
         String refreshToken = Jwts.builder()
-                .setSubject(authentication.getName())
+                .setSubject(userUUID.toString())
                 .setIssuedAt(Date.from(now))
                 .setExpiration(Date.from(refreshTokenExpiresIn))
                 .signWith(refreshKey, SignatureAlgorithm.HS256)
@@ -142,7 +142,7 @@ public class JwtTokenProvider {
 
         String subject = claims.getSubject();
 
-        String authority = oAuth2UserService.getUserAuthorityById(subject);
+        String authority = oAuth2UserService.getUserAuthorityByUUID(subject);
         List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(authority);
 
         return new UsernamePasswordAuthenticationToken(subject, null, authorities);

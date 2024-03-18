@@ -1,7 +1,5 @@
 package shootingstar.var.oAuth;
 
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
@@ -17,9 +15,9 @@ import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
 import shootingstar.var.repository.UserRepository;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -51,11 +49,19 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
         return new DefaultOAuth2User(authorities, oAuth2User.getAttributes(), userNameAttributeName);
     }
 
-    public String getUserAuthorityById(String id) {
-        Optional<User> optionalUser = userRepository.findByKakaoId(id);
+    public String getUserAuthorityByUUID(String userUUID) {
+        Optional<User> optionalUser = userRepository.findByUserUUID(UUID.fromString(userUUID));
         if (optionalUser.isEmpty()) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
         return optionalUser.get().getUserType().toString();
+    }
+
+    public UUID getUserUUIDById(String id) {
+        Optional<User> optionalUser = userRepository.findByKakaoId(id);
+        if (optionalUser.isEmpty()) {
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        }
+        return optionalUser.get().getUserUUID();
     }
 }
