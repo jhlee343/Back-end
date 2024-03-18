@@ -230,4 +230,27 @@ public class JwtTokenProvider {
             throw new CustomException(SERVER_ERROR);
         }
     }
+
+    public void checkRefreshTokenState(String token) {
+        // jwt redis 에서 토큰의 정보를 가지고 온다.
+        String data = jwtRedisUtil.getData(token);
+        if (data == null) {
+            throw new CustomException(INVALID_REFRESH_TOKEN);
+        }
+        try {
+            // JSON 문자열을 JsonNode로 파싱
+            JsonNode jsonNode = objectMapper.readTree(data);
+
+            // "status" 필드의 값을 가져옴
+            String status = jsonNode.get("status").asText();
+
+            // status 값이 active 가 아닌 경우 무효화 된 토큰이다.
+            if (status.equals("expired")) {
+                throw new CustomException(EXPIRED_REFRESH_TOKEN);
+            }
+        } catch (Exception e) {
+            log.info(e.getMessage());
+            throw new CustomException(SERVER_ERROR);
+        }
+    }
 }
