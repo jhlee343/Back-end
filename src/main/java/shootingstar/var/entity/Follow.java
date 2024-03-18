@@ -18,13 +18,12 @@ public class Follow {
     @NotBlank
     private UUID followUUID;
 
-    @NotBlank
-    private Long followerId;
-
-    @NotBlank
-    private Long followingId;
+    @ManyToOne
+    @JoinColumn(name = "follower_id")
+    private User followerId;
 
     @ManyToOne
-    @JoinColumn(name = "user_Id")
-    private User user;
+    @JoinColumn(name = "following_id")
+    private User followingId;
+
 }

@@ -10,6 +10,6 @@ import java.util.Optional;
 
 public interface FollowRepository extends JpaRepository<Follow, Long>, FollowRepositoryCustom {
 
-   // List<FollowingDto> findAllById(Long userId);
-    Optional<Follow> findByFollowerId(Long follwerId);
+    Optional<Follow> findByFollowingId(Long followingId);
+    Optional<Follow> findByFollowUUID(String followUUID);
 }

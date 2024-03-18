@@ -54,11 +54,13 @@ public class User extends BaseTimeEntity {
 
     private Integer warningCount;
 
-    @OneToMany(mappedBy = "user")
-    private List<Follow> followList = new ArrayList<>();
+    @OneToMany(mappedBy = "following")
+    private List<Follow> following ;
+    @OneToMany(mappedBy = "follower")
+    private List<Follow> followingList;
 
     @Builder
-    public User(String kakaoId, String name, String nickname, String phone, String email, String profileImgUrl, UserType userType) {
+    public User(String kakaoId, String name, String nickname, String phone, String email, String profileImgUrl, UserType userType ) {
         this.kakaoId = kakaoId;
         this.name = name;
         this.nickname = nickname;

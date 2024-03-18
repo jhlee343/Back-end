@@ -10,6 +10,7 @@ import shootingstar.var.Service.UserService;
 import shootingstar.var.Service.dto.FollowingDto;
 import shootingstar.var.Service.dto.UserProfileDto;
 import shootingstar.var.Service.dto.UserSignupReqDto;
+import shootingstar.var.entity.Follow;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
 import shootingstar.var.repository.FollowRepository;
@@ -52,13 +53,18 @@ public class UserController {
         List<FollowingDto> followingList = userService.findAllFollowing(nickname);
         return ResponseEntity.ok().body(followingList);
     }
-
-    @DeleteMapping("/unfollow/{followingId}")
-    public ResponseEntity<String> unFollow(@PathVariable("followingId") Long followingId,
-                                           @PathVariable("nickname") String nickname) {
-        userService.unFollow(nickname,followingId);
+    @PostMapping("/follow/{followingId}")
+    public ResponseEntity<String> follow(@PathVariable String followingId, HttpServletRequest request) {
+        String accessToken = getTokenFromHeader(request);
+        userService.follow(followingId,accessToken );
+        return ResponseEntity.ok("follow success");
+    }
+    @DeleteMapping("/unfollow/{followUUID}")
+    public ResponseEntity<String> unFollow(@PathVariable("followingId") String followUUID) {
+        userService.unFollow(followUUID);
         return ResponseEntity.ok().body("unfollow success");
     }
+
 
     @GetMapping("/test")
     public String test() {

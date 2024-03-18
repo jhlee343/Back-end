@@ -1,7 +1,7 @@
 package shootingstar.var.Service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shootingstar.var.Service.dto.FollowingDto;
@@ -10,17 +10,21 @@ import shootingstar.var.Service.dto.UserSignupReqDto;
 import shootingstar.var.entity.Follow;
 import shootingstar.var.entity.User;
 import shootingstar.var.entity.UserType;
+import shootingstar.var.jwt.JwtTokenProvider;
 import shootingstar.var.repository.FollowRepository;
 import shootingstar.var.repository.UserRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
+    private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
     private final FollowRepository followRepository;
+
     public void signup(UserSignupReqDto reqDto) {
         User user = User.builder()
                 .kakaoId(reqDto.getId())
@@ -34,58 +38,72 @@ public class UserService {
 
         userRepository.save(user);
     }
-    public boolean checkNicknameDuplicate(String nickname){
+
+    public boolean checkNicknameDuplicate(String nickname) {
         return userRepository.existsByNickname(nickname);
     }
 
-    public boolean checkVIP(String nickname){
+    public boolean checkVIP(String nickname) {
         User user = findByNickname(nickname);
-        if(user.getUserType().equals(UserType.ROLE_VIP)){
+        if (user.getUserType().equals(UserType.ROLE_VIP)) {
             //vip인 경우 true
             return true;
-        }
-        else {
+        } else {
             //vip가 아닌경우 false
             return false;
         }
     }
-    public UserProfileDto getProfile(String nickname){
-        User user =findByNickname(nickname);
+
+    public UserProfileDto getProfile(String nickname) {
+        User user = findByNickname(nickname);
         UserProfileDto userProfileDto = new UserProfileDto(user.getNickname(), user.getProfileImgUrl(), user.getDonationPrice(), user.getPoint(), user.getSubscribe(), user.getUserType());
         return userProfileDto;
     }
 
-    public List<FollowingDto> findAllFollowing(String nickname){
+    public List<FollowingDto> findAllFollowing(String nickname) {
         User user = findByNickname(nickname);
         return followRepository.findAllByFollowerId(user.getUserId());
     }
+
     @Transactional
-    public void unFollow(String nickname, Long followingId){
-        User user = findByNickname(nickname);
-        Follow follow = findFollowingByFollower(user.getUserId());
-        if(follow.getFollowingId().equals(followingId) & follow.getFollowerId().equals(user.getUserId())) {
-            followRepository.delete(follow);
-        }
-        else{
-            throw new RuntimeException();
-        }
+    public void follow(String followingId, String accessToken) {
+        Authentication authentication = jwtTokenProvider.getAuthenticationFromAccessToken(accessToken);
+        String followerId = authentication.getName();
+        User follower = findUser(followerId);
+        User following = findUser(followingId);
+        UUID followUUID = UUID.randomUUID();
+        Follow follow = new Follow(followUUID,follower,following);
+        followRepository.save(follow);
     }
 
-    private Follow findFollowingByFollower(Long follwerId){
-       Optional<Follow> followOptional = followRepository.findByFollowerId(follwerId);
-       if(followOptional.isEmpty()){
-           throw new RuntimeException();
-       }
+    @Transactional
+    public void unFollow(String followUUID) {
+        Follow follow = findFollowingByFollower(followUUID);
+        followRepository.delete(follow);
+    }
+
+    private Follow findFollowingByFollower(String followUUID) {
+        Optional<Follow> followOptional = followRepository.findByFollowUUID(followUUID);
+        if (followOptional.isEmpty()) {
+            throw new RuntimeException();
+        }
         return followOptional.get();
     }
-    public User findByNickname(String nickname){
+
+    public User findByNickname(String nickname) {
         Optional<User> optionalUser = userRepository.findByNickname(nickname);
-        if(optionalUser.isEmpty()){
+        if (optionalUser.isEmpty()) {
             throw new RuntimeException();
         }
         return optionalUser.get();
     }
 
-
+    public User findUser(String userId) {
+        Optional<User> optionalUser = userRepository.findByUserUUID(userId);
+        if (optionalUser.isEmpty()) {
+            throw new RuntimeException();
+        }
+        return optionalUser.get();
+    }
 
 }
