@@ -1,5 +1,7 @@
 package shootingstar.var.jwt;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -225,7 +227,7 @@ public class JwtTokenProvider {
                 // 이미 만료된 경우, Redis에서 해당 토큰 삭제
                 jwtRedisUtil.deleteData(refreshToken);
             }
-        } catch (Exception e) {
+        }  catch (JsonProcessingException e) {
             log.info(e.getMessage());
             throw new CustomException(SERVER_ERROR);
         }
@@ -248,7 +250,7 @@ public class JwtTokenProvider {
             if (status.equals("expired")) {
                 throw new CustomException(EXPIRED_REFRESH_TOKEN);
             }
-        } catch (Exception e) {
+        } catch (JsonProcessingException e) {
             log.info(e.getMessage());
             throw new CustomException(SERVER_ERROR);
         }
