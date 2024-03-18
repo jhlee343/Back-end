@@ -15,7 +15,6 @@ import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 import shootingstar.var.exception.CustomException;
-import shootingstar.var.exception.ErrorCode;
 import shootingstar.var.oAuth.OAuth2UserService;
 import shootingstar.var.util.JwtRedisUtil;
 
@@ -30,6 +29,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+
+import static shootingstar.var.exception.ErrorCode.*;
 
 @Component
 @Slf4j
@@ -72,7 +73,7 @@ public class JwtTokenProvider {
         return authorities.stream()
                 .findFirst()
                 .map(GrantedAuthority::getAuthority)
-                .orElseThrow(() -> new CustomException(ErrorCode.ACCESS_DENIED));
+                .orElseThrow(() -> new CustomException(ACCESS_DENIED));
     }
 
 
@@ -119,7 +120,7 @@ public class JwtTokenProvider {
 
         if (claims.get("auth") == null) {
             log.info("권한 정보가 없는 토큰입니다.");
-            throw new CustomException(ErrorCode.ILLEGAL_ACCESS_TOKEN);
+            throw new CustomException(ILLEGAL_ACCESS_TOKEN);
         }
 
         String subject = claims.getSubject();
@@ -136,7 +137,7 @@ public class JwtTokenProvider {
 
         if (claims.getSubject() == null) {
             log.info("토큰에서 사용자 식별 정보를 찾을 수 없습니다.");
-            throw new CustomException(ErrorCode.ILLEGAL_REFRESH_TOKEN);
+            throw new CustomException(ILLEGAL_REFRESH_TOKEN);
         }
 
         String subject = claims.getSubject();
@@ -154,16 +155,16 @@ public class JwtTokenProvider {
             return true;
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
             log.info("Invalid ACCESS token");
-            throw new CustomException(ErrorCode.INVALID_ACCESS_TOKEN);
+            throw new CustomException(INVALID_ACCESS_TOKEN);
         } catch (ExpiredJwtException e) {
             log.info("Expired ACCESS token");
-            throw new CustomException(ErrorCode.EXPIRED_ACCESS_TOKEN);
+            throw new CustomException(EXPIRED_ACCESS_TOKEN);
         } catch (UnsupportedJwtException e) {
             log.info("Unsupported ACCESS token");
-            throw new CustomException(ErrorCode.UNSUPPORTED_ACCESS_TOKEN);
+            throw new CustomException(UNSUPPORTED_ACCESS_TOKEN);
         } catch (IllegalArgumentException e) {
             log.info("ACCESS claims string is empty.");
-            throw new CustomException(ErrorCode.ILLEGAL_ACCESS_TOKEN);
+            throw new CustomException(ILLEGAL_ACCESS_TOKEN);
         }
     }
 
@@ -173,16 +174,16 @@ public class JwtTokenProvider {
             Jwts.parserBuilder().setSigningKey(refreshKey).build().parseClaimsJws(token);
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
             log.info("Invalid REFRESH token");
-            throw new CustomException(ErrorCode.INVALID_REFRESH_TOKEN);
+            throw new CustomException(INVALID_REFRESH_TOKEN);
         } catch (ExpiredJwtException e) {
             log.info("Expired REFRESH token");
-            throw new CustomException(ErrorCode.EXPIRED_REFRESH_TOKEN);
+            throw new CustomException(EXPIRED_REFRESH_TOKEN);
         } catch (UnsupportedJwtException e) {
             log.info("Unsupported REFRESH token");
-            throw new CustomException(ErrorCode.UNSUPPORTED_REFRESH_TOKEN);
+            throw new CustomException(UNSUPPORTED_REFRESH_TOKEN);
         } catch (IllegalArgumentException e) {
             log.info("REFRESH claims string is empty.");
-            throw new CustomException(ErrorCode.ILLEGAL_REFRESH_TOKEN);
+            throw new CustomException(ILLEGAL_REFRESH_TOKEN);
         }
     }
 
@@ -228,7 +229,7 @@ public class JwtTokenProvider {
             }
         } catch (Exception e) {
             log.info(e.getMessage());
-            throw new CustomException(ErrorCode.SERVER_ERROR);
+            throw new CustomException(SERVER_ERROR);
         }
     }
 }

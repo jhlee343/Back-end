@@ -1,32 +1,14 @@
 package shootingstar.var.controller;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import shootingstar.var.Service.UserService;
-import shootingstar.var.Service.dto.UserSignupReqDto;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/user")
 public class UserController {
-
-    private final UserService userService;
-
-    @PostMapping("/signup")
-    public ResponseEntity<String> signup(@Valid @RequestBody UserSignupReqDto reqDto) {
-
-        userService.signup(reqDto);
-
-        return ResponseEntity.ok().body("회원가입 성공");
-    }
-
-    @GetMapping("/duplicate/{nickname}")
-    public ResponseEntity<Boolean> checkNicknameDuplicate(@PathVariable String nickname){
-        return ResponseEntity.ok(userService.checkNicknameDuplicate(nickname));
-    }
-
 
     @GetMapping("/test")
     public String test() {
