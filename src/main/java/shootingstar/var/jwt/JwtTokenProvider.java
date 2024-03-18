@@ -1,5 +1,7 @@
 package shootingstar.var.jwt;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -14,8 +16,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
+import shootingstar.var.entity.User;
 import shootingstar.var.exception.CustomException;
-import shootingstar.var.exception.ErrorCode;
 import shootingstar.var.oAuth.OAuth2UserService;
 import shootingstar.var.util.JwtRedisUtil;
 
@@ -26,10 +28,9 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+
+import static shootingstar.var.exception.ErrorCode.*;
 
 @Component
 @Slf4j
@@ -72,13 +73,14 @@ public class JwtTokenProvider {
         return authorities.stream()
                 .findFirst()
                 .map(GrantedAuthority::getAuthority)
-                .orElseThrow(() -> new CustomException(ErrorCode.ACCESS_DENIED));
+                .orElseThrow(() -> new CustomException(ACCESS_DENIED));
     }
 
 
     // 엑세스 토큰 생성 메서드
     public String generateAccessToken(Authentication authentication, Instant now) {
         Instant accessTokenExpiresIn = now.plus(tokenProperty.getACCESS_EXPIRE(), ChronoUnit.MILLIS); // 30분 후 만료
+
         return Jwts.builder()
                 .setSubject(authentication.getName())
                 .claim("auth", getAuthoritiesString(authentication.getAuthorities()))
@@ -90,7 +92,6 @@ public class JwtTokenProvider {
 
     // 리프레시 토큰 생성 메서드
     public String generateRefreshToken(Authentication authentication, Instant now, Instant refreshTokenExpiresIn) {
-
         String refreshToken = Jwts.builder()
                 .setSubject(authentication.getName())
                 .setIssuedAt(Date.from(now))
@@ -119,7 +120,7 @@ public class JwtTokenProvider {
 
         if (claims.get("auth") == null) {
             log.info("권한 정보가 없는 토큰입니다.");
-            throw new CustomException(ErrorCode.ILLEGAL_ACCESS_TOKEN);
+            throw new CustomException(ILLEGAL_ACCESS_TOKEN);
         }
 
         String subject = claims.getSubject();
@@ -136,12 +137,12 @@ public class JwtTokenProvider {
 
         if (claims.getSubject() == null) {
             log.info("토큰에서 사용자 식별 정보를 찾을 수 없습니다.");
-            throw new CustomException(ErrorCode.ILLEGAL_REFRESH_TOKEN);
+            throw new CustomException(ILLEGAL_REFRESH_TOKEN);
         }
 
         String subject = claims.getSubject();
 
-        String authority = oAuth2UserService.getUserAuthorityById(subject);
+        String authority = oAuth2UserService.getUserAuthorityUUID(subject);
         List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(authority);
 
         return new UsernamePasswordAuthenticationToken(subject, null, authorities);
@@ -154,16 +155,16 @@ public class JwtTokenProvider {
             return true;
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
             log.info("Invalid ACCESS token");
-            throw new CustomException(ErrorCode.INVALID_ACCESS_TOKEN);
+            throw new CustomException(INVALID_ACCESS_TOKEN);
         } catch (ExpiredJwtException e) {
             log.info("Expired ACCESS token");
-            throw new CustomException(ErrorCode.EXPIRED_ACCESS_TOKEN);
+            throw new CustomException(EXPIRED_ACCESS_TOKEN);
         } catch (UnsupportedJwtException e) {
             log.info("Unsupported ACCESS token");
-            throw new CustomException(ErrorCode.UNSUPPORTED_ACCESS_TOKEN);
+            throw new CustomException(UNSUPPORTED_ACCESS_TOKEN);
         } catch (IllegalArgumentException e) {
             log.info("ACCESS claims string is empty.");
-            throw new CustomException(ErrorCode.ILLEGAL_ACCESS_TOKEN);
+            throw new CustomException(ILLEGAL_ACCESS_TOKEN);
         }
     }
 
@@ -173,16 +174,16 @@ public class JwtTokenProvider {
             Jwts.parserBuilder().setSigningKey(refreshKey).build().parseClaimsJws(token);
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
             log.info("Invalid REFRESH token");
-            throw new CustomException(ErrorCode.INVALID_REFRESH_TOKEN);
+            throw new CustomException(INVALID_REFRESH_TOKEN);
         } catch (ExpiredJwtException e) {
             log.info("Expired REFRESH token");
-            throw new CustomException(ErrorCode.EXPIRED_REFRESH_TOKEN);
+            throw new CustomException(EXPIRED_REFRESH_TOKEN);
         } catch (UnsupportedJwtException e) {
             log.info("Unsupported REFRESH token");
-            throw new CustomException(ErrorCode.UNSUPPORTED_REFRESH_TOKEN);
+            throw new CustomException(UNSUPPORTED_REFRESH_TOKEN);
         } catch (IllegalArgumentException e) {
             log.info("REFRESH claims string is empty.");
-            throw new CustomException(ErrorCode.ILLEGAL_REFRESH_TOKEN);
+            throw new CustomException(ILLEGAL_REFRESH_TOKEN);
         }
     }
 
@@ -226,9 +227,32 @@ public class JwtTokenProvider {
                 // 이미 만료된 경우, Redis에서 해당 토큰 삭제
                 jwtRedisUtil.deleteData(refreshToken);
             }
-        } catch (Exception e) {
+        }  catch (JsonProcessingException e) {
             log.info(e.getMessage());
-            throw new CustomException(ErrorCode.SERVER_ERROR);
+            throw new CustomException(SERVER_ERROR);
+        }
+    }
+
+    public void checkRefreshTokenState(String token) {
+        // jwt redis 에서 토큰의 정보를 가지고 온다.
+        String data = jwtRedisUtil.getData(token);
+        if (data == null) {
+            throw new CustomException(INVALID_REFRESH_TOKEN);
+        }
+        try {
+            // JSON 문자열을 JsonNode로 파싱
+            JsonNode jsonNode = objectMapper.readTree(data);
+
+            // "status" 필드의 값을 가져옴
+            String status = jsonNode.get("status").asText();
+
+            // status 값이 active 가 아닌 경우 무효화 된 토큰이다.
+            if (status.equals("expired")) {
+                throw new CustomException(EXPIRED_REFRESH_TOKEN);
+            }
+        } catch (JsonProcessingException e) {
+            log.info(e.getMessage());
+            throw new CustomException(SERVER_ERROR);
         }
     }
 }
