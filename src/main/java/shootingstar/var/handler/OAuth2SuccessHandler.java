@@ -49,11 +49,14 @@ public class OAuth2SuccessHandler {
                 objectMapper.writeValue(response.getWriter(), buildUserJson(kakaoUserInfo));
             } else {
                 String oldRefreshToken = TokenUtil.getTokenFromCookie(request);
+
                 if (oldRefreshToken != null) tokenProvider.expiredRefreshToken(oldRefreshToken);
+
                 TokenInfo tokenInfo = tokenProvider.generateToken(authentication);
                 String refreshToken = tokenInfo.getRefreshToken();
+
                 TokenUtil.updateCookie(response, refreshToken, (tokenProperty.getREFRESH_EXPIRE() / 1000) - 1); // 쿠키 만료 시간, 리프레시 토큰의 만료 시간 보다 1분 적게 설정한다.
-                response.setHeader("Authorization", "Bearer " + tokenInfo.getAccessToken());
+                TokenUtil.addHeader(response, tokenInfo.getAccessToken());
             }
         };
     }
