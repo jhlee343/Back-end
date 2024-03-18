@@ -49,15 +49,15 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
         return new DefaultOAuth2User(authorities, oAuth2User.getAttributes(), userNameAttributeName);
     }
 
-    public String getUserAuthorityByUUID(String userUUID) {
+    public User getUserByUUID(String userUUID) {
         Optional<User> optionalUser = userRepository.findByUserUUID(UUID.fromString(userUUID));
         if (optionalUser.isEmpty()) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
-        return optionalUser.get().getUserType().toString();
+        return optionalUser.get();
     }
 
-    public UUID getUserUUIDById(String id) {
+    public UUID getUserUUIDByKakaoId(String id) {
         Optional<User> optionalUser = userRepository.findByKakaoId(id);
         if (optionalUser.isEmpty()) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
