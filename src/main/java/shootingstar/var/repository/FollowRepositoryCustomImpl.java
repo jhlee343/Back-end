@@ -11,6 +11,7 @@ import shootingstar.var.entity.QFollow;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static shootingstar.var.entity.QUser.user;
 import static shootingstar.var.entity.QFollow.follow;
@@ -22,7 +23,7 @@ public class FollowRepositoryCustomImpl implements FollowRepositoryCustom{
     }
 
     @Override
-    public List<FollowingDto> findAllByFollowerId(Long followerId) {
+    public List<FollowingDto> findAllByFollowerId(String followerId) {
         return queryFactory
                 .select(new QFollowingDto(
                         user.nickname,
@@ -34,7 +35,7 @@ public class FollowRepositoryCustomImpl implements FollowRepositoryCustom{
                 .fetch();
     }
 
-    private BooleanExpression IdEq(Long followerId){
-        return followerId !=null ? follow.user.userId.eq(followerId) : null;
+    private BooleanExpression IdEq(String followerId){
+        return followerId !=null ? follow.followerId.userUUID.eq(UUID.fromString(followerId)) : null;
     }
 }

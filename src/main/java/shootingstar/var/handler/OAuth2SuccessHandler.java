@@ -19,6 +19,7 @@ import shootingstar.var.oAuth.KakaoUserResDto;
 import shootingstar.var.jwt.JwtTokenProvider;
 import shootingstar.var.jwt.TokenInfo;
 import shootingstar.var.jwt.TokenProperty;
+import shootingstar.var.util.TokenUtil;
 
 import java.util.Collection;
 
@@ -47,10 +48,15 @@ public class OAuth2SuccessHandler {
                 response.setStatus(HttpStatus.OK.value());
                 objectMapper.writeValue(response.getWriter(), buildUserJson(kakaoUserInfo));
             } else {
+                String oldRefreshToken = TokenUtil.getTokenFromCookie(request);
+
+                if (oldRefreshToken != null) tokenProvider.expiredRefreshToken(oldRefreshToken);
+
                 TokenInfo tokenInfo = tokenProvider.generateToken(authentication);
                 String refreshToken = tokenInfo.getRefreshToken();
-                updateCookie(response, refreshToken, (tokenProperty.getREFRESH_EXPIRE() / 1000) - 1); // 쿠키 만료 시간, 리프레시 토큰의 만료 시간 보다 1분 적게 설정한다.
-                response.setHeader("Authorization", "Bearer " + tokenInfo.getAccessToken());
+
+                TokenUtil.updateCookie(response, refreshToken, (tokenProperty.getREFRESH_EXPIRE() / 1000) - 1); // 쿠키 만료 시간, 리프레시 토큰의 만료 시간 보다 1분 적게 설정한다.
+                TokenUtil.addHeader(response, tokenInfo.getAccessToken());
             }
         };
     }
@@ -69,17 +75,5 @@ public class OAuth2SuccessHandler {
                 kakaoUserInfo.getEmail(),
                 kakaoUserInfo.getPhoneNumber(),
                 kakaoUserInfo.getProfileImgUrl());
-    }
-
-    private void updateCookie(HttpServletResponse response, String value, int age) {
-        // 쿠키에 존재하는 리프레시 토큰을 삭제한다.
-        Cookie cookie = new Cookie("refreshToken", value);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
-        cookie.setAttribute("SameSite", "None");
-        cookie.setPath("/");
-        cookie.setMaxAge(age);
-
-        response.addCookie(cookie);
     }
 }

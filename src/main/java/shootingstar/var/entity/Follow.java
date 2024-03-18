@@ -2,6 +2,7 @@ package shootingstar.var.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -26,4 +27,8 @@ public class Follow {
     @JoinColumn(name = "following_id")
     private User followingId;
 
+
+    public Follow(UUID followUUID, User follower, User following) {
+        this.followUUID = followUUID;
+    }
 }

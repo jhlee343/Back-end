@@ -7,9 +7,10 @@ import shootingstar.var.entity.Follow;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface FollowRepository extends JpaRepository<Follow, Long>, FollowRepositoryCustom {
 
-    Optional<Follow> findByFollowingId(Long followingId);
-    Optional<Follow> findByFollowUUID(String followUUID);
+//    Optional<Follow> findByFollowingId(Long followingId);
+    Optional<Follow> findByFollowUUID(UUID followUUID);
 }

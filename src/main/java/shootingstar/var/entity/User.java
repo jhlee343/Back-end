@@ -10,8 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -20,6 +19,9 @@ public class User extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
+
+    @Column(columnDefinition = "BINARY(16)")
+    private UUID userUUID;
 
     @NotBlank
     private String kakaoId;
@@ -54,13 +56,8 @@ public class User extends BaseTimeEntity {
 
     private Integer warningCount;
 
-    @OneToMany(mappedBy = "following")
-    private List<Follow> following ;
-    @OneToMany(mappedBy = "follower")
-    private List<Follow> followingList;
-
     @Builder
-    public User(String kakaoId, String name, String nickname, String phone, String email, String profileImgUrl, UserType userType ) {
+    public User(String kakaoId, String name, String nickname, String phone, String email, String profileImgUrl, UserType userType) {
         this.kakaoId = kakaoId;
         this.name = name;
         this.nickname = nickname;

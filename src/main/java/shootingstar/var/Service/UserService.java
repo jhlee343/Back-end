@@ -60,29 +60,30 @@ public class UserService {
         return userProfileDto;
     }
 
-    public List<FollowingDto> findAllFollowing(String nickname) {
-        User user = findByNickname(nickname);
-        return followRepository.findAllByFollowerId(user.getUserId());
+    public List<FollowingDto> findAllFollowing(String accessToken) {
+        Authentication authentication = jwtTokenProvider.getAuthenticationFromAccessToken(accessToken);
+        String userUUID = authentication.getName();
+        return followRepository.findAllByFollowerId(userUUID);
     }
 
     @Transactional
     public void follow(String followingId, String accessToken) {
         Authentication authentication = jwtTokenProvider.getAuthenticationFromAccessToken(accessToken);
         String followerId = authentication.getName();
-        User follower = findUser(followerId);
-        User following = findUser(followingId);
+        User follower = findByuserUUID(followerId);
+        User following = findByuserUUID(followingId);
         UUID followUUID = UUID.randomUUID();
         Follow follow = new Follow(followUUID,follower,following);
         followRepository.save(follow);
     }
 
     @Transactional
-    public void unFollow(String followUUID) {
+    public void unFollow(UUID followUUID) {
         Follow follow = findFollowingByFollower(followUUID);
         followRepository.delete(follow);
     }
 
-    private Follow findFollowingByFollower(String followUUID) {
+    private Follow findFollowingByFollower(UUID followUUID) {
         Optional<Follow> followOptional = followRepository.findByFollowUUID(followUUID);
         if (followOptional.isEmpty()) {
             throw new RuntimeException();
@@ -98,8 +99,8 @@ public class UserService {
         return optionalUser.get();
     }
 
-    public User findUser(String userId) {
-        Optional<User> optionalUser = userRepository.findByUserUUID(userId);
+    public User findByuserUUID(String userUUID) {
+        Optional<User> optionalUser = userRepository.findByUserUUID(UUID.fromString(userUUID));
         if (optionalUser.isEmpty()) {
             throw new RuntimeException();
         }

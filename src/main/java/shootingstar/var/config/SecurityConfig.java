@@ -54,7 +54,10 @@ public class SecurityConfig {
                                                 "/login",
                                                 "/api/user/signup",
                                                 "/error",
-                                                "/api/auth/**"
+                                                "/api/all/**",
+                                                "/api/auth/**",
+                                                "/v3/api-docs/**", // swagger 설정
+                                                "/swagger-ui/**" // swagger 설정
                                         ).permitAll()
 
                                         .requestMatchers( // 권환 확인

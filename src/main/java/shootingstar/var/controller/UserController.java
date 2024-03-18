@@ -3,6 +3,9 @@ package shootingstar.var.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +19,7 @@ import shootingstar.var.exception.ErrorCode;
 import shootingstar.var.repository.FollowRepository;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,19 +27,6 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
-
-    @PostMapping("/signup")
-    public ResponseEntity<String> signup(@Valid @RequestBody UserSignupReqDto reqDto) {
-
-        userService.signup(reqDto);
-
-        return ResponseEntity.ok().body("회원가입 성공");
-    }
-
-    @GetMapping("/duplicate/{nickname}")
-    public ResponseEntity<Boolean> checkNicknameDuplicate(@PathVariable String nickname) {
-        return ResponseEntity.ok(userService.checkNicknameDuplicate(nickname));
-    }
 
     @GetMapping("/profile/{nickname}")
     public ResponseEntity<UserProfileDto> getProfile(@PathVariable String nickname) {
@@ -49,18 +40,19 @@ public class UserController {
     }
 
     @GetMapping("/followingList")
-    public ResponseEntity<?> followingList(@RequestParam("nickname") String nickname) {
-        List<FollowingDto> followingList = userService.findAllFollowing(nickname);
+    public ResponseEntity<?> followingList(HttpServletRequest request) {
+        String accessToken = getTokenFromHeader(request);
+        List<FollowingDto> followingList = userService.findAllFollowing(accessToken);
         return ResponseEntity.ok().body(followingList);
     }
     @PostMapping("/follow/{followingId}")
     public ResponseEntity<String> follow(@PathVariable String followingId, HttpServletRequest request) {
         String accessToken = getTokenFromHeader(request);
-        userService.follow(followingId,accessToken );
+        userService.follow(followingId,accessToken);
         return ResponseEntity.ok("follow success");
     }
     @DeleteMapping("/unfollow/{followUUID}")
-    public ResponseEntity<String> unFollow(@PathVariable("followingId") String followUUID) {
+    public ResponseEntity<String> unFollow(@PathVariable("followingId") UUID followUUID) {
         userService.unFollow(followUUID);
         return ResponseEntity.ok().body("unfollow success");
     }
