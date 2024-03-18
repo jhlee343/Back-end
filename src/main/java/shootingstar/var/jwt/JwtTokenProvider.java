@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,6 +21,7 @@ import shootingstar.var.entity.User;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.oAuth.OAuth2UserService;
 import shootingstar.var.util.JwtRedisUtil;
+import shootingstar.var.util.TokenUtil;
 
 import java.security.Key;
 import java.time.Duration;
@@ -129,6 +131,12 @@ public class JwtTokenProvider {
         List<GrantedAuthority> authorities = Collections.singletonList(authority);
 
         return new UsernamePasswordAuthenticationToken(subject, null, authorities);
+    }
+
+    public UUID getUserUUIDByRequest(HttpServletRequest request) {
+        String accessToken = TokenUtil.getTokenFromHeader(request);
+        Authentication authentication = getAuthenticationFromAccessToken(accessToken);
+        return UUID.fromString(authentication.getName());
     }
 
     // refresh 토큰을 복호화하여 토큰에 들어있는 정보를 꺼내는 메서드
