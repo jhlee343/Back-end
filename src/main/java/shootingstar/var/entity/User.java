@@ -72,4 +72,8 @@ public class User extends BaseTimeEntity {
         this.subscribe = null;
         this.warningCount = 0;
     }
+
+    public void increasePoint(long point) {
+        this.point += point;
+    }
 }
