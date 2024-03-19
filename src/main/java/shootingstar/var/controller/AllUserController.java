@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import shootingstar.var.Service.EmailService;
 import shootingstar.var.Service.UserService;
-import shootingstar.var.Service.dto.UserSignupReqDto;
+import shootingstar.var.dto.req.UserSignupReqDto;
 
 @RestController
 @RequiredArgsConstructor

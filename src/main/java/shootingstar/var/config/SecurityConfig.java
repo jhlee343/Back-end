@@ -40,33 +40,37 @@ public class SecurityConfig {
                 .cors(corsCustomizer -> corsCustomizer.configurationSource(corsConfigurationSource()))
                 .sessionManagement(configurer -> configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize ->
-                        authorize
-                                .requestMatchers( // 허용하지 않는 엔드포인트
-                                        "/remote/fgt_lang",
-                                        "/"
-                                ).denyAll()
+                                authorize
+                                        .requestMatchers( // 허용하지 않는 엔드포인트
+                                                "/remote/fgt_lang",
+                                                "/"
+                                        ).denyAll()
 
-                                .requestMatchers( // 인증 후 접근 허용
-                                        "/api/auth/delete/user"
-                                ).authenticated()
+                                        .requestMatchers( // 인증 후 접근 허용
+                                                "/api/auth/delete/user"
+                                        ).authenticated()
 
-                                .requestMatchers( // 인증 없이 접근 허용
-                                        "/login",
-                                        "/error",
-                                        "/favicon.ico",
-                                        "/home",
-                                        "/login/oauth2/code/kakao",
-                                        "/api/all/**",
-                                        "/api/auth/**",
-                                        "/v3/api-docs/**", // swagger 설정
-                                        "/swagger-ui/**" // swagger 설정
-                                ).permitAll()
+                                        .requestMatchers( // 인증 없이 접근 허용
+                                                "/login",
+                                                "/error",
+                                                "/favicon.ico",
+                                                "/home",
+                                                "/login/oauth2/code/kakao",
+                                                "/api/all/**",
+                                                "/api/auth/**",
+                                                "/v3/api-docs/**", // swagger 설정
+                                                "/swagger-ui/**" // swagger 설정
+                                        ).permitAll()
 
-                                .requestMatchers( // 권환 확인
-                                        "/api/user/test"
-                                ).hasRole("BASIC")
+                                        .requestMatchers( // 권한 확인
+                                                "/api/user/test"
+                                        ).hasRole("BASIC")
 
-                                .anyRequest().authenticated() // 정의한 엔드 포인트를 제외한 모든 요청은 인증이 필요함
+                                        .requestMatchers(
+                                                "/api/vip/**"
+                                        ).hasRole("VIP")
+
+                                        .anyRequest().authenticated() // 정의한 엔드 포인트를 제외한 모든 요청은 인증이 필요함
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(authenticationManager -> authenticationManager
