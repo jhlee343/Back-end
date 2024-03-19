@@ -32,12 +32,12 @@ class UserServiceTest {
     public void saveUser() throws Exception {
         //given
         User user1 = new User(
-                "3390072654",
+                "3390072659",
                 "이재현",
                 "dlwogus",
                 "+82 10-0000-000",
                 "w203802@gmail.com",
-                "http://k.kakaocdn.net/dn/bWOklw/btsEJdyuAoJ/DgLQ4aHPSPsyqJyGPEkzs0/img_640x640.jpg",
+                "http://k.kakaocdn.net/dn/bWOklw/btsEJdyuAoJ/DgLQ4aHPSPshqJyGPEkzs0/img_640x640.jpg",
                 UserType.ROLE_VIP
         );
 
@@ -47,7 +47,7 @@ class UserServiceTest {
                 "wotka",
                 "+82 10-0000-000",
                 "aaaaaa@naver.com",
-                "http://k.kakaocdn.net/dn/bWOklw/btsEJdyuAoJ/DgLQ4aHPSPsyqJyGPEkzs0/img_640x640.jpg",
+                "http://k.kakaocdn.net/dn/bWOklw/btsEJdyuAoJ/DgLQ4daHPSPsyqJyGPEkzs0/img_640x640.jpg",
                 UserType.ROLE_BASIC
         );
 
@@ -57,7 +57,7 @@ class UserServiceTest {
                 "wotk",
                 "+82 10-0000-000",
                 "wwwwww@naver.com",
-                "http://k.kakaocdn.net/dn/bWOklw/btsEJdyuAoJ/DgLQ4aHPSPsyqJyGPEkzs0/img_640x640.jpg",
+                "http://k.kakaocdn.net/dn/bWOklw/btsEJdyuAoJ/DgLQ4aHdsPSPsyqJyGPEkzs0/img_640x640.jpg",
                 UserType.ROLE_BASIC
         );
 
