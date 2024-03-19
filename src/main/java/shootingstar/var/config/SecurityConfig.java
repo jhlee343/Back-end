@@ -60,9 +60,13 @@ public class SecurityConfig {
                                                 "/swagger-ui/**" // swagger 설정
                                         ).permitAll()
 
-                                        .requestMatchers( // 권환 확인
+                                        .requestMatchers( // 권한 확인
                                                 "/api/user/test"
                                         ).hasRole("BASIC")
+
+                                        .requestMatchers(
+                                                "/api/vip/**"
+                                        ).hasRole("VIP")
 
                                         .anyRequest().authenticated() // 정의한 엔드 포인트를 제외한 모든 요청은 인증이 필요함
                 )

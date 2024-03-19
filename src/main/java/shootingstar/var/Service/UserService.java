@@ -2,12 +2,11 @@ package shootingstar.var.Service;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import shootingstar.var.dto.req.UserSignupReqDto;
 import org.springframework.transaction.annotation.Transactional;
 import shootingstar.var.Service.dto.FollowingDto;
 import shootingstar.var.Service.dto.UserProfileDto;
-import shootingstar.var.Service.dto.UserSignupReqDto;
 import shootingstar.var.entity.Follow;
 import shootingstar.var.entity.User;
 import shootingstar.var.entity.UserType;

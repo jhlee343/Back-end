@@ -1,22 +1,15 @@
 package shootingstar.var.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import shootingstar.var.Service.UserService;
 import shootingstar.var.Service.dto.FollowingDto;
 import shootingstar.var.Service.dto.UserProfileDto;
-import shootingstar.var.Service.dto.UserSignupReqDto;
-import shootingstar.var.entity.Follow;
-import shootingstar.var.exception.CustomException;
-import shootingstar.var.exception.ErrorCode;
-import shootingstar.var.repository.FollowRepository;
 
 import java.util.List;
 import java.util.UUID;
