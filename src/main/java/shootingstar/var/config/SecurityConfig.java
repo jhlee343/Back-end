@@ -52,6 +52,7 @@ public class SecurityConfig {
 
                                         .requestMatchers( // 인증 없이 접근 허용
                                                 "/login",
+                                                "/api/user/signup",
                                                 "/error",
                                                 "/favicon.ico",
                                                 "/home",
