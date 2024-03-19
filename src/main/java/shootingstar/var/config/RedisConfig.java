@@ -17,13 +17,15 @@ public class RedisConfig {
     private String redisHost;
     @Value("${spring.data.redis.port}")
     private int redisPort1; // jwt 레디스 포트
+    @Value("${spring.data.redis.port2}")
+    private int redisPort2; // mail 레디스 포트
     @Value("${spring.data.redis.password}")
     private String redisPassword;
 
 
     // JWT 레디스 빈 등록
     @Bean
-    public RedisConnectionFactory redisConnectionFactory() {
+    public RedisConnectionFactory jwtRedisConnectionFactory() {
         RedisStandaloneConfiguration redisConfiguration = new RedisStandaloneConfiguration();
         redisConfiguration.setHostName(redisHost);
         redisConfiguration.setPort(redisPort1);
@@ -31,11 +33,31 @@ public class RedisConfig {
         return new LettuceConnectionFactory(redisConfiguration);
     }
 
+    // mail 레디스 빈 등록
+    @Bean
+    public RedisConnectionFactory mailRedisConnectionFactoryTwo() {
+        RedisStandaloneConfiguration redisConfiguration = new RedisStandaloneConfiguration();
+        redisConfiguration.setHostName(redisHost);
+        redisConfiguration.setPort(redisPort2);
+        redisConfiguration.setPassword(redisPassword);
+        return new LettuceConnectionFactory(redisConfiguration);
+    }
+
     // JWT 레디스 템플릿 등록
     @Bean
-    public RedisTemplate<?, ?> redisTemplate() {
+    public RedisTemplate<?, ?> jwtRedisTemplate() {
         RedisTemplate<?, ?> redisTemplate = new RedisTemplate<>();
-        redisTemplate.setConnectionFactory(redisConnectionFactory());   //connection
+        redisTemplate.setConnectionFactory(jwtRedisConnectionFactory());   //connection
+        redisTemplate.setKeySerializer(new StringRedisSerializer());    // key
+        redisTemplate.setValueSerializer(new StringRedisSerializer());  // value
+        return redisTemplate;
+    }
+
+    // mail 레디스 템플릿 등록
+    @Bean
+    public RedisTemplate<?, ?> mailRedisTemplate() {
+        RedisTemplate<?, ?> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(mailRedisConnectionFactoryTwo());   //connection
         redisTemplate.setKeySerializer(new StringRedisSerializer());    // key
         redisTemplate.setValueSerializer(new StringRedisSerializer());  // value
         return redisTemplate;

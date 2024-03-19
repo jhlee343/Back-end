@@ -31,10 +31,10 @@ public class GlobalExceptionHandler {
         ErrorCode errorCode = INCORRECT_FORMAT;
         for (FieldError fieldError : bindingResult.getFieldErrors()) {
             switch (fieldError.getField()) {
-//                case "email" -> {
-//                    errorCode = INCORRECT_FORMAT_EMAIL;
-//                    break;
-//                }
+                case "email" -> {
+                    errorCode = INCORRECT_FORMAT_EMAIL;
+                    break;
+                }
             }
 
             if (!errorCode.equals(INCORRECT_FORMAT)) {
