@@ -34,21 +34,19 @@ public class UserController {
         return ResponseEntity.ok(profile);
     }
 
-    @GetMapping("/checkVIP/{nickname}")
-    public ResponseEntity<Boolean> checkVIP(@PathVariable("nickname") String nickname) {
-        return ResponseEntity.ok(userService.checkVIP(nickname));
+    @GetMapping("/checkVIP")
+    public ResponseEntity<Boolean> checkVIP(HttpServletRequest request) {
+        return ResponseEntity.ok(userService.checkVIP(request));
     }
 
     @GetMapping("/followingList")
     public ResponseEntity<?> followingList(HttpServletRequest request) {
-        String accessToken = getTokenFromHeader(request);
-        List<FollowingDto> followingList = userService.findAllFollowing(accessToken);
+        List<FollowingDto> followingList = userService.findAllFollowing(request);
         return ResponseEntity.ok().body(followingList);
     }
     @PostMapping("/follow/{followingId}")
     public ResponseEntity<String> follow(@PathVariable String followingId, HttpServletRequest request) {
-        String accessToken = getTokenFromHeader(request);
-        userService.follow(followingId,accessToken);
+        userService.follow(followingId,request);
         return ResponseEntity.ok("follow success");
     }
     @DeleteMapping("/unfollow/{followUUID}")
@@ -63,14 +61,4 @@ public class UserController {
         return "접근 성공";
     }
 
-    private static String getTokenFromHeader(HttpServletRequest request) {
-        String token = request.getHeader("Authorization"); // 헤더에 존재하는 엑세스 토큰을 받아온다.
-
-        if (token != null && token.startsWith("Bearer ")) {
-            token = token.substring(7); // "Bearer " 접두어 제거
-        } else {
-            throw new CustomException(ErrorCode.INVALID_ACCESS_TOKEN);
-        }
-        return token;
-    }
 }
