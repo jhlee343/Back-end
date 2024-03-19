@@ -3,6 +3,7 @@ package shootingstar.var.Service;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import shootingstar.var.entity.Auction;
 import shootingstar.var.entity.User;
@@ -13,6 +14,7 @@ import shootingstar.var.repository.AuctionRepository;
 import shootingstar.var.repository.UserRepository;
 import shootingstar.var.dto.req.AuctionCreateReqDto;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuctionService {
@@ -23,7 +25,6 @@ public class AuctionService {
 
     public void create(AuctionCreateReqDto reqDto, HttpServletRequest request) {
         UUID userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
-        // userUUID가 null 일 때 에러 처리가 필요한지??
 
         User findUser = userRepository.findByUserUUID(userUUID)
                 .orElse(null);
