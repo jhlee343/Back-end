@@ -6,7 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import shootingstar.var.dto.req.UserSignupReqDto;
 import org.springframework.transaction.annotation.Transactional;
-import shootingstar.var.Service.dto.FollowingDto;
+import shootingstar.var.dto.req.FollowingDto;
 import shootingstar.var.Service.dto.UserProfileDto;
 import shootingstar.var.dto.req.WarningListDto;
 import shootingstar.var.entity.Follow;
@@ -86,9 +86,9 @@ public class UserService {
         followRepository.delete(follow);
     }
 
-    public Page<WarningListDto> findAllWarning(HttpServletRequest request){
+    public List<WarningListDto> findAllWarning(HttpServletRequest request){
         UUID userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
-        return warningRepository.findAllByUserId(userUUID);
+        return warningRepository.findAllWarnByUserId(userUUID);
     }
 
     private Follow findFollowingByFollowUUID(UUID followUUID) {

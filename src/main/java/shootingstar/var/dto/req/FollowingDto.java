@@ -1,10 +1,7 @@
-package shootingstar.var.Service.dto;
+package shootingstar.var.dto.req;
 
 import com.querydsl.core.annotations.QueryProjection;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 @Data
 public class FollowingDto {

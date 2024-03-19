@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import shootingstar.var.Service.UserService;
-import shootingstar.var.Service.dto.FollowingDto;
+import shootingstar.var.dto.req.FollowingDto;
 import shootingstar.var.Service.dto.UserProfileDto;
 import shootingstar.var.dto.req.WarningListDto;
 import shootingstar.var.entity.Warning;
@@ -53,8 +53,9 @@ public class UserController {
 
     @GetMapping("warningList")
     public ResponseEntity<WarningListDto> warningList(HttpServletRequest request){
-        Page<WarningListDto> warning = userService.findAllWarning(request);
-        return ResponseEntity.ok().body(warning);
+        List<WarningListDto> warning = userService.findAllWarning(request);
+        return null;
+                //ResponseEntity.ok().body(warning);
     }
 
 
