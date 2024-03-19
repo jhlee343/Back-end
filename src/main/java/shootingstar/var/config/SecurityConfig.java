@@ -54,6 +54,9 @@ public class SecurityConfig {
                                                 "/login",
                                                 "/api/user/signup",
                                                 "/error",
+                                                "/favicon.ico",
+                                                "/home",
+                                                "/login/oauth2/code/kakao",
                                                 "/api/all/**",
                                                 "/api/auth/**",
                                                 "/v3/api-docs/**", // swagger 설정
