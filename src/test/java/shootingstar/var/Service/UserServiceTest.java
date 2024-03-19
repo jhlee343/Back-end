@@ -58,7 +58,7 @@ class UserServiceTest {
                 "+82 10-0000-000",
                 "wwwwww@naver.com",
                 "http://k.kakaocdn.net/dn/bWOklw/btsEJdyuAoJ/DgLQ4aHPSPsyqJyGPEkzs0/img_640x640.jpg",
-                "UserType.ROLE_BASIC
+                UserType.ROLE_BASIC
         );
 
         //when

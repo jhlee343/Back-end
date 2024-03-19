@@ -64,14 +64,14 @@ public class UserService {
 
     public List<FollowingDto> findAllFollowing(HttpServletRequest request) {
         UUID userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
-        return followRepository.findAllByFollowerId(String.valueOf(userUUID));
+        return followRepository.findAllByFollowerId(userUUID);
     }
 
     @Transactional
-    public void follow(String followingId, HttpServletRequest request) {
+    public void follow(UUID followingId, HttpServletRequest request) {
         UUID followerId = jwtTokenProvider.getUserUUIDByRequest(request);
         User follower = findByuserUUID(String.valueOf(followerId));
-        User following = findByuserUUID(followingId);
+        User following = findByuserUUID(String.valueOf(followingId));
         UUID followUUID = UUID.randomUUID();
         Follow follow = new Follow(followUUID,follower,following);
         followRepository.save(follow);

@@ -58,6 +58,7 @@ public class User extends BaseTimeEntity {
 
     @Builder
     public User(String kakaoId, String name, String nickname, String phone, String email, String profileImgUrl, UserType userType) {
+        this.userUUID = UUID.randomUUID();
         this.kakaoId = kakaoId;
         this.name = name;
         this.nickname = nickname;

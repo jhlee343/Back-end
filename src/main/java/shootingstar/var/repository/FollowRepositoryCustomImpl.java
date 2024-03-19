@@ -23,19 +23,19 @@ public class FollowRepositoryCustomImpl implements FollowRepositoryCustom{
     }
 
     @Override
-    public List<FollowingDto> findAllByFollowerId(String followerId) {
+    public List<FollowingDto> findAllByFollowerId(UUID followerId) {
         return queryFactory
                 .select(new QFollowingDto(
-                        user.nickname,
-                        user.profileImgUrl,
-                        user.userId
+                        follow.followingId.nickname,
+                        follow.followingId.profileImgUrl,
+                        follow.followingId.userId
                 ))
                 .from(follow)
                 .where(IdEq(followerId))
                 .fetch();
     }
 
-    private BooleanExpression IdEq(String followerId){
-        return followerId !=null ? follow.followerId.userUUID.eq(UUID.fromString(followerId)) : null;
+    private BooleanExpression IdEq(UUID followerId){
+        return followerId !=null ? follow.followerId.userUUID.eq(followerId) : null;
     }
 }

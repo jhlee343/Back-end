@@ -7,8 +7,9 @@ import shootingstar.var.entity.Follow;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface FollowRepositoryCustom {
-    List<FollowingDto> findAllByFollowerId(String followerId);
+    List<FollowingDto> findAllByFollowerId(UUID followerId);
  //   Optional<Follow> findByFollwerIdFollowingId(Long followerId,Long followingId);
 }

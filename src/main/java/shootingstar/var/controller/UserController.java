@@ -44,13 +44,13 @@ public class UserController {
         List<FollowingDto> followingList = userService.findAllFollowing(request);
         return ResponseEntity.ok().body(followingList);
     }
-    @PostMapping("/follow/{followingId}")
-    public ResponseEntity<String> follow(@PathVariable String followingId, HttpServletRequest request) {
+    @GetMapping("/follow/{followingId}")
+    public ResponseEntity<String> follow(@PathVariable("followingId") UUID followingId, HttpServletRequest request) {
         userService.follow(followingId,request);
         return ResponseEntity.ok("follow success");
     }
     @DeleteMapping("/unfollow/{followUUID}")
-    public ResponseEntity<String> unFollow(@PathVariable("followingId") UUID followUUID) {
+    public ResponseEntity<String> unFollow(@PathVariable("followUUID") UUID followUUID) {
         userService.unFollow(followUUID);
         return ResponseEntity.ok().body("unfollow success");
     }

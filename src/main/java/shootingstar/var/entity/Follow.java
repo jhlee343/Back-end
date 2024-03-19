@@ -2,6 +2,7 @@ package shootingstar.var.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,7 +17,7 @@ public class Follow {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long followId;
 
-    @NotBlank
+    @NotNull
     private UUID followUUID;
 
     @ManyToOne
@@ -30,5 +31,7 @@ public class Follow {
 
     public Follow(UUID followUUID, User follower, User following) {
         this.followUUID = followUUID;
+        this.followerId = follower;
+        this.followingId = following;
     }
 }
