@@ -19,6 +19,7 @@ import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Type;
 
 @Entity
 @Getter
@@ -81,5 +82,9 @@ public class Auction extends BaseTimeEntity {
         this.meetingInfoImg = meetingInfoImg;
         this.meetingPromiseImg = meetingPromiseImg;
         this.auctionType = AuctionType.PROGRESS;
+    }
+
+    public void changeAuctionType(AuctionType auctionType) {
+        this.auctionType = auctionType;
     }
 }
