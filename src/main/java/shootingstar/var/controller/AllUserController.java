@@ -6,6 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import shootingstar.var.Service.EmailService;
 import shootingstar.var.Service.UserService;
+import shootingstar.var.dto.req.CheckAuthCodeReqDto;
+import shootingstar.var.dto.req.SendAuthCodeReqDto;
 import shootingstar.var.dto.req.UserSignupReqDto;
 
 @RestController
@@ -29,14 +31,14 @@ public class AllUserController {
     }
 
     @PostMapping("/email/sendAuthCode")
-    public ResponseEntity<String> sendAuthCode() {
-//        emailService.sendAuthCodeEmail();
+    public ResponseEntity<String> sendAuthCode(@Valid @RequestBody SendAuthCodeReqDto reqDto) {
+        emailService.sendAuthCodeEmail(reqDto.getEmail());
         return ResponseEntity.ok().body("인증코드를 발송하였습니다.");
     }
 
     @PostMapping("/email/checkAuthCode")
-    public ResponseEntity<String> checkAuthCode() {
-//        emailService.validateCode();
-        return ResponseEntity.ok().body("인증코드를 발송하였습니다.");
+    public ResponseEntity<String> checkAuthCode(@Valid @RequestBody CheckAuthCodeReqDto reqDto) {
+        emailService.validateCode(reqDto.getEmail(), reqDto.getCode());
+        return ResponseEntity.ok().body("이메일 인증에 성공하였습니다.");
     }
 }
