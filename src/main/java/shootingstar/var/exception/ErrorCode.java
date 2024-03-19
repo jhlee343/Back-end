@@ -23,6 +23,12 @@ public enum ErrorCode {
     UNSUPPORTED_REFRESH_TOKEN(FORBIDDEN, "0108", "지원하지 않는 Refresh Token 입니다."),
     ILLEGAL_REFRESH_TOKEN(FORBIDDEN, "0109", "Claim이 빈 Refresh Token 입니다."),
 
+    KAKAO_AUTHENTICATION_ERROR(UNAUTHORIZED, "0110", "카카오로부터 ACCESS 토큰 획득에 실패했습니다."),
+    KAKAO_CONNECT_FAILED_TOKEN_ENDPOINT(SERVICE_UNAVAILABLE, "0111", "카카오 토큰 엔드포인트와 통신에 실패하였습니다."),
+    KAKAO_FAILED_GET_USERINFO_ERROR(UNAUTHORIZED, "0112", "카카오로부터 사용자 정보를 가져오지 못했습니다."),
+    KAKAO_CONNECT_FAILED_USERINFO_ENDPOINT(UNAUTHORIZED, "0112", "카카오 사용자 정보 엔드포인트와 통신에 실패하였습니다."),
+
+
     NOT_FOUND_END_POINT(NOT_FOUND, "0200", "존재하지 않는 접근입니다."),
 
     INCORRECT_FORMAT_EMAIL(BAD_REQUEST, "1001", "잘못된 형식의 이메일입니다."),
