@@ -2,6 +2,7 @@ package shootingstar.var.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -10,6 +11,8 @@ import org.springframework.web.bind.annotation.*;
 import shootingstar.var.Service.UserService;
 import shootingstar.var.Service.dto.FollowingDto;
 import shootingstar.var.Service.dto.UserProfileDto;
+import shootingstar.var.dto.req.WarningListDto;
+import shootingstar.var.entity.Warning;
 
 import java.util.List;
 import java.util.UUID;
@@ -46,6 +49,12 @@ public class UserController {
     public ResponseEntity<String> unFollow(@PathVariable("followUUID") UUID followUUID) {
         userService.unFollow(followUUID);
         return ResponseEntity.ok().body("unfollow success");
+    }
+
+    @GetMapping("warningList")
+    public ResponseEntity<WarningListDto> warningList(HttpServletRequest request){
+        Page<WarningListDto> warning = userService.findAllWarning(request);
+        return ResponseEntity.ok().body(warning);
     }
 
 

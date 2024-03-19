@@ -22,15 +22,15 @@ public class Warning {
 
     @ManyToOne
     @JoinColumn(name = "review_id")
-    private User userUUID;
+    private User userId;
 
     @Column(columnDefinition = "TEXT")
     private String warningContent;
 
     @Builder
-    public Warning(UUID warningUUID, User userUUID, String warningContent){
+    public Warning(UUID warningUUID, User userId, String warningContent){
         this.warningUUID=warningUUID;
         this.warningContent=warningContent;
-        this.userUUID=userUUID;
+        this.userId=userId;
     }
 }

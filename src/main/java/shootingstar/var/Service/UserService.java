@@ -2,17 +2,20 @@ package shootingstar.var.Service;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import shootingstar.var.dto.req.UserSignupReqDto;
 import org.springframework.transaction.annotation.Transactional;
 import shootingstar.var.Service.dto.FollowingDto;
 import shootingstar.var.Service.dto.UserProfileDto;
+import shootingstar.var.dto.req.WarningListDto;
 import shootingstar.var.entity.Follow;
 import shootingstar.var.entity.User;
 import shootingstar.var.entity.UserType;
 import shootingstar.var.jwt.JwtTokenProvider;
 import shootingstar.var.repository.FollowRepository;
 import shootingstar.var.repository.UserRepository;
+import shootingstar.var.repository.Warning.WarningRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,6 +27,7 @@ public class UserService {
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
     private final FollowRepository followRepository;
+    private final WarningRepository warningRepository;
 
     public void signup(UserSignupReqDto reqDto) {
         User user = User.builder()
@@ -80,6 +84,11 @@ public class UserService {
     public void unFollow(UUID followUUID) {
         Follow follow = findFollowingByFollowUUID(followUUID);
         followRepository.delete(follow);
+    }
+
+    public Page<WarningListDto> findAllWarning(HttpServletRequest request){
+        UUID userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
+        return warningRepository.findAllByUserId(userUUID);
     }
 
     private Follow findFollowingByFollowUUID(UUID followUUID) {
