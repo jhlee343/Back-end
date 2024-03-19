@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import shootingstar.var.Service.dto.UserSignupReqDto;
+import shootingstar.var.dto.req.UserSignupReqDto;
 import shootingstar.var.entity.User;
 
 @Tag(name = "swagger 테스트 컨트롤러", description = "/swagger/TestController를 보면 됩니다.")
