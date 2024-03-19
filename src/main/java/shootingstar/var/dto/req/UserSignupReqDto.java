@@ -1,4 +1,4 @@
-package shootingstar.var.Service.dto;
+package shootingstar.var.dto.req;
 
 import lombok.Data;
 

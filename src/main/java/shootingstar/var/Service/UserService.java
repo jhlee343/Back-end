@@ -2,7 +2,7 @@ package shootingstar.var.Service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import shootingstar.var.Service.dto.UserSignupReqDto;
+import shootingstar.var.dto.req.UserSignupReqDto;
 import shootingstar.var.entity.User;
 import shootingstar.var.entity.UserType;
 import shootingstar.var.repository.UserRepository;
