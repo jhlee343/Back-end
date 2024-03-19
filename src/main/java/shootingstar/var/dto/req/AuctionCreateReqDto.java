@@ -2,7 +2,6 @@ package shootingstar.var.dto.req;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import java.time.LocalDateTime;
 import lombok.Data;
 import shootingstar.var.annotation.After30Days;
 
@@ -11,8 +10,9 @@ public class AuctionCreateReqDto {
     @Min(value = 100000)
     private long minBidAmount;
 
+    @NotBlank
     @After30Days
-    private LocalDateTime meetingDate;
+    private String meetingDate;
 
     @NotBlank
     private String meetingLocation;

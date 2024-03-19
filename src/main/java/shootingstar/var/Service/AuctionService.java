@@ -1,6 +1,7 @@
 package shootingstar.var.Service;
 
 import jakarta.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +36,7 @@ public class AuctionService {
         Auction auction = Auction.builder()
                 .user(findUser)
                 .minBidAmount(reqDto.getMinBidAmount())
-                .meetingDate(reqDto.getMeetingDate())
+                .meetingDate(LocalDateTime.parse(reqDto.getMeetingDate()))
                 .meetingLocation(reqDto.getMeetingLocation())
                 .meetingInfoText(reqDto.getMeetingInfoText())
                 .meetingPromiseText(reqDto.getMeetingPromiseText())

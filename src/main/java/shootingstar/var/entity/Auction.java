@@ -19,7 +19,6 @@ import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import shootingstar.var.annotation.After30Days;
 
 @Entity
 @Getter
@@ -40,7 +39,7 @@ public class Auction extends BaseTimeEntity {
     @Min(value = 100000)
     private long minBidAmount;
 
-    @After30Days
+    @NotNull
     private LocalDateTime meetingDate;
 
     @NotBlank
