@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import shootingstar.var.Service.PaymentService;
-import shootingstar.var.Service.dto.PaymentReqDto;
+import shootingstar.var.dto.req.PaymentReqDto;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
 

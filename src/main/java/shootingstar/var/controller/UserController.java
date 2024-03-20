@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import shootingstar.var.Service.UserService;
-import shootingstar.var.Service.dto.FollowingDto;
-import shootingstar.var.Service.dto.UserProfileDto;
+import shootingstar.var.dto.req.FollowingDto;
+import shootingstar.var.dto.req.UserProfileDto;
 
 import java.util.List;
 import java.util.UUID;

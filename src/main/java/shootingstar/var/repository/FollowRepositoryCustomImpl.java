@@ -4,17 +4,16 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import org.springframework.data.domain.Page;
-import shootingstar.var.Service.dto.FollowingDto;
-import shootingstar.var.Service.dto.QFollowingDto;
+import shootingstar.var.dto.req.FollowingDto;
+import shootingstar.var.dto.req.QFollowingDto;
 import shootingstar.var.entity.Follow;
-import shootingstar.var.entity.QFollow;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static shootingstar.var.entity.QUser.user;
 import static shootingstar.var.entity.QFollow.follow;
+import static shootingstar.var.entity.QUser.user;
 public class FollowRepositoryCustomImpl implements FollowRepositoryCustom{
     private final JPAQueryFactory queryFactory;
 
