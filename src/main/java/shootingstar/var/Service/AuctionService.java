@@ -1,21 +1,25 @@
 package shootingstar.var.Service;
 
-import jakarta.servlet.http.HttpServletRequest;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledFuture;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import shootingstar.var.dto.req.AuctionCreateReqDto;
 import shootingstar.var.entity.Auction;
 import shootingstar.var.entity.AuctionType;
 import shootingstar.var.entity.User;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
-import shootingstar.var.jwt.JwtTokenProvider;
 import shootingstar.var.repository.AuctionRepository;
 import shootingstar.var.repository.UserRepository;
-
-import java.time.LocalDateTime;
+import shootingstar.var.dto.req.AuctionCreateReqDto;
 
 @Slf4j
 @Service
@@ -24,14 +28,22 @@ public class AuctionService {
 
     private final AuctionRepository auctionRepository;
     private final UserRepository userRepository;
-    private final JwtTokenProvider jwtTokenProvider;
+    private final TaskScheduler taskScheduler;
+    private final SchedulerService schedulerService;
 
-    public void create(AuctionCreateReqDto reqDto, HttpServletRequest request) {
-        String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
+    private Map<Long, ScheduledFuture<?>> scheduledTasks = new ConcurrentHashMap<>();
 
+    @Transactional
+    public void create(AuctionCreateReqDto reqDto, String userUUID) {
         User findUser = userRepository.findByUserUUID(userUUID)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
+        // 보유 포인트보다 최소 입찰 금액이 더 클 경우
+        if (findUser.getPoint() < reqDto.getMinBidAmount()) {
+            throw new CustomException(ErrorCode.MIN_BID_AMOUNT_INCORRECT_FORMAT);
+        }
+
+        // 경매 생성
         Auction auction = Auction.builder()
                 .user(findUser)
                 .minBidAmount(reqDto.getMinBidAmount())
@@ -44,16 +56,27 @@ public class AuctionService {
                 .build();
 
         auctionRepository.save(auction);
+
+        // 포인트 차감
+        findUser.decreasePoint(auction.getMinBidAmount());
+
+        LocalDateTime scheduleTime = LocalDateTime.now().plusMinutes(1);
+        Instant instant = scheduleTime.atZone(ZoneId.systemDefault()).toInstant();
+        ScheduledFuture<?> future = taskScheduler.schedule(
+                () -> schedulerService.createTicketAndAuctionTypeSuccess(auction.getAuctionId(), auction.getUser().getUserId()),
+                instant
+        );
+        scheduledTasks.put(auction.getAuctionId(), future);
+        log.info("스케쥴링 추가");
     }
 
     @Transactional
-    public void cancel(String auctionUUID, HttpServletRequest request) {
+    public void cancel(String auctionUUID, String userUUID) {
         // uuid에 해당하는 경매가 존재하는지 확인
         Auction findAuction = auctionRepository.findByAuctionUUID(auctionUUID)
                 .orElseThrow(() -> new CustomException(ErrorCode.AUCTION_NOT_FOUND));
 
         // 찾은 경매가 로그인한 유저가 생성한 게 맞는지 확인
-        String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
         if (!findAuction.getUser().getUserUUID().equals(userUUID)) {
             throw new CustomException(ErrorCode.AUCTION_ACCESS_DENIED);
         }
@@ -75,3 +98,4 @@ public class AuctionService {
         log.info("포인트가 추가되었습니다. userId : {}, 추가 후 포인트 : {}", findAuction.getUser().getUserId(), afterPoint);
     }
 }
+
