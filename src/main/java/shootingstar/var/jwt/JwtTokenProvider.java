@@ -1,7 +1,6 @@
 package shootingstar.var.jwt;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -17,9 +16,12 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
+import shootingstar.var.Service.UserAuthService;
 import shootingstar.var.entity.User;
 import shootingstar.var.exception.CustomException;
-import shootingstar.var.oAuth.OAuth2UserService;
+import shootingstar.var.exception.ErrorCode;
+import shootingstar.var.oAuth.KakaoAPI;
+import shootingstar.var.repository.UserRepository;
 import shootingstar.var.util.JwtRedisUtil;
 import shootingstar.var.util.TokenUtil;
 
@@ -40,18 +42,18 @@ public class JwtTokenProvider {
     private final Key accessKey;
     private final Key refreshKey;
     private final TokenProperty tokenProperty;
-    private final OAuth2UserService oAuth2UserService;
     private final JwtRedisUtil jwtRedisUtil;
+    private final UserRepository userRepository;
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
 
     public JwtTokenProvider(@Value("${jwt.secret-access}") String accessSecretKey,
                             @Value("${jwt.secret-refresh}") String refreshSecretKey,
-                            TokenProperty tokenProperty, OAuth2UserService oAuth2UserService, JwtRedisUtil jwtRedisUtil) {
+                            TokenProperty tokenProperty, UserRepository userRepository, JwtRedisUtil jwtRedisUtil) {
         this.tokenProperty = tokenProperty;
-        this.oAuth2UserService = oAuth2UserService;
         this.jwtRedisUtil = jwtRedisUtil;
+        this.userRepository = userRepository;
         byte[] accessKeyBytes = Decoders.BASE64.decode(accessSecretKey);
         byte[] refreshKeyBytes = Decoders.BASE64.decode(refreshSecretKey);
 
@@ -150,7 +152,12 @@ public class JwtTokenProvider {
 
         String subject = claims.getSubject();
 
-        String authority = oAuth2UserService.getUserAuthorityUUID(subject);
+        Optional<User> optionalUser = userRepository.findByUserUUID(UUID.fromString(subject));
+        if (optionalUser.isEmpty()) {
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        }
+        String authority = optionalUser.get().getUserType().toString();
+
         List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(authority);
 
         return new UsernamePasswordAuthenticationToken(subject, null, authorities);
