@@ -1,8 +1,10 @@
 package shootingstar.var.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,6 +19,7 @@ import shootingstar.var.entity.Warning;
 import java.util.List;
 import java.util.UUID;
 
+@Validated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/user")
@@ -41,7 +44,7 @@ public class UserController {
         return ResponseEntity.ok().body(followingList);
     }
     @GetMapping("/follow/{followingId}")
-    public ResponseEntity<String> follow(@PathVariable("followingId") UUID followingId, HttpServletRequest request) {
+    public ResponseEntity<String> follow(@NotEmpty @PathVariable("followingId") UUID followingId, HttpServletRequest request) {
         userService.follow(followingId,request);
         return ResponseEntity.ok("follow success");
     }
