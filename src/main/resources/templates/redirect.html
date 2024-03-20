@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <!-- Axios 라이브러리 추가 -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .response-container {
+            margin-top: 20px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+        }
+        .response-header {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .response-content {
+            white-space: pre-wrap; /* Keeps the format of JSON string */
+            word-wrap: break-word;
+        }
+    </style>
+    <script th:inline="javascript">
+        // 페이지 로드 시 실행되는 함수
+        window.onload = async function() {
+            // URL에서 'code' 파라미터 값을 가져오는 함수
+            function getQueryParam(param) {
+                const queryString = window.location.search;
+                const urlParams = new URLSearchParams(queryString);
+                return urlParams.get(param);
+            }
+
+            // 'code' 값을 가져옴
+            const code = getQueryParam('code');
+
+            // 'code' 값을 포함하는 POST 요청을 비동기적으로 전송하는 함수
+            async function postCode(code) {
+                try {
+                    // Axios를 사용한 POST 요청
+                    const response = await axios.post('/api/auth/oauth2/accessKakao', {
+                        code: code
+                    });
+                    // 응답 데이터 처리
+                    console.log(response.data);
+                    let responseContent;
+                    if (response.data.type === "JOIN") {
+                        responseContent = JSON.stringify(response.data.kakaoUserResDto, null, 2);
+                    } else {
+                        // Authorization 헤더 값을 읽어서 "Bearer " 부분을 제거한 후 화면에 표시
+                        let authorizationHeader = response.headers['authorization'];
+                        // "Bearer " 부분을 제거
+                        authorizationHeader = authorizationHeader.replace("Bearer ", "");
+                        responseContent = `AccessToken: ${authorizationHeader}`;
+                    }
+                    // 응답 데이터를 HTML 요소에 표시
+                    document.getElementById('response').innerHTML = `
+                        <div class="response-header">Response Data:</div>
+                        <div class="response-content">${responseContent}</div>
+                    `;
+                } catch (error) {
+                    // 에러 처리
+                    console.error('Error during the request:', error);
+                    let responseContent = JSON.stringify(error.response.data, null, 2);
+
+                    document.getElementById('response').innerHTML = `
+                        <div class="response-header">Response Data:</div>
+                        <div class="response-content">${responseContent}</div>
+                    `;
+                }
+            }
+
+            // 코드가 있으면 postCode 함수 실행
+            if (code) {
+                await postCode(code);
+            }
+        };
+    </script>
+</head>
+<body>
+
+<div id="response" class="response-container"></div>
+
+</body>
+</html>

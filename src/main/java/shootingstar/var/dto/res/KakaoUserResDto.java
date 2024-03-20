@@ -1,4 +1,4 @@
-package shootingstar.var.oAuth;
+package shootingstar.var.dto.res;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,5 +11,4 @@ public class KakaoUserResDto {
     private String email;
     private String phoneNumber;
     private String profileImgUrl;
-
 }

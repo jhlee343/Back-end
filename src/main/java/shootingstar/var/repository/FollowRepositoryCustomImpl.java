@@ -6,6 +6,7 @@ import jakarta.persistence.EntityManager;
 import shootingstar.var.Service.dto.QFollowingDto;
 import shootingstar.var.dto.req.FollowingDto;
 
+
 import java.util.List;
 import java.util.UUID;
 
@@ -18,7 +19,7 @@ public class FollowRepositoryCustomImpl implements FollowRepositoryCustom{
     }
 
     @Override
-    public List<FollowingDto> findAllByFollowerId(UUID followerId) {
+    public List<FollowingDto> findAllByFollowerId(String followerId) {
         return queryFactory
                 .select(new QFollowingDto(
                         follow.followingId.nickname,
@@ -30,7 +31,7 @@ public class FollowRepositoryCustomImpl implements FollowRepositoryCustom{
                 .fetch();
     }
 
-    private BooleanExpression IdEq(UUID followerId){
-        return followerId !=null ? follow.followerId.userUUID.eq(followerId) : null;
+    private BooleanExpression IdEq(String followerId){
+        return followerId !=null ? follow.followerId.userUUID.eq(UUID.fromString(followerId)) : null;
     }
 }

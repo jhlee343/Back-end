@@ -17,8 +17,7 @@ public class Follow {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long followId;
 
-    @NotNull
-    private UUID followUUID;
+    private String followUUID;
 
     @ManyToOne
     @JoinColumn(name = "follower_id")
@@ -29,8 +28,8 @@ public class Follow {
     private User followingId;
 
 
-    public Follow(UUID followUUID, User follower, User following) {
-        this.followUUID = followUUID;
+    public Follow(User follower, User following) {
+        this.followUUID = UUID.randomUUID().toString();
         this.followerId = follower;
         this.followingId = following;
     }

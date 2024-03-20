@@ -1,24 +1,15 @@
 package shootingstar.var.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.time.LocalDateTime;
-import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -28,8 +19,7 @@ public class Auction extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long auctionId;
 
-    @Column(columnDefinition = "BINARY(16)")
-    private UUID auctionUUID;
+    private String auctionUUID;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -59,8 +49,7 @@ public class Auction extends BaseTimeEntity {
 
     private long currentHighestBidAmount;
 
-    @Column(columnDefinition = "BINARY(16)")
-    private UUID currentHighestBidderId;
+    private String currentHighestBidderId;
 
     private long bidCount;
 
@@ -71,7 +60,7 @@ public class Auction extends BaseTimeEntity {
     @Builder
     public Auction(User user, long minBidAmount, LocalDateTime meetingDate, String meetingLocation,
                    String meetingInfoText, String meetingPromiseText, String meetingInfoImg, String meetingPromiseImg) {
-        this.auctionUUID = UUID.randomUUID();
+        this.auctionUUID = UUID.randomUUID().toString();
         this.user = user;
         this.minBidAmount = minBidAmount;
         this.meetingDate = meetingDate;
@@ -81,5 +70,9 @@ public class Auction extends BaseTimeEntity {
         this.meetingInfoImg = meetingInfoImg;
         this.meetingPromiseImg = meetingPromiseImg;
         this.auctionType = AuctionType.PROGRESS;
+    }
+
+    public void changeAuctionType(AuctionType auctionType) {
+        this.auctionType = auctionType;
     }
 }
