@@ -1,8 +1,10 @@
 package shootingstar.var.controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import shootingstar.var.Service.EmailService;
 import shootingstar.var.Service.UserService;
@@ -12,6 +14,7 @@ import shootingstar.var.dto.req.UserSignupReqDto;
 
 @RestController
 @RequiredArgsConstructor
+@Validated
 @RequestMapping("/api/all")
 public class AllUserController {
     private final UserService userService;
@@ -26,7 +29,7 @@ public class AllUserController {
     }
 
     @GetMapping("/duplicate/{nickname}")
-    public ResponseEntity<Boolean> checkNicknameDuplicate(@PathVariable String nickname){
+    public ResponseEntity<Boolean> checkNicknameDuplicate(@NotBlank @PathVariable String nickname){
         return ResponseEntity.ok(userService.checkNicknameDuplicate(nickname));
     }
 

@@ -6,15 +6,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import shootingstar.var.Service.AuctionService;
 import shootingstar.var.dto.req.AuctionCreateReqDto;
 
@@ -38,7 +32,7 @@ public class AuctionController {
 
     @PatchMapping("/cancel/{auctionUUID}")
     public ResponseEntity<String> cancel(@PathVariable("auctionUUID") String auctionUUID, HttpServletRequest request) {
-        auctionService.cancel(UUID.fromString(auctionUUID), request);
+        auctionService.cancel(auctionUUID, request);
         return ResponseEntity.ok().body("경매 취소 성공");
     }
 }

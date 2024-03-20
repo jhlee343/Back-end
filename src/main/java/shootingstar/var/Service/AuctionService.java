@@ -1,12 +1,11 @@
 package shootingstar.var.Service;
 
 import jakarta.servlet.http.HttpServletRequest;
-import java.time.LocalDateTime;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import shootingstar.var.dto.req.AuctionCreateReqDto;
 import shootingstar.var.entity.Auction;
 import shootingstar.var.entity.AuctionType;
 import shootingstar.var.entity.User;
@@ -15,7 +14,8 @@ import shootingstar.var.exception.ErrorCode;
 import shootingstar.var.jwt.JwtTokenProvider;
 import shootingstar.var.repository.AuctionRepository;
 import shootingstar.var.repository.UserRepository;
-import shootingstar.var.dto.req.AuctionCreateReqDto;
+
+import java.time.LocalDateTime;
 
 @Slf4j
 @Service
@@ -27,7 +27,7 @@ public class AuctionService {
     private final JwtTokenProvider jwtTokenProvider;
 
     public void create(AuctionCreateReqDto reqDto, HttpServletRequest request) {
-        UUID userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
+        String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
 
         User findUser = userRepository.findByUserUUID(userUUID)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
@@ -47,13 +47,13 @@ public class AuctionService {
     }
 
     @Transactional
-    public void cancel(UUID auctionUUID, HttpServletRequest request) {
+    public void cancel(String auctionUUID, HttpServletRequest request) {
         // uuid에 해당하는 경매가 존재하는지 확인
         Auction findAuction = auctionRepository.findByAuctionUUID(auctionUUID)
                 .orElseThrow(() -> new CustomException(ErrorCode.AUCTION_NOT_FOUND));
 
         // 찾은 경매가 로그인한 유저가 생성한 게 맞는지 확인
-        UUID userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
+        String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
         if (!findAuction.getUser().getUserUUID().equals(userUUID)) {
             throw new CustomException(ErrorCode.AUCTION_ACCESS_DENIED);
         }
