@@ -10,9 +10,12 @@ import org.springframework.transaction.annotation.Transactional;
 import shootingstar.var.entity.Follow;
 import shootingstar.var.entity.User;
 import shootingstar.var.entity.UserType;
+import shootingstar.var.exception.CustomException;
+import shootingstar.var.exception.ErrorCode;
 import shootingstar.var.jwt.JwtTokenProvider;
 import shootingstar.var.repository.FollowRepository;
 import shootingstar.var.repository.UserRepository;
+import shootingstar.var.util.MailRedisUtil;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,23 +27,34 @@ public class UserService {
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
     private final FollowRepository followRepository;
+    private final MailRedisUtil mailRedisUtil;
+    private final CheckDuplicateService duplicateService;
 
     public void signup(UserSignupReqDto reqDto) {
-        User user = User.builder()
-                .kakaoId(reqDto.getId())
-                .name(reqDto.getName())
-                .nickname(reqDto.getNickname())
-                .phone(reqDto.getPhoneNumber())
-                .email(reqDto.getEmail())
-                .profileImgUrl(reqDto.getProfileImgUrl())
-                .userType(UserType.ROLE_BASIC)
-                .build();
+        if (duplicateService.checkEmailDuplicate(reqDto.getEmail())) {
+            throw new CustomException(ErrorCode.DUPLICATE_EMAIL);
+        }
+        if (duplicateService.checkNicknameDuplicate(reqDto.getNickname())) {
+            throw new CustomException(ErrorCode.DUPLICATE_NICKNAME);
+        }
 
-        userRepository.save(user);
-    }
+        if (mailRedisUtil.hasKey(reqDto.getEmail()) && mailRedisUtil.getData(reqDto.getEmail()).equals("validate")) { // 이메일 인증을 받은 이메일 인지 확인
 
-    public boolean checkNicknameDuplicate(String nickname) {
-        return userRepository.existsByNickname(nickname);
+            User user = User.builder()
+                    .kakaoId(reqDto.getKakaoId())
+                    .name(reqDto.getUserName())
+                    .nickname(reqDto.getNickname())
+                    .phone(reqDto.getPhoneNumber())
+                    .email(reqDto.getEmail())
+                    .profileImgUrl(reqDto.getProfileImgUrl())
+                    .userType(UserType.ROLE_BASIC)
+                    .build();
+
+            userRepository.save(user);
+            mailRedisUtil.deleteData(reqDto.getEmail());
+        } else {
+            throw new CustomException(ErrorCode.VALIDATE_ERROR_EMAIL);
+        }
     }
 
     public boolean checkVIP(HttpServletRequest request) {

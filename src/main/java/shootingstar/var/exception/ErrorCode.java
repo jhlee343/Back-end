@@ -24,20 +24,28 @@ public enum ErrorCode {
     ILLEGAL_REFRESH_TOKEN(FORBIDDEN, "0109", "Claim이 빈 Refresh Token 입니다."),
 
     KAKAO_AUTHENTICATION_ERROR(UNAUTHORIZED, "0110", "카카오로부터 ACCESS 토큰 획득에 실패했습니다."),
-    KAKAO_CONNECT_FAILED_TOKEN_ENDPOINT(SERVICE_UNAVAILABLE, "0111", "카카오 토큰 엔드포인트와 통신에 실패하였습니다."),
+    KAKAO_CONNECT_FAILED_TOKEN_ENDPOINT(UNAUTHORIZED, "0111", "카카오 토큰 엔드포인트와 통신에 실패하였습니다."),
     KAKAO_FAILED_GET_USERINFO_ERROR(UNAUTHORIZED, "0112", "카카오로부터 사용자 정보를 가져오지 못했습니다."),
-    KAKAO_CONNECT_FAILED_USERINFO_ENDPOINT(UNAUTHORIZED, "0112", "카카오 사용자 정보 엔드포인트와 통신에 실패하였습니다."),
-
+    KAKAO_CONNECT_FAILED_USERINFO_ENDPOINT(UNAUTHORIZED, "0113", "카카오 사용자 정보 엔드포인트와 통신에 실패하였습니다."),
 
     NOT_FOUND_END_POINT(NOT_FOUND, "0200", "존재하지 않는 접근입니다."),
 
     INCORRECT_FORMAT_EMAIL(BAD_REQUEST, "1001", "잘못된 형식의 이메일입니다."),
     INCORRECT_FORMAT_CODE(BAD_REQUEST, "1002", "잘못된 형식의 인증코드입니다."),
     INCORRECT_FORMAT_NICKNAME(BAD_REQUEST, "1003", "잘못된 형식의 닉네임입니다."),
+    INCORRECT_FORMAT_KAKAO_ID(BAD_REQUEST, "1004", "잘못된 형식의 카카오 고유번호입니다."),
+    INCORRECT_FORMAT_USER_NAME(BAD_REQUEST, "1005", "잘못된 형식의 사용자 이름입니다."),
+    INCORRECT_FORMAT_PHONE_NUMBER(BAD_REQUEST, "1006", "잘못된 형식의 휴대폰 번호입니다."),
+    INCORRECT_FORMAT_PROFILE_IMG_URL(BAD_REQUEST, "1007", "잘못된 형식의 프로필 이미지 주소입니다."),
 
     AUTH_ERROR_EMAIL(UNAUTHORIZED, "1101", "잘못된 키 혹은 잘못(만료) 된 인증 코드입니다."),
+    VALIDATE_ERROR_EMAIL(UNAUTHORIZED, "1102", "인증이 만료되었거나 인증되지 않은 이메일입니다."),
 
-    USER_NOT_FOUND(NOT_FOUND, "1201", "존재하지 않는 사용자입니다."), // 로그인을 제외한 사용자 확인에서 발생하는 오류
+    USER_NOT_FOUND(NOT_FOUND, "1201", "존재하지 않는 사용자입니다."),
+
+    DUPLICATE_EMAIL(CONFLICT, "1301", "이미 사용중인 이메일입니다."),
+    DUPLICATE_NICKNAME(CONFLICT, "1302", "이미 사용중인 닉네임입니다."),
+
     MIN_BID_AMOUNT_INCORRECT_FORMAT(BAD_REQUEST, "2000", "최소입찰금액은 자신의 보유 포인트보다 적어야 합니다."),
     AUCTION_ACCESS_DENIED(FORBIDDEN, "2100", "접근 권한이 없습니다."),
     AUCTION_NOT_FOUND(NOT_FOUND, "2200", "존재하지 않는 경매입니다."),
