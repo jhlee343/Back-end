@@ -10,9 +10,12 @@ import org.springframework.transaction.annotation.Transactional;
 import shootingstar.var.entity.Follow;
 import shootingstar.var.entity.User;
 import shootingstar.var.entity.UserType;
+import shootingstar.var.exception.CustomException;
+import shootingstar.var.exception.ErrorCode;
 import shootingstar.var.jwt.JwtTokenProvider;
 import shootingstar.var.repository.FollowRepository;
 import shootingstar.var.repository.UserRepository;
+import shootingstar.var.util.MailRedisUtil;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,28 +27,39 @@ public class UserService {
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
     private final FollowRepository followRepository;
+    private final MailRedisUtil mailRedisUtil;
+    private final CheckDuplicateService duplicateService;
 
     public void signup(UserSignupReqDto reqDto) {
-        User user = User.builder()
-                .kakaoId(reqDto.getId())
-                .name(reqDto.getName())
-                .nickname(reqDto.getNickname())
-                .phone(reqDto.getPhoneNumber())
-                .email(reqDto.getEmail())
-                .profileImgUrl(reqDto.getProfileImgUrl())
-                .userType(UserType.ROLE_BASIC)
-                .build();
+        if (duplicateService.checkEmailDuplicate(reqDto.getEmail())) {
+            throw new CustomException(ErrorCode.DUPLICATE_EMAIL);
+        }
+        if (duplicateService.checkNicknameDuplicate(reqDto.getNickname())) {
+            throw new CustomException(ErrorCode.DUPLICATE_NICKNAME);
+        }
 
-        userRepository.save(user);
-    }
+        if (mailRedisUtil.hasKey(reqDto.getEmail()) && mailRedisUtil.getData(reqDto.getEmail()).equals("validate")) { // 이메일 인증을 받은 이메일 인지 확인
 
-    public boolean checkNicknameDuplicate(String nickname) {
-        return userRepository.existsByNickname(nickname);
+            User user = User.builder()
+                    .kakaoId(reqDto.getKakaoId())
+                    .name(reqDto.getUserName())
+                    .nickname(reqDto.getNickname())
+                    .phone(reqDto.getPhoneNumber())
+                    .email(reqDto.getEmail())
+                    .profileImgUrl(reqDto.getProfileImgUrl())
+                    .userType(UserType.ROLE_BASIC)
+                    .build();
+
+            userRepository.save(user);
+            mailRedisUtil.deleteData(reqDto.getEmail());
+        } else {
+            throw new CustomException(ErrorCode.VALIDATE_ERROR_EMAIL);
+        }
     }
 
     public boolean checkVIP(HttpServletRequest request) {
-        UUID userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
-        User user = findByuserUUID(String.valueOf(userUUID));
+        String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
+        User user = findByUserUUID(userUUID);
         if (user.getUserType().equals(UserType.ROLE_VIP)) {
             //vip인 경우 true
             return true;
@@ -62,27 +76,27 @@ public class UserService {
     }
 
     public List<FollowingDto> findAllFollowing(HttpServletRequest request) {
-        UUID userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
+        String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
         return followRepository.findAllByFollowerId(userUUID);
     }
 
     @Transactional
-    public void follow(UUID followingId, HttpServletRequest request) {
-        UUID followerId = jwtTokenProvider.getUserUUIDByRequest(request);
-        User follower = findByuserUUID(String.valueOf(followerId));
-        User following = findByuserUUID(String.valueOf(followingId));
+    public void follow(String followingId, HttpServletRequest request) {
+        String followerId = jwtTokenProvider.getUserUUIDByRequest(request);
+        User follower = findByUserUUID(followerId);
+        User following = findByUserUUID(followingId);
         UUID followUUID = UUID.randomUUID();
-        Follow follow = new Follow(followUUID,follower,following);
+        Follow follow = new Follow(follower,following);
         followRepository.save(follow);
     }
 
     @Transactional
-    public void unFollow(UUID followUUID) {
+    public void unFollow(String followUUID) {
         Follow follow = findFollowingByFollowUUID(followUUID);
         followRepository.delete(follow);
     }
 
-    private Follow findFollowingByFollowUUID(UUID followUUID) {
+    private Follow findFollowingByFollowUUID(String followUUID) {
         Optional<Follow> followOptional = followRepository.findByFollowUUID(followUUID);
         if (followOptional.isEmpty()) {
             throw new RuntimeException();
@@ -98,8 +112,8 @@ public class UserService {
         return optionalUser.get();
     }
 
-    public User findByuserUUID(String userUUID) {
-        Optional<User> optionalUser = userRepository.findByUserUUID(UUID.fromString(userUUID));
+    public User findByUserUUID(String userUUID) {
+        Optional<User> optionalUser = userRepository.findByUserUUID(userUUID);
         if (optionalUser.isEmpty()) {
             throw new RuntimeException();
         }

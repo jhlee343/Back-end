@@ -2,9 +2,6 @@ package shootingstar.var.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import shootingstar.var.Service.UserService;
@@ -12,7 +9,6 @@ import shootingstar.var.dto.req.FollowingDto;
 import shootingstar.var.dto.req.UserProfileDto;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -38,12 +34,12 @@ public class UserController {
         return ResponseEntity.ok().body(followingList);
     }
     @GetMapping("/follow/{followingId}")
-    public ResponseEntity<String> follow(@PathVariable("followingId") UUID followingId, HttpServletRequest request) {
+    public ResponseEntity<String> follow(@PathVariable("followingId") String followingId, HttpServletRequest request) {
         userService.follow(followingId,request);
         return ResponseEntity.ok("follow success");
     }
     @DeleteMapping("/unfollow/{followUUID}")
-    public ResponseEntity<String> unFollow(@PathVariable("followUUID") UUID followUUID) {
+    public ResponseEntity<String> unFollow(@PathVariable("followUUID") String followUUID) {
         userService.unFollow(followUUID);
         return ResponseEntity.ok().body("unfollow success");
     }

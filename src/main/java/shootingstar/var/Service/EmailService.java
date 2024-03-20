@@ -23,6 +23,7 @@ public class EmailService {
     private final JavaMailSender mailSender;
     private final SpringTemplateEngine templateEngine;
     private final MailRedisUtil mailRedisUtil;
+    private final CheckDuplicateService duplicateService;
 
     @Value("${fromMail}")
     private String fromEmail;
@@ -33,6 +34,10 @@ public class EmailService {
     }
 
     public void sendAuthCodeEmail(String email) {
+        if (duplicateService.checkEmailDuplicate(email)) {
+            throw new CustomException(ErrorCode.DUPLICATE_EMAIL);
+        }
+
         String code = createCode();
 
         String title = "VIP and Rendezvous 이메일 인증 코드"; // 제목

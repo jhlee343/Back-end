@@ -43,7 +43,7 @@
             async function postCode(code) {
                 try {
                     // Axios를 사용한 POST 요청
-                    const response = await axios.post('/oauth2/accessKakao', {
+                    const response = await axios.post('/api/auth/oauth2/accessKakao', {
                         code: code
                     });
                     // 응답 데이터 처리
