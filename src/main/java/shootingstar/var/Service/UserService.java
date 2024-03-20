@@ -3,10 +3,10 @@ package shootingstar.var.Service;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import shootingstar.var.dto.req.FollowingDto;
+import shootingstar.var.dto.req.UserProfileDto;
 import shootingstar.var.dto.req.UserSignupReqDto;
 import org.springframework.transaction.annotation.Transactional;
-import shootingstar.var.Service.dto.FollowingDto;
-import shootingstar.var.Service.dto.UserProfileDto;
 import shootingstar.var.entity.Follow;
 import shootingstar.var.entity.User;
 import shootingstar.var.entity.UserType;
@@ -44,8 +44,8 @@ public class UserService {
     }
 
     public boolean checkVIP(HttpServletRequest request) {
-        UUID userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
-        User user = findByuserUUID(String.valueOf(userUUID));
+        String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
+        User user = findByUserUUID(userUUID);
         if (user.getUserType().equals(UserType.ROLE_VIP)) {
             //vip인 경우 true
             return true;
@@ -62,27 +62,27 @@ public class UserService {
     }
 
     public List<FollowingDto> findAllFollowing(HttpServletRequest request) {
-        UUID userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
+        String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
         return followRepository.findAllByFollowerId(userUUID);
     }
 
     @Transactional
-    public void follow(UUID followingId, HttpServletRequest request) {
-        UUID followerId = jwtTokenProvider.getUserUUIDByRequest(request);
-        User follower = findByuserUUID(String.valueOf(followerId));
-        User following = findByuserUUID(String.valueOf(followingId));
+    public void follow(String followingId, HttpServletRequest request) {
+        String followerId = jwtTokenProvider.getUserUUIDByRequest(request);
+        User follower = findByUserUUID(followerId);
+        User following = findByUserUUID(followingId);
         UUID followUUID = UUID.randomUUID();
-        Follow follow = new Follow(followUUID,follower,following);
+        Follow follow = new Follow(follower,following);
         followRepository.save(follow);
     }
 
     @Transactional
-    public void unFollow(UUID followUUID) {
+    public void unFollow(String followUUID) {
         Follow follow = findFollowingByFollowUUID(followUUID);
         followRepository.delete(follow);
     }
 
-    private Follow findFollowingByFollowUUID(UUID followUUID) {
+    private Follow findFollowingByFollowUUID(String followUUID) {
         Optional<Follow> followOptional = followRepository.findByFollowUUID(followUUID);
         if (followOptional.isEmpty()) {
             throw new RuntimeException();
@@ -98,8 +98,8 @@ public class UserService {
         return optionalUser.get();
     }
 
-    public User findByuserUUID(String userUUID) {
-        Optional<User> optionalUser = userRepository.findByUserUUID(UUID.fromString(userUUID));
+    public User findByUserUUID(String userUUID) {
+        Optional<User> optionalUser = userRepository.findByUserUUID(userUUID);
         if (optionalUser.isEmpty()) {
             throw new RuntimeException();
         }

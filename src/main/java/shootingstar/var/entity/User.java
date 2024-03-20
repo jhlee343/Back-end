@@ -20,8 +20,7 @@ public class User extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
-    @Column(columnDefinition = "BINARY(16)")
-    private UUID userUUID;
+    private String userUUID;
 
     @NotBlank
     private String kakaoId;
@@ -58,7 +57,7 @@ public class User extends BaseTimeEntity {
 
     @Builder
     public User(String kakaoId, String name, String nickname, String phone, String email, String profileImgUrl, UserType userType) {
-        this.userUUID = UUID.randomUUID();
+        this.userUUID = UUID.randomUUID().toString();
         this.kakaoId = kakaoId;
         this.name = name;
         this.nickname = nickname;

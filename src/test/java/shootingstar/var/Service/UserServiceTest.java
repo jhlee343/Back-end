@@ -4,8 +4,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-import shootingstar.var.Service.dto.UserProfileDto;
-import shootingstar.var.entity.Follow;
 import shootingstar.var.entity.User;
 import shootingstar.var.entity.UserType;
 import shootingstar.var.repository.UserRepository;
@@ -13,7 +11,6 @@ import shootingstar.var.repository.UserRepository;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class UserServiceTest {
@@ -67,9 +64,9 @@ class UserServiceTest {
         User saveUser3 = userRepository.save(user3);
         userRepository.flush();
 
-        UUID userId1 = user1.getUserUUID();
-        UUID userId2 = user2.getUserUUID();
-        UUID userId3 = user3.getUserUUID();
+        String userId1 = user1.getUserUUID();
+        String userId2 = user2.getUserUUID();
+        String userId3 = user3.getUserUUID();
         System.out.println(userId1);
         System.out.println(userId2);
         System.out.println(userId3);

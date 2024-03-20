@@ -16,11 +16,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
-import shootingstar.var.Service.UserAuthService;
 import shootingstar.var.entity.User;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
-import shootingstar.var.oAuth.KakaoAPI;
 import shootingstar.var.repository.UserRepository;
 import shootingstar.var.util.JwtRedisUtil;
 import shootingstar.var.util.TokenUtil;
@@ -135,10 +133,10 @@ public class JwtTokenProvider {
         return new UsernamePasswordAuthenticationToken(subject, null, authorities);
     }
 
-    public UUID getUserUUIDByRequest(HttpServletRequest request) {
+    public String getUserUUIDByRequest(HttpServletRequest request) {
         String accessToken = TokenUtil.getTokenFromHeader(request);
         Authentication authentication = getAuthenticationFromAccessToken(accessToken);
-        return UUID.fromString(authentication.getName());
+        return authentication.getName();
     }
 
     // refresh 토큰을 복호화하여 토큰에 들어있는 정보를 꺼내는 메서드
@@ -152,7 +150,7 @@ public class JwtTokenProvider {
 
         String subject = claims.getSubject();
 
-        Optional<User> optionalUser = userRepository.findByUserUUID(UUID.fromString(subject));
+        Optional<User> optionalUser = userRepository.findByUserUUID(subject);
         if (optionalUser.isEmpty()) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
