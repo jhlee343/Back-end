@@ -34,6 +34,21 @@ public class GlobalExceptionHandler {
                 case "email" -> {
                     errorCode = INCORRECT_FORMAT_EMAIL;
                     break;
+                } case "kakaoId" -> {
+                    errorCode = INCORRECT_FORMAT_KAKAO_ID;
+                    break;
+                } case "nickname" -> {
+                    errorCode = INCORRECT_FORMAT_NICKNAME;
+                    break;
+                } case "userName" -> {
+                    errorCode = INCORRECT_FORMAT_USER_NAME;
+                    break;
+                } case "phoneNumber" -> {
+                    errorCode = INCORRECT_FORMAT_PHONE_NUMBER;
+                    break;
+                } case "profileImgUrl" -> {
+                    errorCode = INCORRECT_FORMAT_PROFILE_IMG_URL;
+                    break;
                 }
             }
 
@@ -63,6 +78,8 @@ public class GlobalExceptionHandler {
 
             if (fieldName.contains("nickname")) {
                 errorCode = INCORRECT_FORMAT_NICKNAME;
+            } else if (fieldName.contains("email")) {
+                errorCode = INCORRECT_FORMAT_EMAIL;
             }
 
             if (!errorCode.equals(INCORRECT_FORMAT)) {
