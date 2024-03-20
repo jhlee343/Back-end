@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -18,6 +19,9 @@ public class User extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
+
+    @Column(columnDefinition = "BINARY(16)")
+    private UUID userUUID;
 
     @NotBlank
     private String kakaoId;
@@ -54,6 +58,7 @@ public class User extends BaseTimeEntity {
 
     @Builder
     public User(String kakaoId, String name, String nickname, String phone, String email, String profileImgUrl, UserType userType) {
+        this.userUUID = UUID.randomUUID();
         this.kakaoId = kakaoId;
         this.name = name;
         this.nickname = nickname;
@@ -66,5 +71,9 @@ public class User extends BaseTimeEntity {
         this.rating = null;
         this.subscribe = null;
         this.warningCount = 0;
+    }
+
+    public void increasePoint(long point) {
+        this.point += point;
     }
 }

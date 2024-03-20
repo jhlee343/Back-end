@@ -16,6 +16,8 @@ build/
 **/src/main/resources/application-redis.yml
 **/src/main/resources/application-iamport.yml
 
+**/src/main/resources/ssl/
+
 ### STS ###
 .apt_generated
 .classpath

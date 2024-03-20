@@ -17,6 +17,7 @@ import org.springframework.web.filter.GenericFilterBean;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
 import shootingstar.var.exception.ErrorResponse;
+import shootingstar.var.util.TokenUtil;
 
 import java.io.IOException;
 
@@ -31,7 +32,7 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 
         HttpServletRequest httpRequest = (HttpServletRequest) request;
-        String token = resolveToken(httpRequest);
+        String token = TokenUtil.getTokenFromHeader(httpRequest);
         String requestURI = httpRequest.getRequestURI();
         log.info("JwtAuthenticationFilter requestURI :  {}, addr : {}", requestURI, httpRequest.getRemoteAddr());
         /*
@@ -84,14 +85,5 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
 
         ObjectMapper objectMapper = new ObjectMapper();
         response.getWriter().write(objectMapper.writeValueAsString(errorResponse)); // JSON 형태로 에러 응답 작성
-    }
-
-    // Request Header 에서 토큰 정보 추출
-    private String resolveToken(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer")) {
-            return bearerToken.substring(7);
-        }
-        return null;
     }
 }

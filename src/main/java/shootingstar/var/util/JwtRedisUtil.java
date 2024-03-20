@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 public class JwtRedisUtil {
     private final RedisTemplate<String, Object> jwtRedis;
 
-    public JwtRedisUtil(@Qualifier("redisTemplate") RedisTemplate<String, Object> jwtRedis) {
+    public JwtRedisUtil(@Qualifier("jwtRedisTemplate") RedisTemplate<String, Object> jwtRedis) {
         this.jwtRedis = jwtRedis;
     }
 
