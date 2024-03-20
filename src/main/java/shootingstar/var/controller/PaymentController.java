@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import shootingstar.var.Service.PaymentService;
+import shootingstar.var.Service.dto.PaymentReqDto;
+import shootingstar.var.exception.CustomException;
+import shootingstar.var.exception.ErrorCode;
 
 import java.io.IOException;
 import java.util.Map;
@@ -43,15 +46,27 @@ public class PaymentController {
 
 
     @PostMapping("/payment")
-    public IamportResponse<Payment> paymentComplete(HttpServletRequest request, @RequestBody Map<String, String> map) throws IamportResponseException, IOException {
-        String impUid = map.get("imp_uid");
-        long actionBoardNo = Long.parseLong(map.get("actionBoardNo"));
-        int amount = Integer.parseInt(map.get("amount"));
+    public IamportResponse<Payment> paymentComplete(HttpServletRequest request, @RequestBody PaymentReqDto paymentReqDto) throws IamportResponseException, IOException {
+        String accessToken = getTokenFromHeader(request);
 
-        IamportResponse<Payment> irsp = paymentLookup(impUid);
+        Long amount = paymentReqDto.getAmount();
 
-        //paymentService.verifyIamportService(irsp, amount, actionBoardNo);
+        IamportResponse<Payment> irsp = paymentLookup(paymentReqDto.getImp_uid());
+
+        paymentService.verifyIamportService(irsp, amount, accessToken);
 
         return irsp;
+    }
+
+
+    private static String getTokenFromHeader(HttpServletRequest request) {
+        String token = request.getHeader("Authorization"); // 헤더에 존재하는 엑세스 토큰을 받아온다.
+
+        if (token != null && token.startsWith("Bearer ")) {
+            token = token.substring(7); // "Bearer " 접두어 제거
+        } else {
+            throw new CustomException(ErrorCode.INVALID_ACCESS_TOKEN);
+        }
+        return token;
     }
 }
