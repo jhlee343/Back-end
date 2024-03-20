@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import shootingstar.var.Service.AuctionService;
 import shootingstar.var.dto.req.AuctionCreateReqDto;
+import shootingstar.var.jwt.JwtTokenProvider;
 
 @Tag(name = "경매 컨트롤러", description= "vip 권한만 사용 가능합니다.")
 @RestController
@@ -19,6 +20,7 @@ import shootingstar.var.dto.req.AuctionCreateReqDto;
 public class AuctionController {
 
     private final AuctionService auctionService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Operation(summary = "경매 생성 API", description = "VIP 권한을 가진 사용자가 경매를 생성할 때 사용합니다.")
     @ApiResponses(value = {
@@ -26,13 +28,15 @@ public class AuctionController {
     })
     @PostMapping("/create")
     public ResponseEntity<String> create(@Valid @RequestBody AuctionCreateReqDto reqDto, HttpServletRequest request) {
-        auctionService.create(reqDto, request);
+        String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
+        auctionService.create(reqDto, userUUID);
         return ResponseEntity.ok().body("경매 생성 성공");
     }
 
     @PatchMapping("/cancel/{auctionUUID}")
     public ResponseEntity<String> cancel(@PathVariable("auctionUUID") String auctionUUID, HttpServletRequest request) {
-        auctionService.cancel(auctionUUID, request);
+        String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
+        auctionService.cancel(auctionUUID, userUUID);
         return ResponseEntity.ok().body("경매 취소 성공");
     }
 }

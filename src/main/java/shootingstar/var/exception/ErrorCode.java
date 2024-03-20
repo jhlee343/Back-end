@@ -46,6 +46,7 @@ public enum ErrorCode {
     DUPLICATE_EMAIL(CONFLICT, "1301", "이미 사용중인 이메일입니다."),
     DUPLICATE_NICKNAME(CONFLICT, "1302", "이미 사용중인 닉네임입니다."),
 
+    MIN_BID_AMOUNT_INCORRECT_FORMAT(BAD_REQUEST, "2000", "최소입찰금액은 자신의 보유 포인트보다 적어야 합니다."),
     AUCTION_ACCESS_DENIED(FORBIDDEN, "2100", "접근 권한이 없습니다."),
     AUCTION_NOT_FOUND(NOT_FOUND, "2200", "존재하지 않는 경매입니다."),
     AUCTION_CONFLICT(CONFLICT, "2300", "이미 처리된 경매입니다."),
