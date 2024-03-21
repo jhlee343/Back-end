@@ -2,12 +2,15 @@ package shootingstar.var.Service;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import shootingstar.var.dto.req.FollowingDto;
 import shootingstar.var.dto.req.UserProfileDto;
 import shootingstar.var.dto.req.UserSignupReqDto;
 import org.springframework.transaction.annotation.Transactional;
 import shootingstar.var.dto.req.WarningListDto;
+import shootingstar.var.dto.res.UserReceiveReviewDto;
 import shootingstar.var.entity.Follow;
 import shootingstar.var.entity.User;
 import shootingstar.var.entity.UserType;
@@ -98,6 +101,9 @@ public class UserService {
         followRepository.delete(follow);
     }
 
+    public Page<UserReceiveReviewDto> receiveReview(String userUUID, Pageable pageable){
+        return null;
+    }
     public List<WarningListDto> findAllWarning(String userUUID) {
         return warningRepository.findAllWarnByUserUUID(userUUID);
     }
