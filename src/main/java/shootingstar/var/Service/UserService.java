@@ -18,6 +18,7 @@ import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
 import shootingstar.var.jwt.JwtTokenProvider;
 import shootingstar.var.repository.FollowRepository;
+import shootingstar.var.repository.Review.ReviewRepository;
 import shootingstar.var.repository.UserRepository;
 import shootingstar.var.repository.Warning.WarningRepository;
 import shootingstar.var.util.MailRedisUtil;
@@ -36,6 +37,7 @@ public class UserService {
     private final MailRedisUtil mailRedisUtil;
     private final CheckDuplicateService duplicateService;
     private final WarningRepository warningRepository;
+    private final ReviewRepository reviewRepository;
 
     public void signup(UserSignupReqDto reqDto) {
         if (duplicateService.checkEmailDuplicate(reqDto.getEmail())) {
@@ -102,7 +104,7 @@ public class UserService {
     }
 
     public Page<UserReceiveReviewDto> receiveReview(String userUUID, Pageable pageable){
-        return null;
+        return reviewRepository.findAllReviewByuserUUID(userUUID,pageable);
     }
     public List<WarningListDto> findAllWarning(String userUUID) {
         return warningRepository.findAllWarnByUserUUID(userUUID);

@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Entity
@@ -33,15 +34,20 @@ public class Review {
     @JoinColumn(name = "receiver_id")
     private User receiverId;
 
-    private Long ticketId;
+    @ManyToOne
+    @JoinColumn(name = "ticket_id")
+    private Ticket ticketId;
+
 
     @Builder
-    public Review(String reviewUUID, User writerId, User receiverId, String reviewContent, double reviewRating, Boolean isShowed){
-        this.reviewUUID = reviewUUID;
+    public Review(User writerId, User receiverId, String reviewContent,
+                  double reviewRating, Ticket ticketId, Boolean isShowed){
+        this.reviewUUID = UUID.randomUUID().toString();
         this.receiverId = receiverId;
         this.writerId = writerId;
         this.reviewContent = reviewContent;
         this.reviewRating = reviewRating;
+        this.ticketId = ticketId;
         this.isShowed =isShowed;
     }
 }
