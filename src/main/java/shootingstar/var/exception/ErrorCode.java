@@ -44,6 +44,7 @@ public enum ErrorCode {
     VALIDATE_ERROR_EMAIL(UNAUTHORIZED, "1102", "인증이 만료되었거나 인증되지 않은 이메일입니다."),
 
     USER_NOT_FOUND(NOT_FOUND, "1201", "존재하지 않는 사용자입니다."),
+    REVIEW_NOT_FOUND(NOT_FOUND, "1202","존재하지 않는 리뷰입니다."),
 
     DUPLICATE_EMAIL(CONFLICT, "1301", "이미 사용중인 이메일입니다."),
     DUPLICATE_NICKNAME(CONFLICT, "1302", "이미 사용중인 닉네임입니다."),

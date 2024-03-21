@@ -9,19 +9,19 @@ import shootingstar.var.entity.User;
 @Data
 public class UserSendReviewDto {
     private String reviewUUID;
-    private Ticket ticket;
+    private String ticketUUID;
     private String reviewContent;
     private Double reviewRating;
-    private User receiver;
+    private String receiverId;
     //내가 보낸 사람 uuid
     @QueryProjection
-    public UserSendReviewDto(String reviewUUID, Ticket ticket, String reviewContent,
-                             Double reviewRating, User receiver ){
+    public UserSendReviewDto(String reviewUUID, String ticketUUID, String reviewContent,
+                             Double reviewRating, String receiverId ){
         this.reviewUUID = reviewUUID;
-        this.ticket = ticket;
+        this.ticketUUID = ticketUUID;
         this.reviewContent = reviewContent;
         this.reviewRating = reviewRating;
-        this.receiver = receiver;
+        this.receiverId = receiverId;
     }
 
 }

@@ -39,7 +39,7 @@ public class Review {
     private Ticket ticketId;
 
 
-    @Builder
+
     public Review(User writerId, User receiverId, String reviewContent,
                   double reviewRating, Ticket ticketId, Boolean isShowed){
         this.reviewUUID = UUID.randomUUID().toString();

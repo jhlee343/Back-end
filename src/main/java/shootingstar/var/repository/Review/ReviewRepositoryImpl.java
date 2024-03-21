@@ -8,7 +8,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 import shootingstar.var.dto.res.QUserReceiveReviewDto;
+import shootingstar.var.dto.res.QUserSendReviewDto;
 import shootingstar.var.dto.res.UserReceiveReviewDto;
+import shootingstar.var.dto.res.UserSendReviewDto;
 
 import java.util.List;
 import static shootingstar.var.entity.QReview.review;
@@ -20,7 +22,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
     }
 
     @Override
-    public List<UserReceiveReviewDto> findAllByserUUID(String userUUID) {
+    public List<UserReceiveReviewDto> findReceiveByserUUID(String userUUID) {
                 return queryFactory
                 .select(new QUserReceiveReviewDto(
                         review.reviewUUID,
@@ -48,7 +50,45 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
                 .where()
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
-                .orderBy()
+                .orderBy(review.reviewId.desc())
+                .fetch();
+
+        JPAQuery<Long> countQuery = queryFactory
+                .select(review.count())
+                .from(review);
+
+        return PageableExecutionUtils.getPage(content,pageable,countQuery::fetchOne);
+    }
+    @Override
+    public List<UserSendReviewDto> findSendByserUUID(String userUUID) {
+        return queryFactory
+                .select(new QUserSendReviewDto(
+                        review.reviewUUID,
+                        review.ticketId.ticketUUID,
+                        review.reviewContent,
+                        review.reviewRating,
+                        review.receiverId.userUUID
+                ))
+                .from(review)
+                .where(userEqReceiver(userUUID))
+                .fetch();
+    }
+
+    @Override
+    public Page<UserSendReviewDto> findAllSendByuserUUID(String userUUID, Pageable pageable) {
+        List<UserSendReviewDto> content = queryFactory
+                .select(new QUserSendReviewDto(
+                        review.reviewUUID,
+                        review.ticketId.ticketUUID,
+                        review.reviewContent,
+                        review.reviewRating,
+                        review.receiverId.userUUID
+                ))
+                .from(review)
+                .where()
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(review.reviewId.desc())
                 .fetch();
 
         JPAQuery<Long> countQuery = queryFactory
@@ -61,4 +101,6 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
     private BooleanExpression userEqReceiver(String userUUID){
         return userUUID !=null ? review.receiverId.userUUID.eq(userUUID) : null;
     }
+
+
 }

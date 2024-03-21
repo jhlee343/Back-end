@@ -19,6 +19,7 @@ import shootingstar.var.dto.req.FollowingDto;
 import shootingstar.var.dto.req.UserProfileDto;
 import shootingstar.var.dto.req.WarningListDto;
 import shootingstar.var.dto.res.UserReceiveReviewDto;
+import shootingstar.var.dto.res.UserSendReviewDto;
 import shootingstar.var.jwt.JwtTokenProvider;
 
 import java.util.List;
@@ -79,6 +80,21 @@ public class UserController {
         String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
         Page<UserReceiveReviewDto> userReceiveReviewDtos = userService.receiveReview(userUUID, pageable);
         return ResponseEntity.ok(userReceiveReviewDtos);
+    }
+
+    @Operation(summary = "사용자페이지 쓴 리뷰 불러오기")
+    @GetMapping("/review/send")
+    public ResponseEntity<?> getSendReview(HttpServletRequest request, @PageableDefault(size=10) Pageable pageable){
+        String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
+        Page<UserSendReviewDto> userReceiveReviewDtos = userService.sendReview(userUUID, pageable);
+        return ResponseEntity.ok(userReceiveReviewDtos);
+    }
+
+    @Operation(summary = "리뷰 신고")
+    @PostMapping("/review/report")
+    public ResponseEntity<String> reportReview(@Valid @RequestParam("reviewId") Long reviewId){
+        userService.reportReview(reviewId);
+        return ResponseEntity.ok().body("review report success");
     }
     @Operation(summary = "경고 내역")
     @GetMapping("warningList")

@@ -11,14 +11,14 @@ import shootingstar.var.dto.req.UserSignupReqDto;
 import org.springframework.transaction.annotation.Transactional;
 import shootingstar.var.dto.req.WarningListDto;
 import shootingstar.var.dto.res.UserReceiveReviewDto;
-import shootingstar.var.entity.Follow;
-import shootingstar.var.entity.User;
-import shootingstar.var.entity.UserType;
+import shootingstar.var.dto.res.UserSendReviewDto;
+import shootingstar.var.entity.*;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
 import shootingstar.var.jwt.JwtTokenProvider;
 import shootingstar.var.repository.FollowRepository;
 import shootingstar.var.repository.Review.ReviewRepository;
+import shootingstar.var.repository.ReviewReport.ReviewReportRepository;
 import shootingstar.var.repository.UserRepository;
 import shootingstar.var.repository.Warning.WarningRepository;
 import shootingstar.var.util.MailRedisUtil;
@@ -38,6 +38,7 @@ public class UserService {
     private final CheckDuplicateService duplicateService;
     private final WarningRepository warningRepository;
     private final ReviewRepository reviewRepository;
+    private final ReviewReportRepository reviewReportRepository;
 
     public void signup(UserSignupReqDto reqDto) {
         if (duplicateService.checkEmailDuplicate(reqDto.getEmail())) {
@@ -106,10 +107,24 @@ public class UserService {
     public Page<UserReceiveReviewDto> receiveReview(String userUUID, Pageable pageable){
         return reviewRepository.findAllReviewByuserUUID(userUUID,pageable);
     }
+
+    public Page<UserSendReviewDto> sendReview(String userUUID, Pageable pageable){
+        return reviewRepository.findAllSendByuserUUID(userUUID,pageable);
+    }
     public List<WarningListDto> findAllWarning(String userUUID) {
         return warningRepository.findAllWarnByUserUUID(userUUID);
     }
 
+    @Transactional
+    public void reportReview(Long reviewId){
+        Review review = findByReviewId(reviewId);
+        ReviewReport reviewReport = new ReviewReport(
+                review,
+                review.getReviewContent(),
+                ReviewReportStatus.STANDBY
+        );
+        reviewReportRepository.save(reviewReport);
+    }
     private Follow findFollowingByFollowUUID(String followUUID) {
         Optional<Follow> followOptional = followRepository.findByFollowUUID(followUUID);
         if (followOptional.isEmpty()) {
@@ -132,6 +147,14 @@ public class UserService {
             throw new CustomException(USER_NOT_FOUND);
         }
         return optionalUser.get();
+    }
+
+    public Review findByReviewId(Long reviewId){
+        Optional<Review> optionalReview = reviewRepository.findByReviewId(reviewId);
+        if(optionalReview.isEmpty()){
+            throw new CustomException(REVIEW_NOT_FOUND);
+        }
+        return optionalReview.get();
     }
 
 }
