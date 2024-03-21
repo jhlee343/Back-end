@@ -3,7 +3,7 @@ package shootingstar.var.repository;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
-import shootingstar.var.Service.dto.QFollowingDto;
+import shootingstar.var.dto.req.QFollowingDto;
 import shootingstar.var.dto.req.FollowingDto;
 
 
@@ -32,6 +32,6 @@ public class FollowRepositoryCustomImpl implements FollowRepositoryCustom{
     }
 
     private BooleanExpression IdEq(String followerId){
-        return followerId !=null ? follow.followerId.userUUID.eq(UUID.fromString(followerId)) : null;
+        return followerId !=null ? follow.followerId.userUUID.eq(followerId) : null;
     }
 }

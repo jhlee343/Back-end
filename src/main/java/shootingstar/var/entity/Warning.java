@@ -18,8 +18,7 @@ public class Warning {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long warningId;
 
-    @NotNull
-    private UUID warningUUID;
+    private String warningUUID;
 
     @ManyToOne
     @JoinColumn(name = "review_id")
@@ -30,8 +29,8 @@ public class Warning {
     private String warningContent;
 
     @Builder
-    public Warning(UUID warningUUID, User userId, String warningContent){
-        this.warningUUID=warningUUID;
+    public Warning(String warningUUID, User userId, String warningContent){
+        this.warningUUID= UUID.randomUUID().toString();
         this.warningContent=warningContent;
         this.userId=userId;
     }

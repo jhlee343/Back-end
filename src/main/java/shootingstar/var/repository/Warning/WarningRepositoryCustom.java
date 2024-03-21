@@ -6,5 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface WarningRepositoryCustom {
-    List<WarningListDto> findAllWarnByUserId(UUID userUUID);
+    List<WarningListDto> findAllWarnByUserUUID(String userUUID);
+
+//    List<WarningListDto> findAllWarnByUserId(UUID userId);
 }

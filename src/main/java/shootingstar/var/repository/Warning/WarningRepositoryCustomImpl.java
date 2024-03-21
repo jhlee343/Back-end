@@ -18,19 +18,20 @@ public class WarningRepositoryCustomImpl implements WarningRepositoryCustom{
     }
 
     @Override
-    public List<WarningListDto> findAllWarnByUserId(UUID userId) {
-         return queryFactory
-                 .select(new QWarningListDto(
-                         warning.warningUUID,
-                         warning.userId,
+    public List<WarningListDto> findAllWarnByUserUUID(String userUUID) {
+        return queryFactory
+                .select(new QWarningListDto(
+                        warning.warningUUID,
+                        warning.userId,
                         warning.warningContent
                 ))
-            .from(warning)
-                .where(IdEq(userId))
-            .fetch();
-}
+                .from(warning)
+                .where(IdEq(UUID.fromString(userUUID)))
+                .fetch();
+    }
 
-    private BooleanExpression IdEq(UUID userId){
-        return userId !=null ? warning.userId.userUUID.eq(userId) : null;
+
+    private BooleanExpression IdEq(UUID userUUID){
+        return userUUID !=null ? warning.userId.userUUID.eq(String.valueOf(userUUID)) : null;
     }
 }

@@ -8,14 +8,14 @@ import java.util.UUID;
 
 @Data
 public class WarningListDto {
-    private UUID warningUUID;
+    private String warningUUID;
 
     private User userUUID;
 
     private String warningContent;
 
     @QueryProjection
-    public WarningListDto(UUID warningUUID, User userUUID, String warningContent){
+    public WarningListDto(String warningUUID, User userUUID, String warningContent){
         this.warningUUID = warningUUID;
         this.userUUID = userUUID;
         this.warningContent = warningContent;

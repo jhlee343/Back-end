@@ -19,6 +19,7 @@ import shootingstar.var.repository.UserRepository;
 import shootingstar.var.repository.Warning.WarningRepository;
 import shootingstar.var.util.MailRedisUtil;
 
+import static shootingstar.var.exception.ErrorCode.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -98,13 +99,13 @@ public class UserService {
     }
 
     public List<WarningListDto> findAllWarning(String userUUID) {
-        return warningRepository.findAllByUserUUID(userUUID);
+        return warningRepository.findAllWarnByUserUUID(userUUID);
     }
 
     private Follow findFollowingByFollowUUID(String followUUID) {
         Optional<Follow> followOptional = followRepository.findByFollowUUID(followUUID);
         if (followOptional.isEmpty()) {
-            throw new RuntimeException();
+            throw new CustomException(USER_NOT_FOUND);
         }
         return followOptional.get();
     }
@@ -112,7 +113,7 @@ public class UserService {
     public User findByNickname(String nickname) {
         Optional<User> optionalUser = userRepository.findByNickname(nickname);
         if (optionalUser.isEmpty()) {
-            throw new RuntimeException();
+            throw new CustomException(USER_NOT_FOUND);
         }
         return optionalUser.get();
     }
@@ -120,7 +121,7 @@ public class UserService {
     public User findByUserUUID(String userUUID) {
         Optional<User> optionalUser = userRepository.findByUserUUID(userUUID);
         if (optionalUser.isEmpty()) {
-            throw new RuntimeException();
+            throw new CustomException(USER_NOT_FOUND);
         }
         return optionalUser.get();
     }

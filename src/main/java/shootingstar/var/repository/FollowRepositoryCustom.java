@@ -11,5 +11,4 @@ import java.util.UUID;
 
 public interface FollowRepositoryCustom {
     List<FollowingDto> findAllByFollowerId(String followerId);
- //   Optional<Follow> findByFollwerIdFollowingId(Long followerId,Long followingId);
 }
