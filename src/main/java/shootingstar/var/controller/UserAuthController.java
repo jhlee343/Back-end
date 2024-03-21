@@ -82,9 +82,24 @@ public class UserAuthController {
         }
     }
 
+
+    @Operation(summary = "로그아웃 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "로그아웃에 성공하였을 때, 쿠키에서 토큰을 삭제해서 반환",
+                    content = {@Content(mediaType = "text/plain", schema = @Schema(implementation = String.class))}),
+            @ApiResponse(responseCode = "500",
+                    description = "Redis JSON 파싱 에러",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+    })
     @DeleteMapping("/logout")
-    public ResponseEntity<String> logout() {
-        return ResponseEntity.ok().body("로그아웃");
+    public ResponseEntity<String> logout(HttpServletRequest request, HttpServletResponse response) {
+        String refreshToken = TokenUtil.getTokenFromCookie(request);
+        tokenProvider.expiredRefreshToken(refreshToken);
+
+        TokenUtil.updateCookie(response, refreshToken, 0);
+
+        return ResponseEntity.ok().body("성공적으로 로그아웃 되었습니다.");
     }
 
     @Operation(summary = "액세스 토큰 재발급 API")
@@ -93,11 +108,14 @@ public class UserAuthController {
                     @Content(mediaType = "text/plain", schema = @Schema(implementation = String.class))}),
             @ApiResponse(responseCode = "403",
                     description =
-                                    "- 잘못된 RefreshToken : 0106\n" +
+                                     "- 잘못된 RefreshToken : 0106\n" +
                                     "- 만료된 RefreshToken : 0107\n" +
                                     "- 지원하지 않는 RefreshToken : 0108\n" +
                                     "- Claim이 빈 Refresh Token : 0109",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+            @ApiResponse(responseCode = "500",
+            description = "Redis JSON 파싱 에러",
+            content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
     })
     @PostMapping("/refresh")
     public ResponseEntity<String> refresh(HttpServletRequest request, HttpServletResponse response) {
