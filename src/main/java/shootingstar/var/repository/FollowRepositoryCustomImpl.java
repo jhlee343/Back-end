@@ -31,6 +31,6 @@ public class FollowRepositoryCustomImpl implements FollowRepositoryCustom{
     }
 
     private BooleanExpression IdEq(String followerId){
-        return followerId !=null ? follow.followerId.userUUID.eq(UUID.fromString(followerId)) : null;
+        return followerId !=null ? follow.followerId.userUUID.eq(followerId) : null;
     }
 }

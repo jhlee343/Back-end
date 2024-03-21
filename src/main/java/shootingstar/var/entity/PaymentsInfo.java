@@ -24,7 +24,7 @@ public class PaymentsInfo {
     @JoinColumn(name = "userId")
     private User user;
 
-    public PaymentsInfo(UUID paymentUUID, Long paymentAmount, User user) {
+    public PaymentsInfo(Long paymentAmount, User user) {
         this.paymentUUID = UUID.randomUUID();
         this.paymentAmount = paymentAmount;
         this.user = user;
