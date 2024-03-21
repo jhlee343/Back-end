@@ -19,6 +19,8 @@ public class RedisConfig {
     private int redisPort1; // jwt 레디스 포트
     @Value("${spring.data.redis.port2}")
     private int redisPort2; // mail 레디스 포트
+    @Value("${spring.data.redis.port3}")
+    private int redisPort3; // loginList 레디스 포트
     @Value("${spring.data.redis.password}")
     private String redisPassword;
 
@@ -35,10 +37,20 @@ public class RedisConfig {
 
     // mail 레디스 빈 등록
     @Bean
-    public RedisConnectionFactory mailRedisConnectionFactoryTwo() {
+    public RedisConnectionFactory mailRedisConnectionFactory() {
         RedisStandaloneConfiguration redisConfiguration = new RedisStandaloneConfiguration();
         redisConfiguration.setHostName(redisHost);
         redisConfiguration.setPort(redisPort2);
+        redisConfiguration.setPassword(redisPassword);
+        return new LettuceConnectionFactory(redisConfiguration);
+    }
+
+    // 로그인 리스트 레디스 빈 등록
+    @Bean
+    public RedisConnectionFactory loginListRedisConnectionFactory() {
+        RedisStandaloneConfiguration redisConfiguration = new RedisStandaloneConfiguration();
+        redisConfiguration.setHostName(redisHost);
+        redisConfiguration.setPort(redisPort3);
         redisConfiguration.setPassword(redisPassword);
         return new LettuceConnectionFactory(redisConfiguration);
     }
@@ -57,7 +69,17 @@ public class RedisConfig {
     @Bean
     public RedisTemplate<?, ?> mailRedisTemplate() {
         RedisTemplate<?, ?> redisTemplate = new RedisTemplate<>();
-        redisTemplate.setConnectionFactory(mailRedisConnectionFactoryTwo());   //connection
+        redisTemplate.setConnectionFactory(mailRedisConnectionFactory());   //connection
+        redisTemplate.setKeySerializer(new StringRedisSerializer());    // key
+        redisTemplate.setValueSerializer(new StringRedisSerializer());  // value
+        return redisTemplate;
+    }
+
+    // 로그인 리스트 레디스 템플릿 등록
+    @Bean
+    public RedisTemplate<?, ?> loginListRedisTemplate() {
+        RedisTemplate<?, ?> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(loginListRedisConnectionFactory());   //connection
         redisTemplate.setKeySerializer(new StringRedisSerializer());    // key
         redisTemplate.setValueSerializer(new StringRedisSerializer());  // value
         return redisTemplate;

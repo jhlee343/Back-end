@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -66,7 +67,7 @@ public class AllUserController {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
     })
     @GetMapping("/duplicate/nickname/{nickname}")
-    public ResponseEntity<Boolean> checkNicknameDuplicate(@NotBlank @PathVariable String nickname){
+    public ResponseEntity<Boolean> checkNicknameDuplicate(@NotEmpty @PathVariable("nickname") String nickname){
         return ResponseEntity.ok(duplicateService.checkNicknameDuplicate(nickname));
     }
 
@@ -78,7 +79,7 @@ public class AllUserController {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
     })
     @GetMapping("/duplicate/email/{email}")
-    public ResponseEntity<Boolean> checkEmailDuplicate(@NotBlank @PathVariable String email){
+    public ResponseEntity<Boolean> checkEmailDuplicate(@NotBlank @PathVariable("email") String email){
         return ResponseEntity.ok(duplicateService.checkEmailDuplicate(email));
     }
 

@@ -17,16 +17,18 @@ public enum ErrorCode {
     INVALID_ACCESS_TOKEN(FORBIDDEN, "0102", "잘못된 Access Token 입니다."),
     EXPIRED_ACCESS_TOKEN(FORBIDDEN, "0103", "만료된 Access Token 입니다."),
     UNSUPPORTED_ACCESS_TOKEN(FORBIDDEN, "0104", "지원하지 않는 Access Token 입니다."),
-    ILLEGAL_ACCESS_TOKEN(FORBIDDEN, "0105", "Claim이 빈 Access Token 입니다."),
+    ILLEGAL_ACCESS_TOKEN(FORBIDDEN, "0105", "권한 정보가 없는 Access Token 입니다."),
     INVALID_REFRESH_TOKEN(FORBIDDEN, "0106", "잘못된 Refresh Token 입니다."),
     EXPIRED_REFRESH_TOKEN(FORBIDDEN, "0107", "만료된 Refresh Token 입니다."),
     UNSUPPORTED_REFRESH_TOKEN(FORBIDDEN, "0108", "지원하지 않는 Refresh Token 입니다."),
-    ILLEGAL_REFRESH_TOKEN(FORBIDDEN, "0109", "Claim이 빈 Refresh Token 입니다."),
+    ILLEGAL_REFRESH_TOKEN(FORBIDDEN, "0109", "권한 정보가 없는 Refresh Token 입니다."),
 
     KAKAO_AUTHENTICATION_ERROR(UNAUTHORIZED, "0110", "카카오로부터 ACCESS 토큰 획득에 실패했습니다."),
     KAKAO_CONNECT_FAILED_TOKEN_ENDPOINT(UNAUTHORIZED, "0111", "카카오 토큰 엔드포인트와 통신에 실패하였습니다."),
     KAKAO_FAILED_GET_USERINFO_ERROR(UNAUTHORIZED, "0112", "카카오로부터 사용자 정보를 가져오지 못했습니다."),
     KAKAO_CONNECT_FAILED_USERINFO_ENDPOINT(UNAUTHORIZED, "0113", "카카오 사용자 정보 엔드포인트와 통신에 실패하였습니다."),
+
+    LOGGED_IN_SOMEWHERE_ELSE(FORBIDDEN, "0114", "다른 장소에서 로그인 되었습니다."),
 
     NOT_FOUND_END_POINT(NOT_FOUND, "0200", "존재하지 않는 접근입니다."),
 
