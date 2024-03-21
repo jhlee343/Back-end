@@ -29,7 +29,7 @@ public class Warning {
     private String warningContent;
 
     @Builder
-    public Warning(String warningUUID, User userId, String warningContent){
+    public Warning(User userId, String warningContent){
         this.warningUUID= UUID.randomUUID().toString();
         this.warningContent=warningContent;
         this.userId=userId;
