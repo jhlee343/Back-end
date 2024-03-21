@@ -17,7 +17,7 @@ public class Review {
     private Long reviewId;
 
     @NotNull
-    private UUID reviewUUID;
+    private String reviewUUID;
 
     private String reviewContent;
 
@@ -36,7 +36,7 @@ public class Review {
     private Long ticketId;
 
     @Builder
-    public Review(UUID reviewUUID, User writerId, User receiverId, String reviewContent, double reviewRating, Boolean isShowed){
+    public Review(String reviewUUID, User writerId, User receiverId, String reviewContent, double reviewRating, Boolean isShowed){
         this.reviewUUID = reviewUUID;
         this.receiverId = receiverId;
         this.writerId = writerId;
