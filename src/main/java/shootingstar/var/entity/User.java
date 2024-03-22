@@ -10,6 +10,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -55,6 +57,12 @@ public class User extends BaseTimeEntity {
 
     private Integer warningCount;
 
+    private Boolean isWithdrawn;
+    private LocalDateTime withdrawnTime;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private final List<Auction> myHostedAuction = new ArrayList<>();
+
     @Builder
     public User(String kakaoId, String name, String nickname, String phone, String email, String profileImgUrl, UserType userType) {
         this.userUUID = UUID.randomUUID().toString();
@@ -70,6 +78,8 @@ public class User extends BaseTimeEntity {
         this.rating = null;
         this.subscribe = null;
         this.warningCount = 0;
+        this.isWithdrawn = false;
+        this.withdrawnTime = null;
     }
 
     public void increasePoint(long point) {
@@ -78,5 +88,10 @@ public class User extends BaseTimeEntity {
 
     public void decreasePoint(long point) {
         this.point -= point;
+    }
+
+    public void withdrawn() {
+        this.isWithdrawn = true;
+        this.withdrawnTime = LocalDateTime.now();
     }
 }

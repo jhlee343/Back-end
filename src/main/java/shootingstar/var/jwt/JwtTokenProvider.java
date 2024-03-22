@@ -156,12 +156,6 @@ public class JwtTokenProvider {
         return new UsernamePasswordAuthenticationToken(subject, null, authorities);
     }
 
-    public String getUserUUIDByRequest(HttpServletRequest request) {
-        String accessToken = TokenUtil.getTokenFromHeader(request);
-        Authentication authentication = getAuthenticationFromAccessToken(accessToken);
-        return authentication.getName();
-    }
-
     // refresh 토큰을 복호화하여 토큰에 들어있는 정보를 꺼내는 메서드
     public Authentication getAuthenticationFromRefreshToken(String refreshToken) {
         Claims claims = parseClaims(refreshToken, refreshKey);
@@ -185,7 +179,7 @@ public class JwtTokenProvider {
     }
 
     // access 토큰 정보를 검증하는 메서드
-    public boolean validateToken(String token) {
+    public boolean validateAccessToken(String token) {
         if (token == null) {
             log.info("Not Found ACCESS token");
             throw new CustomException(INVALID_ACCESS_TOKEN);
@@ -232,7 +226,10 @@ public class JwtTokenProvider {
             throw new CustomException(ILLEGAL_REFRESH_TOKEN);
         }
     }
-
+    // ----------------------------------------------------------------------------------------------------------------
+    /**
+     * JwtRedis 리프레시 토큰 정보 저장
+     */
     private void saveRefreshTokenAtRedis(String refreshToken, Instant refreshTokenExpiresIn) {
         // 리프레시 토큰의 만료 시간을 원하는 형식으로 포맷팅
         String formattedDate = dateTimeFormatter.withZone(ZoneId.systemDefault())
@@ -247,6 +244,9 @@ public class JwtTokenProvider {
         jwtRedisUtil.setDataExpire(refreshToken, valueToStore , ttl);
     }
 
+    /**
+     * JwtRedis 리프레시 토큰 만료 처리
+     */
     public void expiredRefreshTokenAtRedis(String refreshToken) {
         String data = jwtRedisUtil.getData(refreshToken); // 해당 리프레시 토큰 무효화
         if (data == null) {
@@ -284,6 +284,9 @@ public class JwtTokenProvider {
         }
     }
 
+    /**
+     * JwtRedis 리프레시 토큰 만료 상태 확인
+     */
     public void checkRefreshTokenState(String token) {
         // jwt redis 에서 토큰의 정보를 가지고 온다.
         String data = jwtRedisUtil.getData(token);
@@ -307,8 +310,28 @@ public class JwtTokenProvider {
         }
     }
 
+    // ----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * LoginListRedis 로그인 정보 저장
+     */
     private void saveLoginListWithRefreshTokenAtRedis(String userUUID, String refreshToken, Instant refreshTokenExpiresIn) {
         long ttl = Duration.between(Instant.now(), refreshTokenExpiresIn).toMillis();
         loginListRedisUtil.setDataExpire(userUUID, refreshToken , ttl);
+    }
+
+    /**
+     * LoginListRedis 로그인 확인
+     */
+    public boolean isLoginUser(String userUUID) {
+        return loginListRedisUtil.getData(userUUID) != null;
+    }
+
+    // ----------------------------------------------------------------------------------------------------------------
+
+    public String getUserUUIDByRequest(HttpServletRequest request) {
+        String accessToken = TokenUtil.getTokenFromHeader(request);
+        Authentication authentication = getAuthenticationFromAccessToken(accessToken);
+        return authentication.getName();
     }
 }
