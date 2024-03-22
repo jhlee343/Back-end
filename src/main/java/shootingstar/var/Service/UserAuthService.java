@@ -87,7 +87,7 @@ public class UserAuthService {
     }
 
     @Transactional
-    public void withdrawal(String userUUID, String refreshToken) {
+    public String withdrawal(String userUUID, String refreshToken) {
         User user = userRepository.findByUserUUID(userUUID)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
@@ -110,5 +110,7 @@ public class UserAuthService {
         // 진행중인 식사권에 대한 거부 로직도 필요
 
         user.withdrawn();
+
+        return user.getKakaoId();
     }
 }

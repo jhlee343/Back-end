@@ -143,7 +143,8 @@ public class UserAuthController {
         String userUUID = tokenProvider.getUserUUIDByRequest(request);
         String refreshToken = TokenUtil.getTokenFromCookie(request);
 
-        authService.withdrawal(userUUID, refreshToken);
+        String kakaoId = authService.withdrawal(userUUID, refreshToken);
+        kakaoAPI.unlinkUser(kakaoId);
 
         TokenUtil.updateCookie(response, null, 0);
 
