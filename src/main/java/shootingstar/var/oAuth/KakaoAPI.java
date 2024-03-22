@@ -23,6 +23,8 @@ public class KakaoAPI {
     private String redirectURI;
     @Value("${spring.security.oauth2.client.registration.kakao.client-secret}")
     private String clientSecret;
+    @Value("${admin-key}")
+    private String adminKey;
 
     private final RestTemplate restTemplate;
 
@@ -74,6 +76,26 @@ public class KakaoAPI {
             } else {
                 throw new CustomException(KAKAO_FAILED_GET_USERINFO_ERROR);
             }
+        } catch (RestClientException e) {
+            throw new CustomException(KAKAO_CONNECT_FAILED_USERINFO_ENDPOINT);
+        }
+    }
+
+    public void unlinkUser(String kakaoId) {
+        String unlinkUserEndpoint = "https://kapi.kakao.com/v1/user/unlink";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.add("Authorization", "KakaoAK " + adminKey); // 어드민 키 사용
+
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("target_id_type", "user_id");
+        params.add("target_id", String.valueOf(kakaoId));
+
+        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(params, headers);
+
+        try {
+            restTemplate.exchange(unlinkUserEndpoint, HttpMethod.POST, requestEntity, String.class);
         } catch (RestClientException e) {
             throw new CustomException(KAKAO_CONNECT_FAILED_USERINFO_ENDPOINT);
         }

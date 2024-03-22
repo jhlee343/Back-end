@@ -42,11 +42,13 @@ public enum ErrorCode {
 
     AUTH_ERROR_EMAIL(UNAUTHORIZED, "1101", "잘못된 키 혹은 잘못(만료) 된 인증 코드입니다."),
     VALIDATE_ERROR_EMAIL(UNAUTHORIZED, "1102", "인증이 만료되었거나 인증되지 않은 이메일입니다."),
+    BANNED_USER(UNAUTHORIZED, "1103", "경고 3회 누적으로 정지된 사용자입니다."),
 
     USER_NOT_FOUND(NOT_FOUND, "1201", "존재하지 않는 사용자입니다."),
 
     DUPLICATE_EMAIL(CONFLICT, "1301", "이미 사용중인 이메일입니다."),
     DUPLICATE_NICKNAME(CONFLICT, "1302", "이미 사용중인 닉네임입니다."),
+    WITHDRAWAL_ERROR_BY_AUCTION_IN_PROGRESS(CONFLICT, "1303", "현재 진행중인 경매가 존재할 경우 회원탈퇴가 불가능합니다."),
 
     MIN_BID_AMOUNT_INCORRECT_FORMAT(BAD_REQUEST, "2000", "최소입찰금액은 자신의 보유 포인트보다 적어야 합니다."),
     AUCTION_ACCESS_DENIED(FORBIDDEN, "2100", "접근 권한이 없습니다."),
