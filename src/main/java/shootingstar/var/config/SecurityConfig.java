@@ -43,7 +43,7 @@ public class SecurityConfig {
                                 ).denyAll()
 
                                 .requestMatchers( // 인증 후 접근 허용
-                                        "/api/auth/delete/user"
+                                        "/api/auth/withdrawal"
                                 ).authenticated()
 
                                 .requestMatchers( // 인증 없이 접근 허용

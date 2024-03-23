@@ -60,8 +60,11 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
             이 때 만약 잘못된 토큰 값이라면 토큰 에러를 반환한다.
          */
         try {
-            if (token != null && jwtTokenProvider.validateToken(token)) {
+            if (token != null && jwtTokenProvider.validateAccessToken(token)) {
                 Authentication authentication = jwtTokenProvider.getAuthenticationFromAccessToken(token);
+                if (!jwtTokenProvider.isLoginUser(authentication.getName())) {
+                    throw new CustomException(ErrorCode.INVALID_ACCESS_TOKEN);
+                }
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         } catch (CustomException e) {
