@@ -21,7 +21,6 @@ public class Review {
     private String reviewUUID;
 
     private String reviewContent;
-
     private Double reviewRating;
 
     private Boolean isShowed;
