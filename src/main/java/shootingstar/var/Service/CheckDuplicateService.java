@@ -10,10 +10,10 @@ public class CheckDuplicateService {
     private final UserRepository userRepository;
 
     public boolean checkNicknameDuplicate(String nickname) {
-        return userRepository.existsByNickname(nickname);
+        return userRepository.existsByNicknameAndIsWithdrawn(nickname, false);
     }
 
     public boolean checkEmailDuplicate(String email) {
-        return userRepository.existsByEmail(email);
+        return userRepository.existsByEmailAndIsWithdrawn(email, false);
     }
 }
