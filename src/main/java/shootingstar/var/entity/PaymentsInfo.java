@@ -1,7 +1,9 @@
 package shootingstar.var.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -15,18 +17,19 @@ public class PaymentsInfo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long paymentId;
 
-    @Column(columnDefinition = "BINARY(16)")
-    private UUID paymentUUID;
-
-    private Long paymentAmount;
+    private String paymentUUID;
 
     @ManyToOne
     @JoinColumn(name = "userId")
+    @NotNull
     private User user;
 
-    public PaymentsInfo(Long paymentAmount, User user) {
-        this.paymentUUID = UUID.randomUUID();
-        this.paymentAmount = paymentAmount;
+    @NotNull
+    private Long paymentAmount;
+
+    public PaymentsInfo(User user, Long paymentAmount) {
+        this.paymentUUID = UUID.randomUUID().toString();
         this.user = user;
+        this.paymentAmount = paymentAmount;
     }
 }

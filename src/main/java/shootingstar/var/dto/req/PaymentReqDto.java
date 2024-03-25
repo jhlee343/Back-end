@@ -6,5 +6,5 @@ import lombok.Data;
 public class PaymentReqDto {
     private String imp_uid;
     private String merchant_uid;
-    private Long amount;
+    private Long paymentAmount;
 }

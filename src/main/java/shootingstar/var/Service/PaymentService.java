@@ -6,51 +6,70 @@ import com.siot.IamportRestClient.response.Payment;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import shootingstar.var.dto.req.ExchangeReqDto;
+import shootingstar.var.entity.ExchangeForm;
 import shootingstar.var.entity.PaymentsInfo;
 import shootingstar.var.entity.User;
 import shootingstar.var.exception.CustomException;
+import shootingstar.var.exception.ErrorCode;
 import shootingstar.var.jwt.JwtTokenProvider;
+import shootingstar.var.repository.ExchangeFormRepository;
 import shootingstar.var.repository.PaymentRepository;
 import shootingstar.var.repository.UserRepository;
 
 import java.util.Optional;
 import java.util.UUID;
 
-import static shootingstar.var.exception.ErrorCode.INCORRECT_FORMAT;
-import static shootingstar.var.exception.ErrorCode.USER_NOT_FOUND;
+import static shootingstar.var.exception.ErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
 public class PaymentService {
     private final PaymentRepository paymentRepository;
-    private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
+    private final ExchangeFormRepository exchangeFormRepository;
 
 
 
-    public void verifyIamportService(IamportResponse<Payment> ires, Long amount, String accessToken) {
-        Authentication authentication = jwtTokenProvider.getAuthenticationFromAccessToken(accessToken);
-        String userUuid = authentication.getName();
-        User user = findUserByUUID(userUuid);
+    @Transactional
+    public void verifyIamportService(IamportResponse<Payment> ires, Long amount, String userUUID) {
+        User user = userRepository.findByUserUUID(userUUID)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         if (ires.getResponse().getAmount().longValue() != amount) {
-            throw new CustomException(INCORRECT_FORMAT);
+            throw new CustomException(PAYMENT_ACCESS_DENIED);
         }
 
-        PaymentsInfo paymentsInfo = new PaymentsInfo(amount, user);
+        PaymentsInfo paymentsInfo = new PaymentsInfo(user, amount);
         paymentRepository.save(paymentsInfo);
+
+        user.increasePoint(amount);
     }
 
+    @Transactional
+    public void applyExchange(ExchangeReqDto exchangeReqDto, String userUUID) {
+        User user = userRepository.findByUserUUID(userUUID)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-
-    private User findUserByUUID(String userUuid) {
-        Optional<User> optionalUser = userRepository.findByUserUUID(userUuid);
-        if (optionalUser.isEmpty()) {
-            // 엑세스 토큰을 통해 사용자를 찾지 못했을 때
-            // 이 오류가 발생한다면 이미 탈퇴한 회원이 만료되지 않은 엑세스 토큰을 통해 비밀번호 확인을 시도했거나
-            // 어떠한 방법으로 JWT 토큰의 사용자 고유번호를 변경했을 때
-            throw new CustomException(USER_NOT_FOUND);
+        if (!exchangeReqDto.getExchangeAccountHolder().equals(user.getName())) {
+            throw new CustomException(DIFFERENT_ACCOUNT_HOLDER);
         }
-        return optionalUser.get();
+
+        if (exchangeReqDto.getExchangePoint() > user.getPoint()) {
+            throw new CustomException(EXCHANGE_AMOUNT_INCORRECT_FORMAT);
+        }
+
+        ExchangeForm exchangeForm = ExchangeForm.builder()
+                .user(user)
+                .exchangePoint(exchangeReqDto.getExchangePoint())
+                .exchangeAccount(exchangeReqDto.getExchangeAccount())
+                .exchangeBank(exchangeReqDto.getExchangeBank())
+                .exchangeAccountHolder(exchangeReqDto.getExchangeAccountHolder())
+                .build();
+
+        exchangeFormRepository.save(exchangeForm);
+
+        user.decreasePoint(exchangeReqDto.getExchangePoint());
     }
 }

@@ -54,6 +54,10 @@ public enum ErrorCode {
     AUCTION_ACCESS_DENIED(FORBIDDEN, "2100", "접근 권한이 없습니다."),
     AUCTION_NOT_FOUND(NOT_FOUND, "2200", "존재하지 않는 경매입니다."),
     AUCTION_CONFLICT(CONFLICT, "2300", "이미 처리된 경매입니다."),
+
+    EXCHANGE_AMOUNT_INCORRECT_FORMAT(BAD_REQUEST, "3000", "환전 포인트는 보유 포인트보다 적어야 합니다."),
+    PAYMENT_ACCESS_DENIED(FORBIDDEN, "3100", "결제 정보가 다릅니다."),
+    DIFFERENT_ACCOUNT_HOLDER(FORBIDDEN, "3100", "본인 명의의 계좌가 아닙니다."),
     ;
 
     private final HttpStatus httpStatus;

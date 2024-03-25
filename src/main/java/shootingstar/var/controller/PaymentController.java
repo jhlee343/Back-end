@@ -14,14 +14,14 @@ import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import shootingstar.var.Service.PaymentService;
+import shootingstar.var.dto.req.ExchangeReqDto;
 import shootingstar.var.dto.req.PaymentReqDto;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
+import shootingstar.var.jwt.JwtTokenProvider;
 
 import java.io.IOException;
 
@@ -31,6 +31,7 @@ import java.io.IOException;
 @RequestMapping("/api")
 public class PaymentController {
     private final PaymentService paymentService;
+    private final JwtTokenProvider jwtTokenProvider;
     private IamportClient iamportClient;
 
     @Value("${imp.api.key}")
@@ -48,8 +49,6 @@ public class PaymentController {
         return iamportClient.paymentByImpUid(impUid);
     }
 
-
-
     @Operation(summary = "결제 검증 API", description = "결제 데이터를 PortOne서버의 데이터와 비교, 검증하는 API")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful operation", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = Payment.class)) }),
@@ -57,26 +56,21 @@ public class PaymentController {
     })
     @PostMapping("/payment")
     public IamportResponse<Payment> paymentComplete(HttpServletRequest request, @RequestBody PaymentReqDto paymentReqDto) throws IamportResponseException, IOException {
-        String accessToken = getTokenFromHeader(request);
+        String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
 
-        Long amount = paymentReqDto.getAmount();
+        Long amount = paymentReqDto.getPaymentAmount();
 
         IamportResponse<Payment> ires = paymentLookup(paymentReqDto.getImp_uid());
 
-        paymentService.verifyIamportService(ires, amount, accessToken);
+        paymentService.verifyIamportService(ires, amount, userUUID);
 
         return ires;
     }
 
-
-    private static String getTokenFromHeader(HttpServletRequest request) {
-        String token = request.getHeader("Authorization"); // 헤더에 존재하는 엑세스 토큰을 받아온다.
-
-        if (token != null && token.startsWith("Bearer ")) {
-            token = token.substring(7); // "Bearer " 접두어 제거
-        } else {
-            throw new CustomException(ErrorCode.INVALID_ACCESS_TOKEN);
-        }
-        return token;
+    @PostMapping("/payment/exchange")
+    public ResponseEntity<?> applyExchange(HttpServletRequest request, @RequestBody ExchangeReqDto exchangeReqDto) {
+        String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
+        paymentService.applyExchange(exchangeReqDto, userUUID);
+        return ResponseEntity.ok("포인트 환전 신청이 완료되었습니다.");
     }
 }
