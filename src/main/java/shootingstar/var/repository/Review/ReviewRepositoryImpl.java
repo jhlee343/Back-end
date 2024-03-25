@@ -48,7 +48,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
                         review.writerId.userUUID
                 ))
                 .from(review)
-                .where(userEqReceiver(userUUID))
+                .where(userEqReceiver(userUUID), review.receiverId.isWithdrawn.eq(false))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(review.reviewId.desc())
@@ -86,7 +86,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
                         review.receiverId.userUUID
                 ))
                 .from(review)
-                .where(userEqWriter(userUUID))
+                .where(userEqWriter(userUUID), review.writerId.isWithdrawn.eq(false))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(review.reviewId.desc())

@@ -22,7 +22,7 @@ public class WarningRepositoryCustomImpl implements WarningRepositoryCustom{
         return queryFactory
                 .select(new QWarningListDto(
                         warning.warningUUID,
-                        warning.userId,
+                        warning.userId.userUUID,
                         warning.warningContent
                 ))
                 .from(warning)

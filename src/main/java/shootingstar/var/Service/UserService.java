@@ -31,7 +31,6 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
     private final FollowRepository followRepository;
     private final MailRedisUtil mailRedisUtil;
@@ -67,8 +66,7 @@ public class UserService {
         }
     }
 
-    public boolean checkVIP(HttpServletRequest request) {
-        String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
+    public boolean checkVIP(String userUUID) {
         User user = findByUserUUID(userUUID);
         if (user.getUserType().equals(UserType.ROLE_VIP)) {
             //vip인 경우 true

@@ -1,5 +1,6 @@
 package shootingstar.var.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -20,8 +21,10 @@ import shootingstar.var.jwt.JwtTokenProvider;
 @RequiredArgsConstructor
 @RequestMapping("/api/basic")
 public class BasicController {
-    private static JwtTokenProvider jwtTokenProvider;
-    private static BasicService basicService;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final BasicService basicService;
+
+    @Operation(summary = "vip 신청")
     @PostMapping("/applyVip")
     public ResponseEntity<String> applyVip(HttpServletRequest request,
                                            @Valid @RequestBody UserApplyVipDto userApplyVipDto){
