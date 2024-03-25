@@ -7,6 +7,7 @@ import shootingstar.var.dto.req.FollowingDto;
 import shootingstar.var.dto.req.QFollowingDto;
 
 import java.util.List;
+import java.util.UUID;
 
 import static shootingstar.var.entity.QFollow.follow;
 public class FollowRepositoryCustomImpl implements FollowRepositoryCustom{
