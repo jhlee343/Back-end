@@ -49,6 +49,21 @@ public class GlobalExceptionHandler {
                 } case "profileImgUrl" -> {
                     errorCode = INCORRECT_FORMAT_PROFILE_IMG_URL;
                     break;
+                } case "minBidAmount" -> {
+                    errorCode = INCORRECT_FORMAT_MIN_BID_AMOUNT;
+                    break;
+                } case "meetingDate" -> {
+                    errorCode = INCORRECT_FORMAT_MEETING_DATE;
+                    break;
+                } case "meetingLocation" -> {
+                    errorCode = INCORRECT_FORMAT_MEETING_LOCATION;
+                    break;
+                } case "meetingInfoText" -> {
+                    errorCode = INCORRECT_FORMAT_MEETING_INFO_TEXT;
+                    break;
+                } case "meetingPromiseText" -> {
+                    errorCode = INCORRECT_FORMAT_MEETING_PROMISE_TEXT;
+                    break;
                 }
             }
 
