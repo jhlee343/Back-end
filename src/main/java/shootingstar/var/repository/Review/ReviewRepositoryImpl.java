@@ -56,7 +56,8 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
 
         JPAQuery<Long> countQuery = queryFactory
                 .select(review.count())
-                .from(review);
+                .from(review)
+                .where(userEqReceiver(userUUID), review.receiverId.isWithdrawn.eq(false));
 
         return PageableExecutionUtils.getPage(content,pageable,countQuery::fetchOne);
     }
@@ -94,7 +95,8 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
 
         JPAQuery<Long> countQuery = queryFactory
                 .select(review.count())
-                .from(review);
+                .from(review)
+                .where(userEqReceiver(userUUID), review.writerId.isWithdrawn.eq(true));
 
         return PageableExecutionUtils.getPage(content,pageable,countQuery::fetchOne);
     }
