@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,8 @@ import shootingstar.var.Service.UserAuthService;
 import shootingstar.var.dto.req.AccessKakaoReqDto;
 import shootingstar.var.dto.res.AccessKakaoResDto;
 import shootingstar.var.dto.res.KakaoUserResDto;
+import shootingstar.var.exception.CustomException;
+import shootingstar.var.exception.ErrorCode;
 import shootingstar.var.exception.ErrorResponse;
 import shootingstar.var.jwt.JwtTokenProvider;
 import shootingstar.var.jwt.TokenInfo;
@@ -26,6 +29,7 @@ import shootingstar.var.util.TokenUtil;
 
 @Tag(name = "인증 컨트롤러", description = "사용자 인증 관련 컨트롤러")
 @RestController
+@Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
 public class UserAuthController {
@@ -48,7 +52,8 @@ public class UserAuthController {
                                     "- 카카오로부터 ACCESS 토큰 획득에 실패 : 0110\n" +
                                     "- 카카오 토큰 엔드포인트와 통신에 실패 : 0111\n" +
                                     "- 카카오로부터 사용자 정보를 가져오지 못했을 때 : 0112\n" +
-                                    "- 카카오 사용자 정보 엔드포인트와 통신에 실패 : 0113",
+                                    "- 카카오 사용자 정보 엔드포인트와 통신에 실패 : 0113\n" +
+                                    "- 경고 3회 누적으로 정지된 사용자 : 1103",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
     })
     @PostMapping("/oauth2/accessKakao")
@@ -68,10 +73,6 @@ public class UserAuthController {
 
             return ResponseEntity.ok().body(new AccessKakaoResDto("JOIN", kakaoUserResDto));
         } else {
-            String oldRefreshToken = TokenUtil.getTokenFromCookie(request);
-
-            if (oldRefreshToken != null) tokenProvider.expiredRefreshToken(oldRefreshToken);
-
             TokenInfo tokenInfo = tokenProvider.generateToken(authentication);
             String refreshToken = tokenInfo.getRefreshToken();
 
@@ -82,9 +83,26 @@ public class UserAuthController {
         }
     }
 
+    @Operation(summary = "로그아웃 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "로그아웃에 성공하였을 때, 에러가 발생하여도 내부적으로 로그만 남기고 쿠키에서 토큰을 삭제해서 반환",
+                    content = {@Content(mediaType = "text/plain", schema = @Schema(implementation = String.class))}),
+    })
     @DeleteMapping("/logout")
-    public ResponseEntity<String> logout() {
-        return ResponseEntity.ok().body("로그아웃");
+    public ResponseEntity<String> logout(HttpServletRequest request, HttpServletResponse response) {
+        String refreshToken = TokenUtil.getTokenFromCookie(request);
+
+        try {
+            authService.logout(refreshToken);
+        } catch (Exception e) { // 리프레시 토큰 검증 과정에서 에러가 발생하더라도 로그만 남기고 로그아웃 처리
+            log.error("Logout process failed: {}", e.getMessage());
+        } finally {
+            // 로그아웃 요청에 대해 클라이언트의 리프레시 토큰 쿠키를 삭제
+            TokenUtil.updateCookie(response, null, 0);
+        }
+
+        return ResponseEntity.ok().body("성공적으로 로그아웃 되었습니다.");
     }
 
     @Operation(summary = "액세스 토큰 재발급 API")
@@ -96,17 +114,40 @@ public class UserAuthController {
                                     "- 잘못된 RefreshToken : 0106\n" +
                                     "- 만료된 RefreshToken : 0107\n" +
                                     "- 지원하지 않는 RefreshToken : 0108\n" +
-                                    "- Claim이 빈 Refresh Token : 0109",
+                                    "- Claim이 빈 Refresh Token : 0109\n" +
+                                    "- 다른 장소에서 로그인 됨 : 0114",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+            @ApiResponse(responseCode = "500",
+                    description = "Redis JSON 파싱 에러",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
     })
     @PostMapping("/refresh")
     public ResponseEntity<String> refresh(HttpServletRequest request, HttpServletResponse response) {
         String refreshToken = TokenUtil.getTokenFromCookie(request);
 
-        String newAccessToken = authService.refreshAccessToken(refreshToken);
+        String newAccessToken;
+        try {
+            newAccessToken = authService.refreshAccessToken(refreshToken);
+            TokenUtil.addHeader(response, newAccessToken);
+            return ResponseEntity.ok().body("성공적으로 액세스 토큰이 재발행 되었습니다.");
+        } catch (CustomException e) {
+            ErrorCode errorCode = e.getErrorCode();
+            // 클라이언트의 리프레시 토큰 쿠키를 삭제
+            TokenUtil.updateCookie(response, null, 0);
+            throw new CustomException(errorCode);
+        }
+    }
 
-        TokenUtil.addHeader(response, newAccessToken);
+    @PatchMapping("/withdrawal")
+    public ResponseEntity<String> withdrawal(HttpServletRequest request, HttpServletResponse response) {
+        String userUUID = tokenProvider.getUserUUIDByRequest(request);
+        String refreshToken = TokenUtil.getTokenFromCookie(request);
 
-        return ResponseEntity.ok().body("성공적으로 액세스 토큰이 재발행 되었습니다.");
+        String kakaoId = authService.withdrawal(userUUID, refreshToken);
+        kakaoAPI.unlinkUser(kakaoId);
+
+        TokenUtil.updateCookie(response, null, 0);
+
+        return ResponseEntity.ok().body("성공적으로 회원탈퇴 되었습니다.");
     }
 }

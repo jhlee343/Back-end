@@ -21,6 +21,7 @@ import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
 import shootingstar.var.repository.UserRepository;
 import shootingstar.var.util.JwtRedisUtil;
+import shootingstar.var.util.LoginListRedisUtil;
 import shootingstar.var.util.TokenUtil;
 
 import java.security.Key;
@@ -41,6 +42,7 @@ public class JwtTokenProvider {
     private final Key refreshKey;
     private final TokenProperty tokenProperty;
     private final JwtRedisUtil jwtRedisUtil;
+    private final LoginListRedisUtil loginListRedisUtil;
     private final UserRepository userRepository;
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
@@ -48,9 +50,10 @@ public class JwtTokenProvider {
 
     public JwtTokenProvider(@Value("${jwt.secret-access}") String accessSecretKey,
                             @Value("${jwt.secret-refresh}") String refreshSecretKey,
-                            TokenProperty tokenProperty, UserRepository userRepository, JwtRedisUtil jwtRedisUtil) {
+                            TokenProperty tokenProperty, UserRepository userRepository, JwtRedisUtil jwtRedisUtil, LoginListRedisUtil loginListRedisUtil) {
         this.tokenProperty = tokenProperty;
         this.jwtRedisUtil = jwtRedisUtil;
+        this.loginListRedisUtil = loginListRedisUtil;
         this.userRepository = userRepository;
         byte[] accessKeyBytes = Decoders.BASE64.decode(accessSecretKey);
         byte[] refreshKeyBytes = Decoders.BASE64.decode(refreshSecretKey);
@@ -93,6 +96,19 @@ public class JwtTokenProvider {
     }
 
     // 리프레시 토큰 생성 메서드
+//    public String generateRefreshToken(Authentication authentication, Instant now, Instant refreshTokenExpiresIn) {
+//        String refreshToken = Jwts.builder()
+//                .setSubject(authentication.getName())
+//                .setIssuedAt(Date.from(now))
+//                .setExpiration(Date.from(refreshTokenExpiresIn))
+//                .signWith(refreshKey, SignatureAlgorithm.HS256)
+//                .compact();
+//
+//        saveRefreshTokenAtRedis(refreshToken, refreshTokenExpiresIn);
+//
+//        return refreshToken;
+//    }
+
     public String generateRefreshToken(Authentication authentication, Instant now, Instant refreshTokenExpiresIn) {
         String refreshToken = Jwts.builder()
                 .setSubject(authentication.getName())
@@ -101,7 +117,14 @@ public class JwtTokenProvider {
                 .signWith(refreshKey, SignatureAlgorithm.HS256)
                 .compact();
 
+        String beforeRefreshToken = loginListRedisUtil.getData(authentication.getName());
+
+        if (beforeRefreshToken != null) {
+            expiredRefreshTokenAtRedis(beforeRefreshToken);
+        }
+
         saveRefreshTokenAtRedis(refreshToken, refreshTokenExpiresIn);
+        saveLoginListWithRefreshTokenAtRedis(authentication.getName(), refreshToken, refreshTokenExpiresIn);
 
         return refreshToken;
     }
@@ -133,15 +156,9 @@ public class JwtTokenProvider {
         return new UsernamePasswordAuthenticationToken(subject, null, authorities);
     }
 
-    public String getUserUUIDByRequest(HttpServletRequest request) {
-        String accessToken = TokenUtil.getTokenFromHeader(request);
-        Authentication authentication = getAuthenticationFromAccessToken(accessToken);
-        return authentication.getName();
-    }
-
     // refresh 토큰을 복호화하여 토큰에 들어있는 정보를 꺼내는 메서드
-    public Authentication getAuthenticationFromRefreshToken(String token) {
-        Claims claims = parseClaims(token, refreshKey);
+    public Authentication getAuthenticationFromRefreshToken(String refreshToken) {
+        Claims claims = parseClaims(refreshToken, refreshKey);
 
         if (claims.getSubject() == null) {
             log.info("토큰에서 사용자 식별 정보를 찾을 수 없습니다.");
@@ -162,7 +179,12 @@ public class JwtTokenProvider {
     }
 
     // access 토큰 정보를 검증하는 메서드
-    public boolean validateToken(String token) {
+    public boolean validateAccessToken(String token) {
+        if (token == null) {
+            log.info("Not Found ACCESS token");
+            throw new CustomException(INVALID_ACCESS_TOKEN);
+        }
+
         try {
             Jwts.parserBuilder().setSigningKey(accessKey).build().parseClaimsJws(token);
             return true;
@@ -183,6 +205,11 @@ public class JwtTokenProvider {
 
     // refresh 토큰 정보를 검증하는 메서드
     public void validateRefreshToken(String token) {
+        if (token == null) {
+            log.info("Not Found REFRESH token");
+            throw new CustomException(INVALID_REFRESH_TOKEN);
+        }
+
         try {
             Jwts.parserBuilder().setSigningKey(refreshKey).build().parseClaimsJws(token);
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
@@ -199,7 +226,10 @@ public class JwtTokenProvider {
             throw new CustomException(ILLEGAL_REFRESH_TOKEN);
         }
     }
-
+    // ----------------------------------------------------------------------------------------------------------------
+    /**
+     * JwtRedis 리프레시 토큰 정보 저장
+     */
     private void saveRefreshTokenAtRedis(String refreshToken, Instant refreshTokenExpiresIn) {
         // 리프레시 토큰의 만료 시간을 원하는 형식으로 포맷팅
         String formattedDate = dateTimeFormatter.withZone(ZoneId.systemDefault())
@@ -214,7 +244,10 @@ public class JwtTokenProvider {
         jwtRedisUtil.setDataExpire(refreshToken, valueToStore , ttl);
     }
 
-    public void expiredRefreshToken(String refreshToken) {
+    /**
+     * JwtRedis 리프레시 토큰 만료 처리
+     */
+    public void expiredRefreshTokenAtRedis(String refreshToken) {
         String data = jwtRedisUtil.getData(refreshToken); // 해당 리프레시 토큰 무효화
         if (data == null) {
             return;
@@ -222,6 +255,11 @@ public class JwtTokenProvider {
         try {
             // 토큰 데이터를 JSON 형태로 변환한다,
             JsonNode tokenData = objectMapper.readTree(data);
+
+            // 이미 만료된 토큰이라면 종료
+            if (Objects.equals(tokenData.get("status").asText(), "expired")) {
+                return;
+            }
 
             // 상태 정보를 expired 로 변경한다.
             ((ObjectNode) tokenData).put("status", "expired");
@@ -246,6 +284,9 @@ public class JwtTokenProvider {
         }
     }
 
+    /**
+     * JwtRedis 리프레시 토큰 만료 상태 확인
+     */
     public void checkRefreshTokenState(String token) {
         // jwt redis 에서 토큰의 정보를 가지고 온다.
         String data = jwtRedisUtil.getData(token);
@@ -267,5 +308,30 @@ public class JwtTokenProvider {
             log.info(e.getMessage());
             throw new CustomException(SERVER_ERROR);
         }
+    }
+
+    // ----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * LoginListRedis 로그인 정보 저장
+     */
+    private void saveLoginListWithRefreshTokenAtRedis(String userUUID, String refreshToken, Instant refreshTokenExpiresIn) {
+        long ttl = Duration.between(Instant.now(), refreshTokenExpiresIn).toMillis();
+        loginListRedisUtil.setDataExpire(userUUID, refreshToken , ttl);
+    }
+
+    /**
+     * LoginListRedis 로그인 확인
+     */
+    public boolean isLoginUser(String userUUID) {
+        return loginListRedisUtil.getData(userUUID) != null;
+    }
+
+    // ----------------------------------------------------------------------------------------------------------------
+
+    public String getUserUUIDByRequest(HttpServletRequest request) {
+        String accessToken = TokenUtil.getTokenFromHeader(request);
+        Authentication authentication = getAuthenticationFromAccessToken(accessToken);
+        return authentication.getName();
     }
 }

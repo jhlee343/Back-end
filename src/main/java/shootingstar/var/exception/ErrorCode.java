@@ -17,16 +17,18 @@ public enum ErrorCode {
     INVALID_ACCESS_TOKEN(FORBIDDEN, "0102", "잘못된 Access Token 입니다."),
     EXPIRED_ACCESS_TOKEN(FORBIDDEN, "0103", "만료된 Access Token 입니다."),
     UNSUPPORTED_ACCESS_TOKEN(FORBIDDEN, "0104", "지원하지 않는 Access Token 입니다."),
-    ILLEGAL_ACCESS_TOKEN(FORBIDDEN, "0105", "Claim이 빈 Access Token 입니다."),
+    ILLEGAL_ACCESS_TOKEN(FORBIDDEN, "0105", "권한 정보가 없는 Access Token 입니다."),
     INVALID_REFRESH_TOKEN(FORBIDDEN, "0106", "잘못된 Refresh Token 입니다."),
     EXPIRED_REFRESH_TOKEN(FORBIDDEN, "0107", "만료된 Refresh Token 입니다."),
     UNSUPPORTED_REFRESH_TOKEN(FORBIDDEN, "0108", "지원하지 않는 Refresh Token 입니다."),
-    ILLEGAL_REFRESH_TOKEN(FORBIDDEN, "0109", "Claim이 빈 Refresh Token 입니다."),
+    ILLEGAL_REFRESH_TOKEN(FORBIDDEN, "0109", "권한 정보가 없는 Refresh Token 입니다."),
 
     KAKAO_AUTHENTICATION_ERROR(UNAUTHORIZED, "0110", "카카오로부터 ACCESS 토큰 획득에 실패했습니다."),
     KAKAO_CONNECT_FAILED_TOKEN_ENDPOINT(UNAUTHORIZED, "0111", "카카오 토큰 엔드포인트와 통신에 실패하였습니다."),
     KAKAO_FAILED_GET_USERINFO_ERROR(UNAUTHORIZED, "0112", "카카오로부터 사용자 정보를 가져오지 못했습니다."),
     KAKAO_CONNECT_FAILED_USERINFO_ENDPOINT(UNAUTHORIZED, "0113", "카카오 사용자 정보 엔드포인트와 통신에 실패하였습니다."),
+
+    LOGGED_IN_SOMEWHERE_ELSE(FORBIDDEN, "0114", "다른 장소에서 로그인 되었습니다."),
 
     NOT_FOUND_END_POINT(NOT_FOUND, "0200", "존재하지 않는 접근입니다."),
 
@@ -40,11 +42,13 @@ public enum ErrorCode {
 
     AUTH_ERROR_EMAIL(UNAUTHORIZED, "1101", "잘못된 키 혹은 잘못(만료) 된 인증 코드입니다."),
     VALIDATE_ERROR_EMAIL(UNAUTHORIZED, "1102", "인증이 만료되었거나 인증되지 않은 이메일입니다."),
+    BANNED_USER(UNAUTHORIZED, "1103", "경고 3회 누적으로 정지된 사용자입니다."),
 
     USER_NOT_FOUND(NOT_FOUND, "1201", "존재하지 않는 사용자입니다."),
 
     DUPLICATE_EMAIL(CONFLICT, "1301", "이미 사용중인 이메일입니다."),
     DUPLICATE_NICKNAME(CONFLICT, "1302", "이미 사용중인 닉네임입니다."),
+    WITHDRAWAL_ERROR_BY_AUCTION_IN_PROGRESS(CONFLICT, "1303", "현재 진행중인 경매가 존재할 경우 회원탈퇴가 불가능합니다."),
 
     MIN_BID_AMOUNT_INCORRECT_FORMAT(BAD_REQUEST, "2000", "최소입찰금액은 자신의 보유 포인트보다 적어야 합니다."),
     INCORRECT_FORMAT_MIN_BID_AMOUNT(BAD_REQUEST, "2001", "잘못된 형식의 최소 입찰 금액입니다."),
