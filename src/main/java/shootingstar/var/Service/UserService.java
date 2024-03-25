@@ -105,7 +105,7 @@ public class UserService {
     }
 
     public Page<UserReceiveReviewDto> receiveReview(String userUUID, Pageable pageable){
-        return reviewRepository.findAllReviewByuserUUID(userUUID,pageable);
+        return reviewRepository.findAllReceiveByuserUUID(userUUID,pageable);
     }
 
     public Page<UserSendReviewDto> sendReview(String userUUID, Pageable pageable){

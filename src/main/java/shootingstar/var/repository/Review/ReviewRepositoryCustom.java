@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface ReviewRepositoryCustom {
     List<UserReceiveReviewDto> findReceiveByserUUID(String userUUID);
-    Page<UserReceiveReviewDto> findAllReviewByuserUUID(String userUUID, Pageable pageable);
+    Page<UserReceiveReviewDto> findAllReceiveByuserUUID(String userUUID, Pageable pageable);
 
     List<UserSendReviewDto> findSendByserUUID(String userUUID);
     Page<UserSendReviewDto> findAllSendByuserUUID(String userUUID, Pageable pageable);

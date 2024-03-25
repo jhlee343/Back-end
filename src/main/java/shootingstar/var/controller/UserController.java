@@ -87,11 +87,13 @@ public class UserController {
     @GetMapping("/review/send")
     public ResponseEntity<?> getSendReview(HttpServletRequest request, @PageableDefault(size=10) Pageable pageable){
         String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
-        Page<UserSendReviewDto> userReceiveReviewDtos = userService.sendReview(userUUID, pageable);
-        return ResponseEntity.ok(userReceiveReviewDtos);
+        Page<UserSendReviewDto> userSendReviewDtos = userService.sendReview(userUUID, pageable);
+        return ResponseEntity.ok(userSendReviewDtos);
     }
 
-    @Operation(summary = "리뷰 신고")
+    @Operation(summary = "리뷰 신고") @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "review report success")
+    })
     @PostMapping("/review/report")
     public ResponseEntity<String> reportReview(@Valid @PathVariable("reviewId") Long reviewId){
         userService.reportReview(reviewId);

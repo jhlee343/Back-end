@@ -11,6 +11,7 @@ import shootingstar.var.dto.res.QUserReceiveReviewDto;
 import shootingstar.var.dto.res.QUserSendReviewDto;
 import shootingstar.var.dto.res.UserReceiveReviewDto;
 import shootingstar.var.dto.res.UserSendReviewDto;
+import shootingstar.var.entity.Review;
 
 import java.util.List;
 import static shootingstar.var.entity.QReview.review;
@@ -37,7 +38,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
     }
 
     @Override
-    public Page<UserReceiveReviewDto> findAllReviewByuserUUID(String userUUID, Pageable pageable) {
+    public Page<UserReceiveReviewDto> findAllReceiveByuserUUID(String userUUID, Pageable pageable) {
         List<UserReceiveReviewDto> content = queryFactory
                 .select(new QUserReceiveReviewDto(
                         review.reviewUUID,
@@ -105,6 +106,5 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
     private BooleanExpression userEqWriter(String userUUID){
         return userUUID != null ? review.writerId.userUUID.eq(userUUID) : null;
     }
-
 
 }
