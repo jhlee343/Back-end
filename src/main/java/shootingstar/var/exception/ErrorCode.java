@@ -51,6 +51,12 @@ public enum ErrorCode {
     WITHDRAWAL_ERROR_BY_AUCTION_IN_PROGRESS(CONFLICT, "1303", "현재 진행중인 경매가 존재할 경우 회원탈퇴가 불가능합니다."),
 
     MIN_BID_AMOUNT_INCORRECT_FORMAT(BAD_REQUEST, "2000", "최소입찰금액은 자신의 보유 포인트보다 적어야 합니다."),
+    INCORRECT_FORMAT_MIN_BID_AMOUNT(BAD_REQUEST, "2001", "잘못된 형식의 최소 입찰 금액입니다."),
+    INCORRECT_FORMAT_MEETING_DATE(BAD_REQUEST, "2002", "잘못된 형식의 식사 날짜입니다."),
+    INCORRECT_FORMAT_MEETING_LOCATION(BAD_REQUEST, "2003", "잘못된 형식의 식사 장소입니다."),
+    INCORRECT_FORMAT_MEETING_INFO_TEXT(BAD_REQUEST, "2004", "잘못된 형식의 만남에 대한 정보입니다."),
+    INCORRECT_FORMAT_MEETING_PROMISE_TEXT(BAD_REQUEST, "2005", "잘못된 형식의 만남에 대한 약속입니다."),
+
     AUCTION_ACCESS_DENIED(FORBIDDEN, "2100", "접근 권한이 없습니다."),
     AUCTION_NOT_FOUND(NOT_FOUND, "2200", "존재하지 않는 경매입니다."),
     AUCTION_CONFLICT(CONFLICT, "2300", "이미 처리된 경매입니다."),
