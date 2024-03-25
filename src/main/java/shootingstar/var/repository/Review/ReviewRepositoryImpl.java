@@ -47,7 +47,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
                         review.writerId.userUUID
                 ))
                 .from(review)
-                .where()
+                .where(userEqReceiver(userUUID))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(review.reviewId.desc())
@@ -70,7 +70,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
                         review.receiverId.userUUID
                 ))
                 .from(review)
-                .where(userEqReceiver(userUUID))
+                .where(userEqWriter(userUUID))
                 .fetch();
     }
 
@@ -85,7 +85,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
                         review.receiverId.userUUID
                 ))
                 .from(review)
-                .where()
+                .where(userEqWriter(userUUID))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(review.reviewId.desc())
@@ -100,6 +100,10 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
 
     private BooleanExpression userEqReceiver(String userUUID){
         return userUUID !=null ? review.receiverId.userUUID.eq(userUUID) : null;
+    }
+
+    private BooleanExpression userEqWriter(String userUUID){
+        return userUUID != null ? review.writerId.userUUID.eq(userUUID) : null;
     }
 
 

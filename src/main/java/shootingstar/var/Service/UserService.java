@@ -125,6 +125,7 @@ public class UserService {
         );
         reviewReportRepository.save(reviewReport);
     }
+
     private Follow findFollowingByFollowUUID(String followUUID) {
         Optional<Follow> followOptional = followRepository.findByFollowUUID(followUUID);
         if (followOptional.isEmpty()) {

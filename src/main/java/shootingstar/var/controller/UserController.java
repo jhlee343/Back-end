@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -36,7 +37,7 @@ public class UserController {
 
     @Operation(summary = "프로필 불러오기")
     @GetMapping("/profile/{nickname}")
-    public ResponseEntity<UserProfileDto> getProfile(@PathVariable String nickname) {
+    public ResponseEntity<UserProfileDto> getProfile(@NotEmpty @PathVariable String nickname) {
         UserProfileDto profile = userService.getProfile(nickname);
         return ResponseEntity.ok(profile);
     }
@@ -92,16 +93,16 @@ public class UserController {
 
     @Operation(summary = "리뷰 신고")
     @PostMapping("/review/report")
-    public ResponseEntity<String> reportReview(@Valid @RequestParam("reviewId") Long reviewId){
+    public ResponseEntity<String> reportReview(@Valid @PathVariable("reviewId") Long reviewId){
         userService.reportReview(reviewId);
         return ResponseEntity.ok().body("review report success");
     }
     @Operation(summary = "경고 내역")
-    @GetMapping("warningList")
-    public ResponseEntity<WarningListDto> warningList(HttpServletRequest request){
+    @GetMapping("/warningList")
+    public ResponseEntity<?> warningList(HttpServletRequest request){
         String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
         List<WarningListDto> warning = userService.findAllWarning(userUUID);
-        return null;
+        return ResponseEntity.ok().body(warning);
                 //ResponseEntity.ok().body(warning);
     }
 

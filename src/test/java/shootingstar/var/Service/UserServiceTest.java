@@ -6,6 +6,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
+import shootingstar.var.controller.UserController;
+import shootingstar.var.dto.req.UserSignupReqDto;
+import shootingstar.var.dto.req.WarningListDto;
 import shootingstar.var.dto.res.UserReceiveReviewDto;
 import shootingstar.var.entity.*;
 import shootingstar.var.repository.AuctionRepository;
@@ -35,7 +38,7 @@ class UserServiceTest {
 
     @Test
     @Transactional
-    public void saveReview() throws Exception{
+    public void saveReview() throws Exception {
         User user1 = new User(
                 "000000001",
                 "이재현",
@@ -48,7 +51,10 @@ class UserServiceTest {
         userRepository.save(user1);
         userRepository.flush();
 
+        userService.getProfile("dlwogus");
+
         System.out.println(user1.getUserUUID());
+
         Auction auction1 = new Auction(
                 user1,
                 1000000,
@@ -73,8 +79,6 @@ class UserServiceTest {
         ticketRepository.save(ticket1);
         ticketRepository.flush();
 
-        System.out.println(ticket1.getUser().getUserUUID());
-
         Review review1 = new Review(
                 user1,
                 user1,
@@ -87,24 +91,14 @@ class UserServiceTest {
         reviewRepository.save(review1);
         reviewRepository.flush();
 
-        System.out.println(review1.getReceiverId().getUserUUID());
-        System.out.println(review1.getWriterId().getUserUUID());
+
+        //when
     }
 
-    @Test
-    public void receiveReview(String user, Pageable pageable){
-        userService.receiveReview("12323",pageable);
-    }
-    @Test
-    @Transactional
-    public void saveFollow() throws Exception{
-
-    }
     @Test
     @Transactional
     public void saveUser() throws Exception {
         //given
-
 
         //when
 
