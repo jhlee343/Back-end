@@ -68,6 +68,7 @@ public enum ErrorCode {
     SCHEDULING_SERVER_ERROR(INTERNAL_SERVER_ERROR, "4000", "알 수 없는 오류가 발생했습니다."),
     TASK_NOT_FOUND(NOT_FOUND, "4200", "존재하지 않는 task입니다."),
 
+    REVIEW_NOT_FOUND(NOT_FOUND, "5201","존재하지 않는 리뷰입니다."),
     ;
 
     private final HttpStatus httpStatus;

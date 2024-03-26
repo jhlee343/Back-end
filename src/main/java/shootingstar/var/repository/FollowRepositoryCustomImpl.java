@@ -3,8 +3,9 @@ package shootingstar.var.repository;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
-import shootingstar.var.dto.req.FollowingDto;
 import shootingstar.var.dto.req.QFollowingDto;
+import shootingstar.var.dto.req.FollowingDto;
+
 
 import java.util.List;
 import java.util.UUID;
