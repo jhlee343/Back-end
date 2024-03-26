@@ -65,6 +65,9 @@ public enum ErrorCode {
     PAYMENT_ACCESS_DENIED(FORBIDDEN, "3100", "결제 정보가 다릅니다."),
     DIFFERENT_ACCOUNT_HOLDER(FORBIDDEN, "3100", "본인 명의의 계좌가 아닙니다."),
 
+    SCHEDULING_SERVER_ERROR(INTERNAL_SERVER_ERROR, "4000", "알 수 없는 오류가 발생했습니다."),
+    TASK_NOT_FOUND(NOT_FOUND, "4200", "존재하지 않는 task입니다."),
+
     REVIEW_NOT_FOUND(NOT_FOUND, "5201","존재하지 않는 리뷰입니다."),
     ;
 

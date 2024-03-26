@@ -5,19 +5,29 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.quartz.JobBuilder;
+import org.quartz.JobDetail;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.Trigger;
+import org.quartz.TriggerBuilder;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shootingstar.var.entity.Auction;
 import shootingstar.var.entity.AuctionType;
+import shootingstar.var.entity.ScheduledTask;
 import shootingstar.var.entity.User;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
+import shootingstar.var.quartz.TicketCreationJob;
 import shootingstar.var.repository.AuctionRepository;
+import shootingstar.var.repository.ScheduledTaskRepository;
 import shootingstar.var.repository.UserRepository;
 import shootingstar.var.dto.req.AuctionCreateReqDto;
 
@@ -28,10 +38,9 @@ public class AuctionService {
 
     private final AuctionRepository auctionRepository;
     private final UserRepository userRepository;
-    private final TaskScheduler taskScheduler;
+    private final ScheduledTaskRepository scheduledTaskRepository;
     private final SchedulerService schedulerService;
-
-    private Map<Long, ScheduledFuture<?>> scheduledTasks = new ConcurrentHashMap<>();
+    private final Scheduler scheduler;
 
     @Transactional
     public void create(AuctionCreateReqDto reqDto, String userUUID) {
@@ -60,14 +69,34 @@ public class AuctionService {
         // 포인트 차감
         findUser.decreasePoint(auction.getMinBidAmount());
 
-        LocalDateTime scheduleTime = LocalDateTime.now().plusMinutes(1);
+        // 스케줄링 저장
+        LocalDateTime scheduleTime = LocalDateTime.now().plusDays(3);
+        ScheduledTask task = ScheduledTask.builder()
+                .auctionId(auction.getAuctionId())
+                .userId(auction.getUser().getUserId())
+                .scheduledTime(scheduleTime)
+                .build();
+        scheduledTaskRepository.save(task);
+
+        JobDetail jobDetail = JobBuilder.newJob(TicketCreationJob.class)
+                .withIdentity(UUID.randomUUID().toString(), "ticket-creation-jobs")
+                .usingJobData("auctionId", auction.getAuctionId())
+                .usingJobData("userId", findUser.getUserId())
+                .usingJobData("scheduledTaskId", task.getScheduledTaskId())
+                .build();
+
         Instant instant = scheduleTime.atZone(ZoneId.systemDefault()).toInstant();
-        ScheduledFuture<?> future = taskScheduler.schedule(
-                () -> schedulerService.createTicketAndAuctionTypeSuccess(auction.getAuctionId(), auction.getUser().getUserId()),
-                instant
-        );
-        scheduledTasks.put(auction.getAuctionId(), future);
-        log.info("스케쥴링 추가");
+        Trigger trigger = TriggerBuilder.newTrigger()
+                .withIdentity(jobDetail.getKey().getName(), "ticket-creation-triggers")
+                .startAt(Date.from(instant))
+                .build();
+
+        try {
+            scheduler.scheduleJob(jobDetail, trigger);
+            log.info("스케쥴링 추가");
+        } catch (SchedulerException e) {
+            throw new CustomException(ErrorCode.SCHEDULING_SERVER_ERROR);
+        }
     }
 
     @Transactional
