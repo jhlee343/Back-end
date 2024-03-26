@@ -2,21 +2,28 @@ package shootingstar.var.Service;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import shootingstar.var.dto.req.FollowingDto;
 import shootingstar.var.dto.req.UserProfileDto;
 import shootingstar.var.dto.req.UserSignupReqDto;
 import org.springframework.transaction.annotation.Transactional;
-import shootingstar.var.entity.Follow;
-import shootingstar.var.entity.User;
-import shootingstar.var.entity.UserType;
+import shootingstar.var.dto.req.WarningListDto;
+import shootingstar.var.dto.res.UserReceiveReviewDto;
+import shootingstar.var.dto.res.UserSendReviewDto;
+import shootingstar.var.entity.*;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
 import shootingstar.var.jwt.JwtTokenProvider;
 import shootingstar.var.repository.FollowRepository;
+import shootingstar.var.repository.Review.ReviewRepository;
+import shootingstar.var.repository.ReviewReport.ReviewReportRepository;
 import shootingstar.var.repository.UserRepository;
+import shootingstar.var.repository.Warning.WarningRepository;
 import shootingstar.var.util.MailRedisUtil;
 
+import static shootingstar.var.exception.ErrorCode.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -24,11 +31,13 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
     private final FollowRepository followRepository;
     private final MailRedisUtil mailRedisUtil;
     private final CheckDuplicateService duplicateService;
+    private final WarningRepository warningRepository;
+    private final ReviewRepository reviewRepository;
+    private final ReviewReportRepository reviewReportRepository;
 
     public void signup(UserSignupReqDto reqDto) {
         if (duplicateService.checkEmailDuplicate(reqDto.getEmail())) {
@@ -57,8 +66,7 @@ public class UserService {
         }
     }
 
-    public boolean checkVIP(HttpServletRequest request) {
-        String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
+    public boolean checkVIP(String userUUID) {
         User user = findByUserUUID(userUUID);
         if (user.getUserType().equals(UserType.ROLE_VIP)) {
             //vip인 경우 true
@@ -75,15 +83,13 @@ public class UserService {
         return userProfileDto;
     }
 
-    public List<FollowingDto> findAllFollowing(HttpServletRequest request) {
-        String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
+    public List<FollowingDto> findAllFollowing(String userUUID) {
         return followRepository.findAllByFollowerId(userUUID);
     }
 
     @Transactional
-    public void follow(String followingId, HttpServletRequest request) {
-        String followerId = jwtTokenProvider.getUserUUIDByRequest(request);
-        User follower = findByUserUUID(followerId);
+    public void follow(String followingId, String userUUID) {
+        User follower = findByUserUUID(userUUID);
         User following = findByUserUUID(followingId);
         UUID followUUID = UUID.randomUUID();
         Follow follow = new Follow(follower,following);
@@ -96,10 +102,32 @@ public class UserService {
         followRepository.delete(follow);
     }
 
+    public Page<UserReceiveReviewDto> receiveReview(String userUUID, Pageable pageable){
+        return reviewRepository.findAllReceiveByuserUUID(userUUID,pageable);
+    }
+
+    public Page<UserSendReviewDto> sendReview(String userUUID, Pageable pageable){
+        return reviewRepository.findAllSendByuserUUID(userUUID,pageable);
+    }
+    public List<WarningListDto> findAllWarning(String userUUID) {
+        return warningRepository.findAllWarnByUserUUID(userUUID);
+    }
+
+    @Transactional
+    public void reportReview(Long reviewId){
+        Review review = findByReviewId(reviewId);
+        ReviewReport reviewReport = new ReviewReport(
+                review,
+                review.getReviewContent(),
+                ReviewReportStatus.STANDBY
+        );
+        reviewReportRepository.save(reviewReport);
+    }
+
     private Follow findFollowingByFollowUUID(String followUUID) {
         Optional<Follow> followOptional = followRepository.findByFollowUUID(followUUID);
         if (followOptional.isEmpty()) {
-            throw new RuntimeException();
+            throw new CustomException(USER_NOT_FOUND);
         }
         return followOptional.get();
     }
@@ -107,7 +135,7 @@ public class UserService {
     public User findByNickname(String nickname) {
         Optional<User> optionalUser = userRepository.findByNickname(nickname);
         if (optionalUser.isEmpty()) {
-            throw new RuntimeException();
+            throw new CustomException(USER_NOT_FOUND);
         }
         return optionalUser.get();
     }
@@ -115,9 +143,17 @@ public class UserService {
     public User findByUserUUID(String userUUID) {
         Optional<User> optionalUser = userRepository.findByUserUUID(userUUID);
         if (optionalUser.isEmpty()) {
-            throw new RuntimeException();
+            throw new CustomException(USER_NOT_FOUND);
         }
         return optionalUser.get();
+    }
+
+    public Review findByReviewId(Long reviewId){
+        Optional<Review> optionalReview = reviewRepository.findByReviewId(reviewId);
+        if(optionalReview.isEmpty()){
+            throw new CustomException(REVIEW_NOT_FOUND);
+        }
+        return optionalReview.get();
     }
 
 }

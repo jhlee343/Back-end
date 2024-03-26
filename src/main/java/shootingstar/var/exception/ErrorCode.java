@@ -64,6 +64,8 @@ public enum ErrorCode {
     EXCHANGE_AMOUNT_INCORRECT_FORMAT(BAD_REQUEST, "3000", "환전 포인트는 보유 포인트보다 적어야 합니다."),
     PAYMENT_ACCESS_DENIED(FORBIDDEN, "3100", "결제 정보가 다릅니다."),
     DIFFERENT_ACCOUNT_HOLDER(FORBIDDEN, "3100", "본인 명의의 계좌가 아닙니다."),
+
+    REVIEW_NOT_FOUND(NOT_FOUND, "5201","존재하지 않는 리뷰입니다."),
     ;
 
     private final HttpStatus httpStatus;

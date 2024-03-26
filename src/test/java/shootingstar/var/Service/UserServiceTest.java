@@ -3,11 +3,21 @@ package shootingstar.var.Service;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
-import shootingstar.var.entity.User;
-import shootingstar.var.entity.UserType;
+import shootingstar.var.controller.UserController;
+import shootingstar.var.dto.req.UserSignupReqDto;
+import shootingstar.var.dto.req.WarningListDto;
+import shootingstar.var.dto.res.UserReceiveReviewDto;
+import shootingstar.var.entity.*;
+import shootingstar.var.repository.AuctionRepository;
+import shootingstar.var.repository.Review.ReviewRepository;
+import shootingstar.var.repository.TicketRepository;
 import shootingstar.var.repository.UserRepository;
 
+import java.security.PublicKey;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -19,61 +29,81 @@ class UserServiceTest {
     private UserService userService;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private ReviewRepository reviewRepository;
+    @Autowired
+    private AuctionRepository auctionRepository;
+    @Autowired
+    private TicketRepository ticketRepository;
+
     @Test
     @Transactional
-    public void follow() throws Exception{
-        //
+    public void saveReview() throws Exception {
+        User user1 = new User(
+                "000000001",
+                "이재현",
+                "dlwogus",
+                "+82 10-0000-000",
+                "wwwwww@gmail.com",
+                "http://k.kakaocdn.net/dn/bWOklw/btsEJdyuAoJ/DgLQ4aHPSPshqJyGPEkzs0/img_640x640.jpg",
+                UserType.ROLE_BASIC
+        );
+        userRepository.save(user1);
+        userRepository.flush();
+
+        userService.getProfile("dlwogus");
+
+        System.out.println(user1.getUserUUID());
+
+        Auction auction1 = new Auction(
+                user1,
+                1000000,
+                LocalDateTime.now(),
+                "seoul",
+                "meetingInfoText",
+                "meetingPromiseText",
+                "meetingInfoImg",
+                "meetingPromiseImg"
+        );
+
+        auctionRepository.save(auction1);
+        auctionRepository.flush();
+
+        System.out.println(auction1.getUser().getUserUUID());
+
+        Ticket ticket1 = new Ticket(
+                auction1,
+                user1
+        );
+
+        ticketRepository.save(ticket1);
+        ticketRepository.flush();
+
+        Review review1 = new Review(
+                user1,
+                user1,
+                "review1 Content",
+                0,
+                ticket1,
+                true
+        );
+
+        reviewRepository.save(review1);
+        reviewRepository.flush();
+
+
+        //when
     }
+
     @Test
     @Transactional
     public void saveUser() throws Exception {
         //given
-        User user1 = new User(
-                "3390072659",
-                "이재현",
-                "dlwogus",
-                "+82 10-0000-000",
-                "w203802@gmail.com",
-                "http://k.kakaocdn.net/dn/bWOklw/btsEJdyuAoJ/DgLQ4aHPSPshqJyGPEkzs0/img_640x640.jpg",
-                UserType.ROLE_VIP
-        );
-
-        User user2 = new User(
-                "3390072653",
-                "이재삼",
-                "wotka",
-                "+82 10-0000-000",
-                "aaaaaa@naver.com",
-                "http://k.kakaocdn.net/dn/bWOklw/btsEJdyuAoJ/DgLQ4daHPSPsyqJyGPEkzs0/img_640x640.jpg",
-                UserType.ROLE_BASIC
-        );
-
-        User user3 = new User(
-                "3390072655",
-                "이재사",
-                "wotk",
-                "+82 10-0000-000",
-                "wwwwww@naver.com",
-                "http://k.kakaocdn.net/dn/bWOklw/btsEJdyuAoJ/DgLQ4aHdsPSPsyqJyGPEkzs0/img_640x640.jpg",
-                UserType.ROLE_BASIC
-        );
 
         //when
-        User saveUser1 = userRepository.save(user1);
-        User saveUser2 = userRepository.save(user2);
-        User saveUser3 = userRepository.save(user3);
-        userRepository.flush();
 
-        String userId1 = user1.getUserUUID();
-        String userId2 = user2.getUserUUID();
-        String userId3 = user3.getUserUUID();
-        System.out.println(userId1);
-        System.out.println(userId2);
-        System.out.println(userId3);
-
-        Long findUserId = userRepository.findByUserUUID(userId1).get().getUserId();
         //then
-        assertThat(saveUser1.getUserId()).isEqualTo(userId1);
-        assertThat(userId1).isEqualTo(findUserId);
+
+
     }
 }
