@@ -6,11 +6,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shootingstar.var.entity.Auction;
 import shootingstar.var.entity.AuctionType;
+import shootingstar.var.entity.ScheduledTask;
+import shootingstar.var.entity.TaskType;
 import shootingstar.var.entity.Ticket;
 import shootingstar.var.entity.User;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
 import shootingstar.var.repository.AuctionRepository;
+import shootingstar.var.repository.ScheduledTaskRepository;
 import shootingstar.var.repository.TicketRepository;
 import shootingstar.var.repository.UserRepository;
 
@@ -20,10 +23,11 @@ import shootingstar.var.repository.UserRepository;
 public class SchedulerService {
     private final TicketRepository ticketRepository;
     private final AuctionRepository auctionRepository;
+    private final ScheduledTaskRepository scheduledTaskRepository;
     private final UserRepository userRepository;
 
     @Transactional
-    public void createTicketAndAuctionTypeSuccess(Long auctionId, Long userId) {
+    public void createTicketAndAuctionTypeSuccess(Long auctionId, Long userId, Long scheduledTaskId) {
         log.info("스케쥴링 시작");
         log.info("스레드 이름 : {}", Thread.currentThread().getName());
         Auction auction = auctionRepository.findById(auctionId)
@@ -43,6 +47,10 @@ public class SchedulerService {
             log.info("사용자 증가 전 포인트 : {}", user.getPoint());
             user.increasePoint(auction.getMinBidAmount());
             log.info("사용자 증가 후 포인트 : {}", user.getPoint());
+
+            ScheduledTask task = scheduledTaskRepository.findById(scheduledTaskId)
+                    .orElseThrow(() -> new CustomException(ErrorCode.TASK_NOT_FOUND));
+            task.changeTaskType(TaskType.COMPLETE);
             return;
         }
 
@@ -59,5 +67,10 @@ public class SchedulerService {
         Auction findAuction = auctionRepository.findById(auction.getAuctionId())
                 .orElseThrow(() -> new CustomException(ErrorCode.AUCTION_NOT_FOUND));
         findAuction.changeAuctionType(AuctionType.SUCCESS);
+
+        // scheduledTask 타입 완료로 변경
+        ScheduledTask task = scheduledTaskRepository.findById(scheduledTaskId)
+                .orElseThrow(() -> new CustomException(ErrorCode.TASK_NOT_FOUND));
+        task.changeTaskType(TaskType.COMPLETE);
     }
 }
