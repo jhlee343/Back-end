@@ -10,8 +10,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.quartz.Job;
 import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
+import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
@@ -22,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import shootingstar.var.entity.Auction;
 import shootingstar.var.entity.AuctionType;
 import shootingstar.var.entity.ScheduledTask;
+import shootingstar.var.entity.TaskType;
 import shootingstar.var.entity.User;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
@@ -35,6 +38,8 @@ import shootingstar.var.dto.req.AuctionCreateReqDto;
 @Service
 @RequiredArgsConstructor
 public class AuctionService {
+
+    private final String JOB_GROUP_NAME = "ticket-creation-jobs";
 
     private final AuctionRepository auctionRepository;
     private final UserRepository userRepository;
@@ -78,15 +83,16 @@ public class AuctionService {
         scheduledTaskRepository.save(task);
 
         JobDetail jobDetail = JobBuilder.newJob(TicketCreationJob.class)
-                .withIdentity(UUID.randomUUID().toString(), "ticket-creation-jobs")
+                .withIdentity(auction.getAuctionUUID() + "-" + task.getScheduledTaskId(), JOB_GROUP_NAME)
                 .usingJobData("auctionId", auction.getAuctionId())
                 .usingJobData("userId", findUser.getUserId())
                 .usingJobData("scheduledTaskId", task.getScheduledTaskId())
                 .build();
 
         Instant instant = scheduleTime.atZone(ZoneId.systemDefault()).toInstant();
+        String TRIGGER_GROUP_NAME = "ticket-creation-triggers";
         Trigger trigger = TriggerBuilder.newTrigger()
-                .withIdentity(jobDetail.getKey().getName(), "ticket-creation-triggers")
+                .withIdentity(jobDetail.getKey().getName(), TRIGGER_GROUP_NAME)
                 .startAt(Date.from(instant))
                 .build();
 
@@ -118,12 +124,48 @@ public class AuctionService {
         findAuction.changeAuctionType(AuctionType.CANCEL);
         log.info("경매가 취소되었습니다. auctionUUID : {}", findAuction.getAuctionUUID());
 
+        // 입찰에 참여한 유저가 있을 때, 현재 최고 입찰자에게 현재 최고 입찰 금액 반환
+        if (findAuction.getCurrentHighestBidderId() != null) {
+            User findCurrentHighestBidder = userRepository.findByUserUUID(findAuction.getCurrentHighestBidderId())
+                    .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+            long beforePoint = findCurrentHighestBidder.getPoint();
+            log.info("포인트가 추가될 예정입니다. userId : {}, 추가 전 포인트 : {}", findCurrentHighestBidder.getUserId(), beforePoint);
+
+            findCurrentHighestBidder.increasePoint(findAuction.getCurrentHighestBidAmount());
+
+            long afterPoint = findCurrentHighestBidder.getPoint();
+            log.info("포인트가 추가되었습니다. userId : {}, 추가 후 포인트 : {}", findCurrentHighestBidder.getUserId(), afterPoint);
+        }
+
         // 사용자 포인트에 += 최소입찰금액
         long beforePoint = findAuction.getUser().getPoint();
         log.info("포인트가 추가될 예정입니다. userId : {}, 추가 전 포인트 : {}", findAuction.getUser().getUserId(), beforePoint);
+
         findAuction.getUser().increasePoint(findAuction.getMinBidAmount());
+
         long afterPoint = findAuction.getUser().getPoint();
         log.info("포인트가 추가되었습니다. userId : {}, 추가 후 포인트 : {}", findAuction.getUser().getUserId(), afterPoint);
+
+
+        ScheduledTask task = scheduledTaskRepository.findByAuctionId(findAuction.getAuctionId())
+                .orElseThrow(() -> new CustomException(ErrorCode.TASK_NOT_FOUND));
+
+        // 예정된 스케줄링 작업 삭제
+        JobKey jobKey = new JobKey(findAuction.getAuctionUUID() + "-" + task.getScheduledTaskId(), JOB_GROUP_NAME);
+
+        try {
+            boolean isDeleted = scheduler.deleteJob(jobKey);
+            if (!isDeleted) {
+                throw new CustomException(ErrorCode.FAIL_TASK_DELETE);
+            }
+        } catch (SchedulerException e) {
+            log.info("스케줄러 취소 에러", e);
+            throw new CustomException(ErrorCode.SCHEDULING_SERVER_ERROR);
+        }
+
+        // 스케줄링 타입 CANCEL로 변경
+        task.changeTaskType(TaskType.CANCEL);
     }
 }
 
