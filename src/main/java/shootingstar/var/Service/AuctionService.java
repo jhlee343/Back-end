@@ -39,7 +39,6 @@ public class AuctionService {
     private final AuctionRepository auctionRepository;
     private final UserRepository userRepository;
     private final ScheduledTaskRepository scheduledTaskRepository;
-    private final SchedulerService schedulerService;
     private final Scheduler scheduler;
 
     @Transactional
@@ -70,7 +69,7 @@ public class AuctionService {
         findUser.decreasePoint(auction.getMinBidAmount());
 
         // 스케줄링 저장
-        LocalDateTime scheduleTime = LocalDateTime.now().plusDays(3);
+        LocalDateTime scheduleTime = LocalDateTime.now().plusMinutes(1);
         ScheduledTask task = ScheduledTask.builder()
                 .auctionId(auction.getAuctionId())
                 .userId(auction.getUser().getUserId())
