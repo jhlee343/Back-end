@@ -29,17 +29,21 @@ public class Ticket extends BaseTimeEntity {
     private Auction auction;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    @NotNull
-    private User user;
+    @JoinColumn(name = "winner_id")
+    private User winner;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "organizer_id")
+    private User organizer;
 
     private boolean ticketIsOpened;
 
     @Builder
-    public Ticket(Auction auction, User user) {
+    public Ticket(Auction auction, User winner, User organizer) {
         this.ticketUUID = UUID.randomUUID().toString();
         this.auction = auction;
-        this.user = user;
+        this.winner = winner;
+        this.organizer = organizer;
         this.ticketIsOpened = true;
     }
 }
