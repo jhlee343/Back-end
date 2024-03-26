@@ -56,11 +56,11 @@ public class SchedulerService {
 
         log.info("식사권 생성 & 경매 타입 변경");
         // 한 명 이라도 경매에 참여했을 경우
-        User user = userRepository.findByUserUUID(auction.getCurrentHighestBidderId())
+        User winner = userRepository.findByUserUUID(auction.getCurrentHighestBidderId())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         // 식사권 생성
-        Ticket ticket = new Ticket(auction, user);
+        Ticket ticket = new Ticket(auction, winner, auction.getUser());
         ticketRepository.save(ticket);
 
         // 경매 타입 낙찰로 변경
