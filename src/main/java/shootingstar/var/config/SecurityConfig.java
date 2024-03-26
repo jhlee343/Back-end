@@ -58,6 +58,10 @@ public class SecurityConfig {
                                         "/swagger-ui/**" // swagger 설정
                                 ).permitAll()
 
+                                .requestMatchers(
+                                        "/api/ticket/**"
+                                ).hasAnyRole("BASIC", "VIP")
+
                                 .requestMatchers( // 권한 확인
                                         "/api/user/test"
                                 ).hasRole("BASIC")

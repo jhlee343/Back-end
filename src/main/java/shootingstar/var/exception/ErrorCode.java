@@ -70,6 +70,8 @@ public enum ErrorCode {
     FAIL_TASK_DELETE(NOT_FOUND, "4201", "스케줄링된 task를 취소하는데 실패했습니다."),
 
     REVIEW_NOT_FOUND(NOT_FOUND, "5201","존재하지 않는 리뷰입니다."),
+
+    TICKET_NOT_FOUND(NOT_FOUND, "6200", "존재하지 않는 식사권입니다.");
     ;
 
     private final HttpStatus httpStatus;
