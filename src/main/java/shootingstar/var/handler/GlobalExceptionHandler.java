@@ -70,6 +70,12 @@ public class GlobalExceptionHandler {
                 } case "startMeetingTime" -> {
                     errorCode = INCORRECT_FORMAT_START_MEETING_TIME;
                     break;
+                } case "ticketReportContent" -> {
+                    errorCode = INCORRECT_FORMAT_TICKET_REPORT_CONTENT;
+                    break;
+                } case "ticketReportEvidenceUrl" -> {
+                    errorCode = INCORRECT_FORMAT_TICKET_REPORT_EVIDENCE_URL;
+                    break;
                 }
             }
 

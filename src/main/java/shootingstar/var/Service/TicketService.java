@@ -7,14 +7,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shootingstar.var.dto.req.MeetingTimeSaveReqDto;
+import shootingstar.var.dto.req.TicketReportReqDto;
 import shootingstar.var.dto.res.DetailTicketResDto;
 import shootingstar.var.entity.Auction;
 import shootingstar.var.entity.Ticket;
 import shootingstar.var.entity.TicketMeetingTime;
+import shootingstar.var.entity.TicketReport;
 import shootingstar.var.entity.User;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
 import shootingstar.var.repository.TicketMeetingTimeRepository;
+import shootingstar.var.repository.TicketReportRepository;
 import shootingstar.var.repository.TicketRepository;
 import shootingstar.var.repository.UserRepository;
 
@@ -23,6 +26,7 @@ import shootingstar.var.repository.UserRepository;
 public class TicketService {
     private final TicketRepository ticketRepository;
     private final TicketMeetingTimeRepository ticketMeetingTimeRepository;
+    private final TicketReportRepository ticketReportRepository;
     private final UserRepository userRepository;
 
     public DetailTicketResDto detailTicket(String ticketUUID, String userUUID) {
@@ -106,5 +110,37 @@ public class TicketService {
             return ticketMeetingTimes.get(0).getStartMeetingTime();
         }
         return ticketMeetingTimes.get(1).getStartMeetingTime();
+    }
+
+    public void reportTicket(TicketReportReqDto reqDto, String userUUID) {
+        Ticket ticket = ticketRepository.findById(reqDto.getTicketId())
+                .orElseThrow(() -> new CustomException(ErrorCode.TICKET_NOT_FOUND));
+
+        // 로그인한 사용자가 경매의 낙찰자도 주최자도 아닐 때
+        if (!ticket.getWinner().getUserUUID().equals(userUUID) && !ticket.getOrganizer().getUserUUID().equals(userUUID)) {
+            throw new CustomException(ErrorCode.ACCESS_DENIED);
+        }
+
+        String ticketReportNickname = "";
+        if (ticket.getWinner().getUserUUID().equals(userUUID)) {
+            ticketReportNickname = ticket.getWinner().getNickname();
+        } else if (ticket.getOrganizer().getUserUUID().equals(userUUID)) {
+            ticketReportNickname = ticket.getOrganizer().getNickname();
+        }
+
+        // 로그인한 사용자가 이미 해당 식사권에 대해 신고 경험이 있는 경우
+        TicketReport findTicketReport = ticketReportRepository.findByTicketIdAndTicketReportNickname(reqDto.getTicketId(), ticketReportNickname)
+                .orElse(null);
+        if (findTicketReport != null) {
+            throw new CustomException(ErrorCode.TICKET_REPORT_CONFLICT);
+        }
+
+        TicketReport ticketReport = TicketReport.builder()
+                .ticket(ticket)
+                .ticketReportNickname(ticketReportNickname)
+                .ticketReportContent(reqDto.getTicketReportContent())
+                .ticketReportEvidenceUrl(reqDto.getTicketReportEvidenceUrl())
+                .build();
+        ticketReportRepository.save(ticketReport);
     }
 }
