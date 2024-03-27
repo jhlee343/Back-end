@@ -7,8 +7,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
@@ -39,6 +42,9 @@ public class Ticket extends BaseTimeEntity {
     private boolean ticketIsOpened;
     private boolean winnerIsPushed;
     private boolean organizerIsPushed;
+
+    @OneToMany(mappedBy = "ticket")
+    private List<TicketMeetingTime> ticketMeetingTimes = new ArrayList<>();
 
     @Builder
     public Ticket(Auction auction, User winner, User organizer) {
