@@ -64,6 +64,12 @@ public class GlobalExceptionHandler {
                 } case "meetingPromiseText" -> {
                     errorCode = INCORRECT_FORMAT_MEETING_PROMISE_TEXT;
                     break;
+                } case "ticketId" -> {
+                    errorCode = INCORRECT_FORMAT_TICKET_ID;
+                    break;
+                } case "startMeetingTime" -> {
+                    errorCode = INCORRECT_FORMAT_START_MEETING_TIME;
+                    break;
                 }
             }
 
