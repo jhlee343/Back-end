@@ -1,13 +1,18 @@
 package shootingstar.var.Service;
 
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import shootingstar.var.dto.req.MeetingTimeSaveReqDto;
 import shootingstar.var.dto.res.DetailTicketResDto;
 import shootingstar.var.entity.Auction;
 import shootingstar.var.entity.Ticket;
+import shootingstar.var.entity.TicketMeetingTime;
 import shootingstar.var.entity.User;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
+import shootingstar.var.repository.TicketMeetingTimeRepository;
 import shootingstar.var.repository.TicketRepository;
 import shootingstar.var.repository.UserRepository;
 
@@ -15,6 +20,7 @@ import shootingstar.var.repository.UserRepository;
 @RequiredArgsConstructor
 public class TicketService {
     private final TicketRepository ticketRepository;
+    private final TicketMeetingTimeRepository ticketMeetingTimeRepository;
     private final UserRepository userRepository;
 
     public DetailTicketResDto detailTicket(String ticketUUID, String userUUID) {
@@ -40,5 +46,33 @@ public class TicketService {
                 .meetingInfoText(auction.getMeetingInfoText())
                 .meetingPromiseText(auction.getMeetingPromiseText())
                 .build();
+    }
+
+    @Transactional
+    public void saveMeetingTime(MeetingTimeSaveReqDto reqDto, String userUUID) {
+        User findUser = userRepository.findByUserUUID(userUUID)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        Ticket ticket = ticketRepository.findById(reqDto.getTicketId())
+                .orElseThrow(() -> new CustomException(ErrorCode.TICKET_NOT_FOUND));
+
+        // 로그인한 사용자가 식사권의 낙찰자도 주최자도 아닐 경우
+        if (!ticket.getWinner().getUserUUID().equals(userUUID) && !ticket.getOrganizer().getUserUUID().equals(userUUID)) {
+            throw new CustomException(ErrorCode.ACCESS_DENIED);
+        }
+
+        // 로그인한 사용자가 이미 만남 시작 버튼을 눌렀을 경우
+        TicketMeetingTime findTicketMeetingTime = ticketMeetingTimeRepository.findByTicketIdAndUserNickname(reqDto.getTicketId(), findUser.getNickname())
+                .orElse(null);
+        if (findTicketMeetingTime != null) {
+            throw new CustomException(ErrorCode.TICKET_CONFLICT);
+        }
+
+        TicketMeetingTime ticketMeetingTime = TicketMeetingTime.builder()
+                .ticket(ticket)
+                .userNickname(findUser.getNickname())
+                .startMeetingTime(LocalDateTime.parse(reqDto.getStartMeetingTime()))
+                .build();
+        ticketMeetingTimeRepository.save(ticketMeetingTime);
     }
 }
