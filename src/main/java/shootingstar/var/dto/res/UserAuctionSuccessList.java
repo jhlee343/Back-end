@@ -1,9 +1,12 @@
 package shootingstar.var.dto.res;
 
+import com.querydsl.core.annotations.QueryProjection;
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 
 import java.time.LocalDateTime;
 
+@Data
 public class UserAuctionSuccessList {
     //참여중 진행중 경매 모두 사용
     //입찰 성공 - 이름, 약속 날짜, 최종 낙찰 금액, 낙찰자
@@ -17,4 +20,10 @@ public class UserAuctionSuccessList {
     @NotNull
     private String basicUserName;
 
+    @QueryProjection
+    public UserAuctionSuccessList(String vipUserName, LocalDateTime meetDate, String basicUserName){
+        this.vipUserName = vipUserName;
+        this.meetDate = meetDate;
+        this.basicUserName = basicUserName;
+    }
 }
