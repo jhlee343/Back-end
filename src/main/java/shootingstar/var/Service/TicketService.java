@@ -68,6 +68,13 @@ public class TicketService {
             throw new CustomException(ErrorCode.TICKET_CONFLICT);
         }
 
+        // 로그인한 사용자에 해당하는 식사권의 만남 시작 버튼 누른 여부를 true로 변경
+        if (ticket.getWinner().getUserUUID().equals(userUUID)) {
+            ticket.changeWinnerIsPushed(true);
+        } else if (ticket.getOrganizer().getUserUUID().equals(userUUID)) {
+            ticket.changeOrganizerIsPushed(true);
+        }
+
         TicketMeetingTime ticketMeetingTime = TicketMeetingTime.builder()
                 .ticket(ticket)
                 .userNickname(findUser.getNickname())

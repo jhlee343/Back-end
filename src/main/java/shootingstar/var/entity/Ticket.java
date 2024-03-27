@@ -37,6 +37,8 @@ public class Ticket extends BaseTimeEntity {
     private User organizer;
 
     private boolean ticketIsOpened;
+    private boolean winnerIsPushed;
+    private boolean organizerIsPushed;
 
     @Builder
     public Ticket(Auction auction, User winner, User organizer) {
@@ -45,5 +47,15 @@ public class Ticket extends BaseTimeEntity {
         this.winner = winner;
         this.organizer = organizer;
         this.ticketIsOpened = true;
+        this.winnerIsPushed = false;
+        this.organizerIsPushed = false;
+    }
+
+    public void changeWinnerIsPushed(boolean winnerIsPushed) {
+        this.winnerIsPushed = winnerIsPushed;
+    }
+
+    public void changeOrganizerIsPushed(boolean organizerIsPushed) {
+        this.organizerIsPushed = organizerIsPushed;
     }
 }
