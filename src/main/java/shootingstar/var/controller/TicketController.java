@@ -56,6 +56,11 @@ public class TicketController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",
                     description = "- 사용자 타입이 VIP, BASIC일 때 : 만남 시작 시간 저장 성공"),
+            @ApiResponse(responseCode = "400",
+                    description =
+                                    "- 잘못된 형식의 식사권 고유번호 입력 시 : 6001\n" +
+                                    "- 잘못된 형식의 만남 시작 시간 입력 시 : 6002\n",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
             @ApiResponse(responseCode = "404",
                     description =
                                     "- 식사권 정보 조회 실패 : 6200\n" +
