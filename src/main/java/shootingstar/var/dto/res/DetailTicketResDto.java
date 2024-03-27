@@ -14,11 +14,13 @@ public class DetailTicketResDto {
     private Double donation;
     private String meetingInfoText;
     private String meetingPromiseText;
+    private boolean winnerIsPushed;
+    private boolean organizerIsPushed;
 
     @Builder
     public DetailTicketResDto(LocalDateTime meetingDate, String meetingLocation, String organizerNickname,
                               String winnerNickname, Long winningBid, Double donation, String meetingInfoText,
-                              String meetingPromiseText) {
+                              String meetingPromiseText, boolean winnerIsPushed, boolean organizerIsPushed) {
         this.meetingDate = meetingDate;
         this.meetingLocation = meetingLocation;
         this.organizerNickname = organizerNickname;
@@ -27,5 +29,7 @@ public class DetailTicketResDto {
         this.donation = donation;
         this.meetingInfoText = meetingInfoText;
         this.meetingPromiseText = meetingPromiseText;
+        this.winnerIsPushed = winnerIsPushed;
+        this.organizerIsPushed = organizerIsPushed;
     }
 }

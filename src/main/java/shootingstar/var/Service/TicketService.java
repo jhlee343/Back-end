@@ -45,6 +45,8 @@ public class TicketService {
                 .donation(auction.getCurrentHighestBidAmount() * 0.05)
                 .meetingInfoText(auction.getMeetingInfoText())
                 .meetingPromiseText(auction.getMeetingPromiseText())
+                .winnerIsPushed(ticket.isWinnerIsPushed())
+                .organizerIsPushed(ticket.isOrganizerIsPushed())
                 .build();
     }
 
