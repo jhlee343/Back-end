@@ -1,0 +1,36 @@
+package shootingstar.var.controller;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import shootingstar.var.Service.VipService;
+import shootingstar.var.dto.res.VipInfoDto;
+import shootingstar.var.jwt.JwtTokenProvider;
+
+@Tag(name = "VipUserController", description = "VIP 유저 사용 컨트롤러")
+@Validated
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/vip")
+
+public class VipUserController {
+
+    private final JwtTokenProvider jwtTokenProvider;
+    private final VipService vipService;
+
+    @Operation(summary = "vip 소개 불러오기")
+    @GetMapping("/info")
+    public ResponseEntity<VipInfoDto> getVipInfo(HttpServletRequest request){
+        String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
+        VipInfoDto vipInfo = vipService.getVipInfo(userUUID);
+        return ResponseEntity.ok(vipInfo);
+
+    }
+
+}

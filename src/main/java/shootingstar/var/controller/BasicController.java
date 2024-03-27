@@ -13,6 +13,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import shootingstar.var.Service.BasicService;
 import shootingstar.var.dto.req.UserApplyVipDto;
+import shootingstar.var.dto.res.TicketListResDto;
+import shootingstar.var.dto.res.UserAuctionParticipateList;
 import shootingstar.var.dto.res.UserAuctionSuccessList;
 import shootingstar.var.entity.SortType;
 import shootingstar.var.jwt.JwtTokenProvider;
@@ -41,12 +43,16 @@ public class BasicController {
                                            @RequestParam(value = "sortType", required = false, defaultValue = "TIME_DESC") SortType sortType,
                                            @RequestParam(value = "search", required = false) String search,
                                            @PageableDefault(size =10) Pageable pageable){
-        return null;
+        String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
+        Page<TicketListResDto> findAllTicketListDto = basicService.getAllTicketList(userUUID, pageable);
+        return ResponseEntity.ok(findAllTicketListDto);
     }
     @Operation(summary = "참여중인 경매 불러오기")
     @GetMapping("/auction/participate")
     public ResponseEntity<?> getParticipateAuctionList(HttpServletRequest request,@PageableDefault(size = 10) Pageable pageable){
-        return null;
+        String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
+        Page<UserAuctionParticipateList> userAuctionParticipateLists =basicService.participateAuctionList(userUUID,pageable);
+        return ResponseEntity.ok(userAuctionParticipateLists);
     }
 
     @Operation(summary = "낙찰받은 경매 불러오기")

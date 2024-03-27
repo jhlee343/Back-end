@@ -5,6 +5,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import shootingstar.var.dto.req.UserApplyVipDto;
+import shootingstar.var.dto.res.TicketListResDto;
+import shootingstar.var.dto.res.UserAuctionParticipateList;
 import shootingstar.var.dto.res.UserAuctionSuccessList;
 import shootingstar.var.entity.VipApprovalType;
 import shootingstar.var.entity.VipInfo;
@@ -29,8 +31,17 @@ public class BasicService {
 
         vipInfoRepository.save(vipInfo);
     }
+
+    public Page<TicketListResDto> getAllTicketList(String userUUID, Pageable pageable){
+        return null;
+    }
+
+
     public Page<UserAuctionSuccessList> successAuctionList(String userUUID, Pageable pageable){
         return null;
-        //return auctionRepository.findAllSuccessByuserUUID(userUUID,pageable);
+    }
+
+    public Page<UserAuctionParticipateList> participateAuctionList(String userUUID, Pageable pageable){
+        return null;
     }
 }
