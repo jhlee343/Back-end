@@ -76,6 +76,7 @@ public enum ErrorCode {
     INCORRECT_FORMAT_START_MEETING_TIME(BAD_REQUEST, "6002", "잘못된 형식의 만남 시작 시간입니다."),
 
     TICKET_NOT_FOUND(NOT_FOUND, "6200", "존재하지 않는 식사권입니다."),
+    TICKET_MEETING_TIME_NOT_FOUND(NOT_FOUND, "6201", "존재하지 않는 만남 시작 시간입니다."),
 
     TICKET_CONFLICT(CONFLICT, "6300", "이미 처리된 식사권 만남 시간입니다."),
     ;
