@@ -6,11 +6,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import shootingstar.var.Service.VipService;
 import shootingstar.var.dto.res.VipInfoDto;
+import shootingstar.var.entity.VipInfo;
 import shootingstar.var.jwt.JwtTokenProvider;
 
 @Tag(name = "VipUserController", description = "VIP 유저 사용 컨트롤러")
@@ -31,6 +30,14 @@ public class VipUserController {
         VipInfoDto vipInfo = vipService.getVipInfo(userUUID);
         return ResponseEntity.ok(vipInfo);
 
+    }
+
+    @Operation(summary = "vip 소개 수정하기")
+    @PatchMapping("/editInfo")
+    public ResponseEntity<String> editInfo(HttpServletRequest request, @RequestBody VipInfoDto vipInfoDto){
+        String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
+        vipService.editInfo(userUUID,vipInfoDto);
+        return ResponseEntity.ok().body("edit Vip Info success");
     }
 
 }

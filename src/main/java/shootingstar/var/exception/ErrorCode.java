@@ -79,6 +79,8 @@ public enum ErrorCode {
     TICKET_MEETING_TIME_NOT_FOUND(NOT_FOUND, "6201", "존재하지 않는 만남 시작 시간입니다."),
 
     TICKET_CONFLICT(CONFLICT, "6300", "이미 처리된 식사권 만남 시간입니다."),
+
+    VIP_INFO_NOT_FOUND(NOT_FOUND, "7201","존재하지 않는 VIP 정보입니다.")
     ;
 
     private final HttpStatus httpStatus;
