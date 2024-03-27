@@ -73,7 +73,7 @@ public class TicketService {
         TicketMeetingTime findTicketMeetingTime = ticketMeetingTimeRepository.findByTicketIdAndUserNickname(reqDto.getTicketId(), findUser.getNickname())
                 .orElse(null);
         if (findTicketMeetingTime != null) {
-            throw new CustomException(ErrorCode.TICKET_CONFLICT);
+            throw new CustomException(ErrorCode.TICKET_MEETING_TIME_CONFLICT);
         }
 
         // 로그인한 사용자에 해당하는 식사권의 만남 시작 버튼 누른 여부를 true로 변경
