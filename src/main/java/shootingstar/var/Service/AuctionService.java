@@ -115,8 +115,8 @@ public class AuctionService {
             throw new CustomException(ErrorCode.AUCTION_ACCESS_DENIED);
         }
 
-        // 경매 타입이 CANCEL인지 확인
-        if (findAuction.getAuctionType().equals(AuctionType.CANCEL)) {
+        // 경매 타입이 PROGRESS인지 확인
+        if (!findAuction.getAuctionType().equals(AuctionType.PROGRESS)) {
             throw new CustomException(ErrorCode.AUCTION_CONFLICT);
         }
 
