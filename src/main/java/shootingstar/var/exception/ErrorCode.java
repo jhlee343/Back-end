@@ -82,6 +82,8 @@ public enum ErrorCode {
 
     TICKET_MEETING_TIME_CONFLICT(CONFLICT, "6300", "이미 처리된 식사권 만남 시간입니다."),
     TICKET_REPORT_CONFLICT(CONFLICT, "6301", "이미 신고된 식사권입니다."),
+    TICKET_CANCEL_CONFLICT(CONFLICT, "6302", "식사 시간이 지난 후에는 취소가 불가능합니다."),
+    ALREADY_TICKET_CANCEL_CONFLICT(CONFLICT, "6303", "이미 취소된 식사권입니다."),
     ;
 
     private final HttpStatus httpStatus;
