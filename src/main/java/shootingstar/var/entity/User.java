@@ -4,10 +4,12 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.math.BigDecimal;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import shootingstar.var.entity.ticket.Ticket;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -47,7 +49,8 @@ public class User extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private UserType userType;
 
-    private Long point;
+    @Column(precision = 10, scale = 2)
+    private BigDecimal point;
 
     private Long donationPrice;
 
@@ -63,6 +66,12 @@ public class User extends BaseTimeEntity {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private final List<Auction> myHostedAuction = new ArrayList<>();
 
+    @OneToMany(mappedBy = "organizer", fetch = FetchType.LAZY)
+    private final List<Ticket> myHostedTicket = new ArrayList<>();
+
+    @OneToMany(mappedBy = "winner", fetch = FetchType.LAZY)
+    private final List<Ticket> winningTicket = new ArrayList<>();
+
     @Builder
     public User(String kakaoId, String name, String nickname, String phone, String email, String profileImgUrl, UserType userType) {
         this.userUUID = UUID.randomUUID().toString();
@@ -73,7 +82,7 @@ public class User extends BaseTimeEntity {
         this.email = email;
         this.profileImgUrl = profileImgUrl;
         this.userType = userType;
-        this.point = 0L;
+        this.point = new BigDecimal(0);
         this.donationPrice = 0L;
         this.rating = null;
         this.subscribe = null;
@@ -82,12 +91,12 @@ public class User extends BaseTimeEntity {
         this.withdrawnTime = null;
     }
 
-    public void increasePoint(long point) {
-        this.point += point;
+    public void increasePoint(BigDecimal point) {
+        this.point = this.point.add(point);
     }
 
-    public void decreasePoint(long point) {
-        this.point -= point;
+    public void decreasePoint(BigDecimal point) {
+        this.point = this.point.subtract(point);
     }
 
     public void withdrawn() {

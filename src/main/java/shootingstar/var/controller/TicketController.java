@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import shootingstar.var.Service.TicketService;
 import shootingstar.var.dto.req.MeetingTimeSaveReqDto;
+import shootingstar.var.dto.req.TicketReportReqDto;
 import shootingstar.var.dto.res.DetailTicketResDto;
 import shootingstar.var.dto.res.MeetingTimeResDto;
 import shootingstar.var.exception.ErrorResponse;
@@ -101,5 +103,54 @@ public class TicketController {
         String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
         LocalDateTime startMeetingTime = ticketService.findMeetingTimeByTicketUUID(ticketUUID, userUUID);
         return ResponseEntity.ok().body(new MeetingTimeResDto(startMeetingTime));
+    }
+
+    @Operation(summary = "식사권 신고하는 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "- 사용자 타입이 VIP, BASIC일 때 : 식사권 신고 성공"),
+            @ApiResponse(responseCode = "400",
+                    description =
+                                    "- 잘못된 형식의 식사권 신고 내용 입력 시 : 6003\n" +
+                                    "- 잘못된 형식의 식사권 신고 증거 URL 입력 시 : 6004\n",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+            @ApiResponse(responseCode = "404",
+                    description = "- 식사권 정보 조회 실패 : 6200",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+            @ApiResponse(responseCode = "403",
+                    description = "- 로그인한 사용자가 식사권의 낙찰자도 주최자도 아닐 때 : 0101",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+            @ApiResponse(responseCode = "409",
+                    description = "- 이미 같은 식사권에 신고한 적이 있는 경우 : 6301",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+    })
+    @PostMapping("/report")
+    public ResponseEntity<String> reportTicket(@Valid @RequestBody TicketReportReqDto reqDto, HttpServletRequest request) {
+        String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
+        ticketService.reportTicket(reqDto, userUUID);
+        return ResponseEntity.ok().body("식사권 신고 성공");
+    }
+
+    @Operation(summary = "식사권 취소하는 API", description = "낙찰자와 주최자 둘 다 사용")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "- 식사권의 낙찰자이거나 주최자일 때 : 식사권 취소 성공"),
+            @ApiResponse(responseCode = "404",
+                    description = "- 식사권 정보 조회 실패 : 6200",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+            @ApiResponse(responseCode = "403",
+                    description = "- 로그인한 사용자가 경매의 낙찰자도 주최자도 아닐 때 : 0101",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+            @ApiResponse(responseCode = "409",
+                    description =
+                                    "- 식사 시간 이후에 식사권 취소를 요청하는 경우 : 6302\n" +
+                                    "- 이미 취소된 식사권에 같은 요청을 보낼 경우 : 6303",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+    })
+    @PatchMapping("/cancel/{ticketUUID}")
+    public ResponseEntity<String> cancelTicket(@PathVariable("ticketUUID") String ticketUUID, HttpServletRequest request) {
+        String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
+        ticketService.cancelTicket(ticketUUID, userUUID);
+        return ResponseEntity.ok().body("식사권 취소 성공");
     }
 }

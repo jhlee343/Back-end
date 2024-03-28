@@ -2,12 +2,11 @@ package shootingstar.var.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.util.UUID;
+import shootingstar.var.entity.ticket.Ticket;
 
 @Entity
 @Getter

@@ -7,8 +7,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.stereotype.Service;
-import shootingstar.var.entity.Auction;
-import shootingstar.var.entity.AuctionType;
+import shootingstar.var.entity.ticket.Ticket;
+import shootingstar.var.enums.type.AuctionType;
 import shootingstar.var.entity.User;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.jwt.JwtTokenProvider;
@@ -91,15 +91,7 @@ public class UserAuthService {
         User user = userRepository.findByUserUUID(userUUID)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
-        tokenProvider.expiredRefreshTokenAtRedis(refreshToken);
-
-        String storeRefreshToken = loginListRedisUtil.getData(userUUID); // 로그인 리스트에 등록된 토큰
-        if (!Objects.equals(storeRefreshToken, refreshToken)) { // 로그인 리스트와 현재 등록된 토큰이 다를 경우
-            tokenProvider.expiredRefreshTokenAtRedis(storeRefreshToken); // 로그인 리스트에 등록된 토큰도 만료 시킨다.
-        }
-        loginListRedisUtil.deleteData(userUUID); // 로그인 리스트에서 사용자 정보를 제거한다.
-
-        // 진행중인 경매 혹은 진행중인 식사권이 있다면 회원탈퇴를 거부
+        // 진행중인 경매가 있다면 회원탈퇴를 거부
         boolean hasInProgressAuction = user.getMyHostedAuction().stream()
                 .anyMatch(auction -> AuctionType.PROGRESS.equals(auction.getAuctionType()));
 
@@ -107,7 +99,26 @@ public class UserAuthService {
             throw new CustomException(WITHDRAWAL_ERROR_BY_AUCTION_IN_PROGRESS);
         }
 
-        // 진행중인 식사권에 대한 거부 로직도 필요
+        // VIP 입장에서 현재 만료되지 않은 식사권이 있다면 true
+        boolean hasOpenHostTicket = user.getMyHostedTicket().stream()
+                .anyMatch(Ticket::isTicketIsOpened);
+
+        // 낙찰자 입장에서 현재 만료되지 않은 식사권이 있다면 true
+        boolean hasOpenWinningTicket = user.getWinningTicket().stream()
+                .anyMatch(Ticket::isTicketIsOpened);
+
+        // 위 두 경우 중 하나라도 만료되지 않은 식사권이 있다면 회원탈퇴를 거부
+        if (hasOpenHostTicket || hasOpenWinningTicket) {
+            throw new CustomException(WITHDRAWAL_ERROR_BY_TICKET_IN_PROGRESS);
+        }
+
+        tokenProvider.expiredRefreshTokenAtRedis(refreshToken);
+
+        String storeRefreshToken = loginListRedisUtil.getData(userUUID); // 로그인 리스트에 등록된 토큰
+        if (!Objects.equals(storeRefreshToken, refreshToken)) { // 로그인 리스트와 현재 등록된 토큰이 다를 경우
+            tokenProvider.expiredRefreshTokenAtRedis(storeRefreshToken); // 로그인 리스트에 등록된 토큰도 만료 시킨다.
+        }
+        loginListRedisUtil.deleteData(userUUID); // 로그인 리스트에서 사용자 정보를 제거한다.
 
         user.withdrawn();
 

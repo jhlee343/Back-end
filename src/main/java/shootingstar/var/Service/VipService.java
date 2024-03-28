@@ -11,7 +11,7 @@ import shootingstar.var.repository.Vip.VipInfoRepository;
 import java.util.Optional;
 
 import static shootingstar.var.exception.ErrorCode.USER_NOT_FOUND;
-import static shootingstar.var.exception.ErrorCode.VIP_INFO_NOT_FOUND;
+
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +35,7 @@ public class VipService {
     public VipInfo findByUserUUID(String userUUID) {
         Optional<VipInfo> optionalVipInfo = vipInfoRepository.findByuserUUID(userUUID);
         if (optionalVipInfo.isEmpty()) {
-            throw new CustomException(VIP_INFO_NOT_FOUND);
+            throw new RuntimeException();
         }
         return optionalVipInfo.get();
     }

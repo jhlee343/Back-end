@@ -1,5 +1,7 @@
 package shootingstar.var.dto.res;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Data;
@@ -11,7 +13,7 @@ public class DetailTicketResDto {
     private String organizerNickname;
     private String winnerNickname;
     private Long winningBid;
-    private Double donation;
+    private BigDecimal donation;
     private String meetingInfoText;
     private String meetingPromiseText;
     private boolean winnerIsPushed;
@@ -19,14 +21,14 @@ public class DetailTicketResDto {
 
     @Builder
     public DetailTicketResDto(LocalDateTime meetingDate, String meetingLocation, String organizerNickname,
-                              String winnerNickname, Long winningBid, Double donation, String meetingInfoText,
+                              String winnerNickname, Long winningBid, BigDecimal donation, String meetingInfoText,
                               String meetingPromiseText, boolean winnerIsPushed, boolean organizerIsPushed) {
         this.meetingDate = meetingDate;
         this.meetingLocation = meetingLocation;
         this.organizerNickname = organizerNickname;
         this.winnerNickname = winnerNickname;
         this.winningBid = winningBid;
-        this.donation = donation;
+        this.donation = donation.setScale(2, RoundingMode.HALF_UP);
         this.meetingInfoText = meetingInfoText;
         this.meetingPromiseText = meetingPromiseText;
         this.winnerIsPushed = winnerIsPushed;

@@ -40,4 +40,5 @@ public class VipUserController {
         return ResponseEntity.ok().body("edit Vip Info success");
     }
 
+
 }

@@ -3,6 +3,7 @@ package shootingstar.var.Service;
 import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.response.IamportResponse;
 import com.siot.IamportRestClient.response.Payment;
+import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -44,7 +45,7 @@ public class PaymentService {
         PaymentsInfo paymentsInfo = new PaymentsInfo(user, amount);
         paymentRepository.save(paymentsInfo);
 
-        user.increasePoint(amount);
+        user.increasePoint(BigDecimal.valueOf(amount));
     }
 
     @Transactional
@@ -56,7 +57,7 @@ public class PaymentService {
             throw new CustomException(DIFFERENT_ACCOUNT_HOLDER);
         }
 
-        if (exchangeReqDto.getExchangePoint() > user.getPoint()) {
+        if (new BigDecimal(exchangeReqDto.getExchangePoint()).compareTo(user.getPoint()) == 1) {
             throw new CustomException(EXCHANGE_AMOUNT_INCORRECT_FORMAT);
         }
 
@@ -70,6 +71,6 @@ public class PaymentService {
 
         exchangeFormRepository.save(exchangeForm);
 
-        user.decreasePoint(exchangeReqDto.getExchangePoint());
+        user.decreasePoint(BigDecimal.valueOf(exchangeReqDto.getExchangePoint()));
     }
 }
