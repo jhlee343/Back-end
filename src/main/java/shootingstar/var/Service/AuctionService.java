@@ -1,16 +1,12 @@
 package shootingstar.var.Service;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ScheduledFuture;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.quartz.Job;
 import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
@@ -18,13 +14,12 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
-import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shootingstar.var.entity.Auction;
-import shootingstar.var.entity.AuctionType;
+import shootingstar.var.enums.type.AuctionType;
 import shootingstar.var.entity.ScheduledTask;
-import shootingstar.var.entity.TaskType;
+import shootingstar.var.enums.type.TaskType;
 import shootingstar.var.entity.User;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
@@ -51,8 +46,13 @@ public class AuctionService {
         User findUser = userRepository.findByUserUUID(userUUID)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
+        // 최소 입찰 금액이 10000원 단위가 아닐 경우
+        if (reqDto.getMinBidAmount() % 10000 != 0) {
+            throw new CustomException(ErrorCode.INCORRECT_FORMAT_MIN_BID_AMOUNT);
+        }
+
         // 보유 포인트보다 최소 입찰 금액이 더 클 경우
-        if (findUser.getPoint() < reqDto.getMinBidAmount()) {
+        if (findUser.getPoint().compareTo(BigDecimal.valueOf(reqDto.getMinBidAmount())) == -1) {
             throw new CustomException(ErrorCode.MIN_BID_AMOUNT_INCORRECT_FORMAT);
         }
 
@@ -71,7 +71,9 @@ public class AuctionService {
         auctionRepository.save(auction);
 
         // 포인트 차감
-        findUser.decreasePoint(auction.getMinBidAmount());
+        log.info("사용자 감소 전 포인트 : {}", findUser.getPoint());
+        findUser.decreasePoint(BigDecimal.valueOf(auction.getMinBidAmount()));
+        log.info("사용자 감소 후 포인트 : {}", findUser.getPoint());
 
         // 스케줄링 저장
         LocalDateTime scheduleTime = LocalDateTime.now().plusMinutes(1);
@@ -129,22 +131,22 @@ public class AuctionService {
             User findCurrentHighestBidder = userRepository.findByUserUUID(findAuction.getCurrentHighestBidderId())
                     .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-            long beforePoint = findCurrentHighestBidder.getPoint();
+            BigDecimal beforePoint = findCurrentHighestBidder.getPoint();
             log.info("포인트가 추가될 예정입니다. userId : {}, 추가 전 포인트 : {}", findCurrentHighestBidder.getUserId(), beforePoint);
 
-            findCurrentHighestBidder.increasePoint(findAuction.getCurrentHighestBidAmount());
+            findCurrentHighestBidder.increasePoint(BigDecimal.valueOf(findAuction.getCurrentHighestBidAmount()));
 
-            long afterPoint = findCurrentHighestBidder.getPoint();
+            BigDecimal afterPoint = findCurrentHighestBidder.getPoint();
             log.info("포인트가 추가되었습니다. userId : {}, 추가 후 포인트 : {}", findCurrentHighestBidder.getUserId(), afterPoint);
         }
 
         // 사용자 포인트에 += 최소입찰금액
-        long beforePoint = findAuction.getUser().getPoint();
+        BigDecimal beforePoint = findAuction.getUser().getPoint();
         log.info("포인트가 추가될 예정입니다. userId : {}, 추가 전 포인트 : {}", findAuction.getUser().getUserId(), beforePoint);
 
-        findAuction.getUser().increasePoint(findAuction.getMinBidAmount());
+        findAuction.getUser().increasePoint(BigDecimal.valueOf(findAuction.getMinBidAmount()));
 
-        long afterPoint = findAuction.getUser().getPoint();
+        BigDecimal afterPoint = findAuction.getUser().getPoint();
         log.info("포인트가 추가되었습니다. userId : {}, 추가 후 포인트 : {}", findAuction.getUser().getUserId(), afterPoint);
 
 

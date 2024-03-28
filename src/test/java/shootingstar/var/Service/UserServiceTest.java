@@ -13,7 +13,7 @@
 //import shootingstar.var.entity.*;
 //import shootingstar.var.repository.AuctionRepository;
 //import shootingstar.var.repository.Review.ReviewRepository;
-//import shootingstar.var.repository.TicketRepository;
+//import shootingstar.var.repository.ticket.TicketRepository;
 //import shootingstar.var.repository.UserRepository;
 //
 //import java.security.PublicKey;

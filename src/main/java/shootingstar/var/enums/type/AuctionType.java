@@ -1,4 +1,4 @@
-package shootingstar.var.entity;
+package shootingstar.var.enums.type;
 
 public enum AuctionType {
     PROGRESS, CANCEL, SUCCESS, INVALIDITY

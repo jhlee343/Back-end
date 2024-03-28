@@ -1,4 +1,4 @@
-package shootingstar.var.entity;
+package shootingstar.var.entity.ticket;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -15,6 +15,8 @@ import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import shootingstar.var.entity.BaseTimeEntity;
+import shootingstar.var.enums.status.TicketReportStatus;
 
 @Entity
 @Getter

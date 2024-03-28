@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import shootingstar.var.entity.Auction;
 import shootingstar.var.entity.AuctionType;
 import shootingstar.var.entity.Ticket;
+import shootingstar.var.enums.type.AuctionType;
 import shootingstar.var.entity.User;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.jwt.JwtTokenProvider;
