@@ -2,7 +2,6 @@ package shootingstar.var.exception;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.client.HttpClientErrorException.Conflict;
 
 import static org.springframework.http.HttpStatus.*;
 
@@ -28,8 +27,8 @@ public enum ErrorCode {
     KAKAO_CONNECT_FAILED_TOKEN_ENDPOINT(UNAUTHORIZED, "0111", "카카오 토큰 엔드포인트와 통신에 실패하였습니다."),
     KAKAO_FAILED_GET_USERINFO_ERROR(UNAUTHORIZED, "0112", "카카오로부터 사용자 정보를 가져오지 못했습니다."),
     KAKAO_CONNECT_FAILED_USERINFO_ENDPOINT(UNAUTHORIZED, "0113", "카카오 사용자 정보 엔드포인트와 통신에 실패하였습니다."),
-
-    LOGGED_IN_SOMEWHERE_ELSE(FORBIDDEN, "0114", "다른 장소에서 로그인 되었습니다."),
+    KAKAO_CONNECT_FAILED_UNLINK_ENDPOINT(UNAUTHORIZED, "0114", "카카오 사용자 연결 해제 엔드포인트와 통신에 실패하였습니다."),
+    LOGGED_IN_SOMEWHERE_ELSE(FORBIDDEN, "0115", "다른 장소에서 로그인 되었습니다."),
 
     NOT_FOUND_END_POINT(NOT_FOUND, "0200", "존재하지 않는 접근입니다."),
 
@@ -50,6 +49,7 @@ public enum ErrorCode {
     DUPLICATE_EMAIL(CONFLICT, "1301", "이미 사용중인 이메일입니다."),
     DUPLICATE_NICKNAME(CONFLICT, "1302", "이미 사용중인 닉네임입니다."),
     WITHDRAWAL_ERROR_BY_AUCTION_IN_PROGRESS(CONFLICT, "1303", "현재 진행중인 경매가 존재할 경우 회원탈퇴가 불가능합니다."),
+    WITHDRAWAL_ERROR_BY_TICKET_IN_PROGRESS(CONFLICT, "1304", "현재 종료되지 않은 식사권이 존재할 경우 회원탈퇴가 불가능합니다."),
 
     MIN_BID_AMOUNT_INCORRECT_FORMAT(BAD_REQUEST, "2000", "최소입찰금액은 자신의 보유 포인트보다 적어야 합니다."),
     INCORRECT_FORMAT_MIN_BID_AMOUNT(BAD_REQUEST, "2001", "잘못된 형식의 최소 입찰 금액입니다."),

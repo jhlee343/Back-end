@@ -9,6 +9,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import shootingstar.var.entity.ticket.Ticket;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -64,6 +65,12 @@ public class User extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private final List<Auction> myHostedAuction = new ArrayList<>();
+
+    @OneToMany(mappedBy = "organizer", fetch = FetchType.LAZY)
+    private final List<Ticket> myHostedTicket = new ArrayList<>();
+
+    @OneToMany(mappedBy = "winner", fetch = FetchType.LAZY)
+    private final List<Ticket> winningTicket = new ArrayList<>();
 
     @Builder
     public User(String kakaoId, String name, String nickname, String phone, String email, String profileImgUrl, UserType userType) {
