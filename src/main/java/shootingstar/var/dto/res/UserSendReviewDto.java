@@ -2,8 +2,6 @@ package shootingstar.var.dto.res;
 
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Data;
-import shootingstar.var.entity.Ticket;
-import shootingstar.var.entity.User;
 
 //작성 리뷰 불러오기
 @Data
