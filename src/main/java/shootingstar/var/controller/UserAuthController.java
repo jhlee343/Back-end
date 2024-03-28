@@ -138,6 +138,26 @@ public class UserAuthController {
         }
     }
 
+
+    @Operation(summary = "회원탈퇴 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "회원탈퇴 성공", content = {
+                    @Content(mediaType = "text/plain", schema = @Schema(implementation = String.class))}),
+            @ApiResponse(responseCode = "401",
+                    description = "카카오 사용자 연결 해제 실패 : 0114",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+            @ApiResponse(responseCode = "404",
+                    description = "사용자를 찾을 수 없음 : 1201",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+            @ApiResponse(responseCode = "409",
+                    description =
+                                    "- 진행중인 경매 존재 : 1303\n" +
+                                    "- 진행중인 식사권 존재 : 1304",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+            @ApiResponse(responseCode = "500",
+                    description = "Redis JSON 파싱 에러",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+    })
     @PatchMapping("/withdrawal")
     public ResponseEntity<String> withdrawal(HttpServletRequest request, HttpServletResponse response) {
         String userUUID = tokenProvider.getUserUUIDByRequest(request);

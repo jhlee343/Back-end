@@ -2,7 +2,6 @@ package shootingstar.var.exception;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.client.HttpClientErrorException.Conflict;
 
 import static org.springframework.http.HttpStatus.*;
 
@@ -28,8 +27,8 @@ public enum ErrorCode {
     KAKAO_CONNECT_FAILED_TOKEN_ENDPOINT(UNAUTHORIZED, "0111", "카카오 토큰 엔드포인트와 통신에 실패하였습니다."),
     KAKAO_FAILED_GET_USERINFO_ERROR(UNAUTHORIZED, "0112", "카카오로부터 사용자 정보를 가져오지 못했습니다."),
     KAKAO_CONNECT_FAILED_USERINFO_ENDPOINT(UNAUTHORIZED, "0113", "카카오 사용자 정보 엔드포인트와 통신에 실패하였습니다."),
-
-    LOGGED_IN_SOMEWHERE_ELSE(FORBIDDEN, "0114", "다른 장소에서 로그인 되었습니다."),
+    KAKAO_CONNECT_FAILED_UNLINK_ENDPOINT(UNAUTHORIZED, "0114", "카카오 사용자 연결 해제 엔드포인트와 통신에 실패하였습니다."),
+    LOGGED_IN_SOMEWHERE_ELSE(FORBIDDEN, "0115", "다른 장소에서 로그인 되었습니다."),
 
     NOT_FOUND_END_POINT(NOT_FOUND, "0200", "존재하지 않는 접근입니다."),
 

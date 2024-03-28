@@ -97,7 +97,7 @@ public class KakaoAPI {
         try {
             restTemplate.exchange(unlinkUserEndpoint, HttpMethod.POST, requestEntity, String.class);
         } catch (RestClientException e) {
-            throw new CustomException(KAKAO_CONNECT_FAILED_USERINFO_ENDPOINT);
+            throw new CustomException(KAKAO_CONNECT_FAILED_UNLINK_ENDPOINT);
         }
     }
 }
