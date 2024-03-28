@@ -1,5 +1,6 @@
 package shootingstar.var.Service;
 
+import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -45,7 +46,7 @@ public class SchedulerService {
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
             log.info("사용자 증가 전 포인트 : {}", user.getPoint());
-            user.increasePoint(auction.getMinBidAmount());
+            user.increasePoint(BigDecimal.valueOf(auction.getMinBidAmount()));
             log.info("사용자 증가 후 포인트 : {}", user.getPoint());
 
             ScheduledTask task = scheduledTaskRepository.findById(scheduledTaskId)

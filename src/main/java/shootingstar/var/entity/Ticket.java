@@ -57,6 +57,10 @@ public class Ticket extends BaseTimeEntity {
         this.organizerIsPushed = false;
     }
 
+    public void changeTicketIsOpened(boolean ticketIsOpened) {
+        this.ticketIsOpened = ticketIsOpened;
+    }
+
     public void changeWinnerIsPushed(boolean winnerIsPushed) {
         this.winnerIsPushed = winnerIsPushed;
     }
