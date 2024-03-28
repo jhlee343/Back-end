@@ -6,16 +6,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shootingstar.var.entity.Auction;
-import shootingstar.var.entity.AuctionType;
+import shootingstar.var.enums.type.AuctionType;
 import shootingstar.var.entity.ScheduledTask;
-import shootingstar.var.entity.TaskType;
-import shootingstar.var.entity.Ticket;
+import shootingstar.var.enums.type.TaskType;
+import shootingstar.var.entity.ticket.Ticket;
 import shootingstar.var.entity.User;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
 import shootingstar.var.repository.AuctionRepository;
 import shootingstar.var.repository.ScheduledTaskRepository;
-import shootingstar.var.repository.TicketRepository;
+import shootingstar.var.repository.ticket.TicketRepository;
 import shootingstar.var.repository.UserRepository;
 
 @Slf4j

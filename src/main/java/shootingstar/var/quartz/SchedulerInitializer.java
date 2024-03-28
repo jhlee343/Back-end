@@ -19,7 +19,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import shootingstar.var.Service.SchedulerService;
 import shootingstar.var.entity.ScheduledTask;
-import shootingstar.var.entity.TaskType;
+import shootingstar.var.enums.type.TaskType;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
 import shootingstar.var.repository.ScheduledTaskRepository;

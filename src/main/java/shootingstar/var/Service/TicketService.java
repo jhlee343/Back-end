@@ -13,15 +13,15 @@ import shootingstar.var.dto.req.MeetingTimeSaveReqDto;
 import shootingstar.var.dto.req.TicketReportReqDto;
 import shootingstar.var.dto.res.DetailTicketResDto;
 import shootingstar.var.entity.Auction;
-import shootingstar.var.entity.Ticket;
-import shootingstar.var.entity.TicketMeetingTime;
-import shootingstar.var.entity.TicketReport;
+import shootingstar.var.entity.ticket.Ticket;
+import shootingstar.var.entity.ticket.TicketMeetingTime;
+import shootingstar.var.entity.ticket.TicketReport;
 import shootingstar.var.entity.User;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
-import shootingstar.var.repository.TicketMeetingTimeRepository;
-import shootingstar.var.repository.TicketReportRepository;
-import shootingstar.var.repository.TicketRepository;
+import shootingstar.var.repository.ticket.TicketMeetingTimeRepository;
+import shootingstar.var.repository.ticket.TicketReportRepository;
+import shootingstar.var.repository.ticket.TicketRepository;
 import shootingstar.var.repository.UserRepository;
 
 @Slf4j
