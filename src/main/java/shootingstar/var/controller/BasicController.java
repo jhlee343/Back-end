@@ -16,7 +16,7 @@ import shootingstar.var.dto.req.UserApplyVipDto;
 import shootingstar.var.dto.res.TicketListResDto;
 import shootingstar.var.dto.res.UserAuctionParticipateList;
 import shootingstar.var.dto.res.UserAuctionSuccessList;
-import shootingstar.var.entity.SortType;
+import shootingstar.var.enums.type.TicketSortType;
 import shootingstar.var.jwt.JwtTokenProvider;
 
 @Tag(name = "BasicController", description = "Basic 사용자 사용가능 기능")
@@ -40,11 +40,11 @@ public class BasicController {
     @Operation(summary = "사용자 식사권 리스트 불러오기")
     @GetMapping("/ticketList")
     public ResponseEntity<?> getTicketList(HttpServletRequest request,
-                                           @RequestParam(value = "sortType", required = false, defaultValue = "TIME_DESC") SortType sortType,
+                                           @RequestParam(value = "ticketSortType", required = false, defaultValue = "TIME_DESC") TicketSortType ticketSortType,
                                            @RequestParam(value = "search", required = false) String search,
                                            @PageableDefault(size =10) Pageable pageable){
         String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
-        Page<TicketListResDto> findAllTicketListDto = basicService.getAllTicketList(userUUID, pageable);
+        Page<TicketListResDto> findAllTicketListDto = basicService.getAllTicketList(userUUID, ticketSortType,search, pageable);
         return ResponseEntity.ok(findAllTicketListDto);
     }
     @Operation(summary = "참여중인 경매 불러오기")

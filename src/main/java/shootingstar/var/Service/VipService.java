@@ -19,7 +19,7 @@ public class VipService {
     private final VipInfoRepository vipInfoRepository;
 
     public VipInfoDto getVipInfo(String userUUID){
-        VipInfo vipInfo = findByUserUUID(userUUID);
+        VipInfo vipInfo = findByvipInfoUUID(userUUID);
         VipInfoDto vipInfoDto = new VipInfoDto(
                 vipInfo.getVipJob(),
                 vipInfo.getVipIntroduce(),
@@ -32,8 +32,8 @@ public class VipService {
     public void editInfo(String userUUID, VipInfoDto vipInfoDto){
 
     }
-    public VipInfo findByUserUUID(String userUUID) {
-        Optional<VipInfo> optionalVipInfo = vipInfoRepository.findByuserUUID(userUUID);
+    public VipInfo findByvipInfoUUID(String userUUID) {
+        Optional<VipInfo> optionalVipInfo = vipInfoRepository.findByvipInfoUUID(userUUID);
         if (optionalVipInfo.isEmpty()) {
             throw new RuntimeException();
         }

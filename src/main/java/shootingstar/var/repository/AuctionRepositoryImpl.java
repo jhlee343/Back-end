@@ -9,7 +9,7 @@ import shootingstar.var.dto.res.UserAuctionParticipateList;
 import shootingstar.var.dto.res.UserAuctionSuccessList;
 import shootingstar.var.dto.res.QUserAuctionSuccessList;
 import shootingstar.var.dto.res.QUserAuctionParticipateList;
-import shootingstar.var.entity.AuctionType;
+import shootingstar.var.enums.type.AuctionType;
 
 import java.util.List;
 import static shootingstar.var.entity.QAuction.auction;

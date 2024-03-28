@@ -41,7 +41,7 @@ public class VipInfo {
     @Builder
     public VipInfo(String vipInfoUUID, User user, String vipName ,String vipJob,
                    String vipCareer, String vipIntroduce, VipApprovalType vipApprovalType, String vipEvidenceUrl){
-        this.vipInfoUUID = UUID.randomUUID().toString();
+        this.vipInfoUUID = vipInfoUUID;
         this.user = user;
         this.vipName = vipName;
         this.vipCareer = vipCareer;
