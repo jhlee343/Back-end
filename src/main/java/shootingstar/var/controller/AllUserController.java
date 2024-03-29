@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import shootingstar.var.Service.AllUserService;
 import shootingstar.var.Service.CheckDuplicateService;
 import shootingstar.var.Service.EmailService;
-import shootingstar.var.Service.UserService;
 import shootingstar.var.dto.req.CheckAuthCodeReqDto;
 import shootingstar.var.dto.req.SendAuthCodeReqDto;
 import shootingstar.var.dto.req.UserSignupReqDto;
