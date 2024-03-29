@@ -27,10 +27,10 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
                 return queryFactory
                 .select(new QUserReceiveReviewDto(
                         review.reviewUUID,
-                        review.ticketId.ticketUUID,
+                        review.ticket.ticketUUID,
                         review.reviewContent,
                         review.reviewRating,
-                        review.writerId.userUUID
+                        review.writer.userUUID
                 ))
                 .from(review)
                 .where(userEqReceiver(userUUID))
@@ -42,13 +42,13 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
         List<UserReceiveReviewDto> content = queryFactory
                 .select(new QUserReceiveReviewDto(
                         review.reviewUUID,
-                        review.ticketId.ticketUUID,
+                        review.ticket.ticketUUID,
                         review.reviewContent,
                         review.reviewRating,
-                        review.writerId.userUUID
+                        review.writer.userUUID
                 ))
                 .from(review)
-                .where(userEqReceiver(userUUID), review.receiverId.isWithdrawn.eq(false))
+                .where(userEqReceiver(userUUID), review.receiver.isWithdrawn.eq(false))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(review.reviewId.desc())
@@ -57,7 +57,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
         JPAQuery<Long> countQuery = queryFactory
                 .select(review.count())
                 .from(review)
-                .where(userEqReceiver(userUUID), review.receiverId.isWithdrawn.eq(false));
+                .where(userEqReceiver(userUUID), review.receiver.isWithdrawn.eq(false));
 
         return PageableExecutionUtils.getPage(content,pageable,countQuery::fetchOne);
     }
@@ -66,10 +66,10 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
         return queryFactory
                 .select(new QUserSendReviewDto(
                         review.reviewUUID,
-                        review.ticketId.ticketUUID,
+                        review.ticket.ticketUUID,
                         review.reviewContent,
                         review.reviewRating,
-                        review.receiverId.userUUID
+                        review.receiver.userUUID
                 ))
                 .from(review)
                 .where(userEqWriter(userUUID))
@@ -81,13 +81,13 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
         List<UserSendReviewDto> content = queryFactory
                 .select(new QUserSendReviewDto(
                         review.reviewUUID,
-                        review.ticketId.ticketUUID,
+                        review.ticket.ticketUUID,
                         review.reviewContent,
                         review.reviewRating,
-                        review.receiverId.userUUID
+                        review.receiver.userUUID
                 ))
                 .from(review)
-                .where(userEqWriter(userUUID), review.writerId.isWithdrawn.eq(false))
+                .where(userEqWriter(userUUID), review.writer.isWithdrawn.eq(false))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(review.reviewId.desc())
@@ -96,17 +96,17 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
         JPAQuery<Long> countQuery = queryFactory
                 .select(review.count())
                 .from(review)
-                .where(userEqReceiver(userUUID), review.writerId.isWithdrawn.eq(true));
+                .where(userEqReceiver(userUUID), review.writer.isWithdrawn.eq(true));
 
         return PageableExecutionUtils.getPage(content,pageable,countQuery::fetchOne);
     }
 
     private BooleanExpression userEqReceiver(String userUUID){
-        return userUUID !=null ? review.receiverId.userUUID.eq(userUUID) : null;
+        return userUUID !=null ? review.receiver.userUUID.eq(userUUID) : null;
     }
 
     private BooleanExpression userEqWriter(String userUUID){
-        return userUUID != null ? review.writerId.userUUID.eq(userUUID) : null;
+        return userUUID != null ? review.writer.userUUID.eq(userUUID) : null;
     }
 
 }

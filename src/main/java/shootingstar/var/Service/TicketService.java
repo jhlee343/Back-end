@@ -10,15 +10,18 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shootingstar.var.dto.req.MeetingTimeSaveReqDto;
+import shootingstar.var.dto.req.ReviewSaveReqDto;
 import shootingstar.var.dto.req.TicketReportReqDto;
 import shootingstar.var.dto.res.DetailTicketResDto;
 import shootingstar.var.entity.Auction;
+import shootingstar.var.entity.Review;
 import shootingstar.var.entity.ticket.Ticket;
 import shootingstar.var.entity.ticket.TicketMeetingTime;
 import shootingstar.var.entity.ticket.TicketReport;
 import shootingstar.var.entity.User;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
+import shootingstar.var.repository.Review.ReviewRepository;
 import shootingstar.var.repository.ticket.TicketMeetingTimeRepository;
 import shootingstar.var.repository.ticket.TicketReportRepository;
 import shootingstar.var.repository.ticket.TicketRepository;
@@ -32,6 +35,7 @@ public class TicketService {
     private final TicketMeetingTimeRepository ticketMeetingTimeRepository;
     private final TicketReportRepository ticketReportRepository;
     private final UserRepository userRepository;
+    private final ReviewRepository reviewRepository;
     private final ObjectProvider<TicketService> ticketServiceProvider;
 
     public DetailTicketResDto detailTicket(String ticketUUID, String userUUID) {
@@ -248,5 +252,46 @@ public class TicketService {
         log.info("낙찰자 환불 받기 전 포인트 : {}", ticket.getWinner().getPoint());
         ticket.getWinner().increasePoint(BigDecimal.valueOf(ticket.getAuction().getCurrentHighestBidAmount()));
         log.info("낙찰자 환불 받은 후 포인트 : {}", ticket.getWinner().getPoint());
+    }
+
+    @Transactional
+    public void saveReview(ReviewSaveReqDto reqDto, String userUUID) {
+        Ticket ticket = ticketRepository.findById(reqDto.getTicketId())
+                .orElseThrow(() -> new CustomException(ErrorCode.TICKET_NOT_FOUND));
+
+        // 로그인한 사용자가 식사권의 낙찰자도 주최자도 아닐 경우
+        if (!ticket.getWinner().getUserUUID().equals(userUUID) && !ticket.getOrganizer().getUserUUID().equals(userUUID)) {
+            throw new CustomException(ErrorCode.ACCESS_DENIED);
+        }
+
+        // 해당 식사권에 대한 리뷰를 작성한 적이 있는 경우
+        if (ticket.getReviews().stream().anyMatch(review -> review.getWriter().getUserUUID().equals(userUUID))) {
+            throw new CustomException(ErrorCode.REVIEW_CONFLICT);
+        }
+
+        // 현재 시간이 식사 날짜 시간 + 2시간 전인 경우
+        if (LocalDateTime.now().isBefore(ticket.getAuction().getMeetingDate().plusHours(2))) {
+            throw new CustomException(ErrorCode.MEETING_TIME_NOT_PASSED);
+        }
+
+        User writer;
+        User receiver;
+        if (ticket.getWinner().getUserUUID().equals(userUUID)) {
+            writer = ticket.getWinner();
+            receiver = ticket.getOrganizer();
+        } else {
+            writer = ticket.getOrganizer();
+            receiver = ticket.getWinner();
+        }
+
+        Review review = Review.builder()
+                .writer(writer)
+                .receiver(receiver)
+                .ticket(ticket)
+                .reviewContent(reqDto.getReviewContent())
+                .reviewRating(reqDto.getReviewRating())
+                .build();
+
+        reviewRepository.save(review);
     }
 }

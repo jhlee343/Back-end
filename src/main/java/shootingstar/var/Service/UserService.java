@@ -21,50 +21,22 @@ import shootingstar.var.repository.Review.ReviewRepository;
 import shootingstar.var.repository.ReviewReport.ReviewReportRepository;
 import shootingstar.var.repository.User.UserRepository;
 import shootingstar.var.repository.Warning.WarningRepository;
-import shootingstar.var.util.MailRedisUtil;
 
-import static shootingstar.var.exception.ErrorCode.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import static shootingstar.var.exception.ErrorCode.REVIEW_NOT_FOUND;
+import static shootingstar.var.exception.ErrorCode.USER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
     private final FollowRepository followRepository;
-    private final MailRedisUtil mailRedisUtil;
-    private final CheckDuplicateService duplicateService;
     private final WarningRepository warningRepository;
     private final ReviewRepository reviewRepository;
     private final ReviewReportRepository reviewReportRepository;
-
-    public void signup(UserSignupReqDto reqDto) {
-        if (duplicateService.checkEmailDuplicate(reqDto.getEmail())) {
-            throw new CustomException(ErrorCode.DUPLICATE_EMAIL);
-        }
-        if (duplicateService.checkNicknameDuplicate(reqDto.getNickname())) {
-            throw new CustomException(ErrorCode.DUPLICATE_NICKNAME);
-        }
-
-        if (mailRedisUtil.hasKey(reqDto.getEmail()) && mailRedisUtil.getData(reqDto.getEmail()).equals("validate")) { // 이메일 인증을 받은 이메일 인지 확인
-
-            User user = User.builder()
-                    .kakaoId(reqDto.getKakaoId())
-                    .name(reqDto.getUserName())
-                    .nickname(reqDto.getNickname())
-                    .phone(reqDto.getPhoneNumber())
-                    .email(reqDto.getEmail())
-                    .profileImgUrl(reqDto.getProfileImgUrl())
-                    .userType(UserType.ROLE_BASIC)
-                    .build();
-
-            userRepository.save(user);
-            mailRedisUtil.deleteData(reqDto.getEmail());
-        } else {
-            throw new CustomException(ErrorCode.VALIDATE_ERROR_EMAIL);
-        }
-    }
 
     public boolean checkVIP(String userUUID) {
         User user = findByUserUUID(userUUID);

@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import shootingstar.var.Service.TicketService;
 import shootingstar.var.dto.req.MeetingTimeSaveReqDto;
+import shootingstar.var.dto.req.ReviewSaveReqDto;
 import shootingstar.var.dto.req.TicketReportReqDto;
 import shootingstar.var.dto.res.DetailTicketResDto;
 import shootingstar.var.dto.res.MeetingTimeResDto;
@@ -152,5 +153,33 @@ public class TicketController {
         String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
         ticketService.cancelTicket(ticketUUID, userUUID);
         return ResponseEntity.ok().body("식사권 취소 성공");
+    }
+
+    @Operation(summary = "식사권 리뷰 작성 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "식사권 리뷰 작성 성공"),
+            @ApiResponse(responseCode = "400",
+                    description =
+                                    "- 잘못된 형식의 식사권 고유번호 입력 시 : 6001\n" +
+                                    "- 잘못된 형식의 리뷰 내용 입력 시 : 6005\n" +
+                                    "- 잘못된 형식의 리뷰 점수 입력 시 : 6006\n" +
+                                    "- 만남 시간 + 2시간 전에 리뷰 작성 시 : 6007",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+            @ApiResponse(responseCode = "404",
+                    description = "- 식사권 정보 조회 실패 : 6200",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+            @ApiResponse(responseCode = "409",
+                    description = "- 해당 식사권에 대한 리뷰를 작성한 적이 있을 때 : 6304",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+            @ApiResponse(responseCode = "403",
+                    description = "- 로그인한 사용자가 식사권의 낙찰자도 주최자도 아닐 때 : 0101",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+    })
+    @PostMapping("/review")
+    public ResponseEntity<String> saveReview(@Valid @RequestBody ReviewSaveReqDto reqDto, HttpServletRequest request) {
+        String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
+        ticketService.saveReview(reqDto, userUUID);
+        return ResponseEntity.ok().body("식사권 리뷰 작성 성공");
     }
 }

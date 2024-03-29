@@ -76,6 +76,9 @@ public enum ErrorCode {
     INCORRECT_FORMAT_START_MEETING_TIME(BAD_REQUEST, "6002", "잘못된 형식의 만남 시작 시간입니다."),
     INCORRECT_FORMAT_TICKET_REPORT_CONTENT(BAD_REQUEST, "6003", "잘못된 형식의 식사권 신고 내용입니다."),
     INCORRECT_FORMAT_TICKET_REPORT_EVIDENCE_URL(BAD_REQUEST, "6004", "잘못된 형식의 식사권 신고 증거 URL입니다."),
+    INCORRECT_FORMAT_REVIEW_CONTENT(BAD_REQUEST, "6005", "잘못된 형식의 리뷰 내용입니다."),
+    INCORRECT_FORMAT_REVIEW_RATING(BAD_REQUEST, "6006", "잘못된 형식의 리뷰 점수입니다."),
+    MEETING_TIME_NOT_PASSED(BAD_REQUEST, "6007", "만남이 끝나기 전에 리뷰 작성을 할 수 없습니다."),
 
     TICKET_NOT_FOUND(NOT_FOUND, "6200", "존재하지 않는 식사권입니다."),
     TICKET_MEETING_TIME_NOT_FOUND(NOT_FOUND, "6201", "존재하지 않는 만남 시작 시간입니다."),
@@ -84,6 +87,7 @@ public enum ErrorCode {
     TICKET_REPORT_CONFLICT(CONFLICT, "6301", "이미 신고된 식사권입니다."),
     TICKET_CANCEL_CONFLICT(CONFLICT, "6302", "식사 시간이 지난 후에는 취소가 불가능합니다."),
     ALREADY_TICKET_CANCEL_CONFLICT(CONFLICT, "6303", "이미 취소된 식사권입니다."),
+    REVIEW_CONFLICT(CONFLICT, "6304", "해당 식사권에 대한 리뷰를 작성한 적이 있습니다."),
     ;
 
     private final HttpStatus httpStatus;
