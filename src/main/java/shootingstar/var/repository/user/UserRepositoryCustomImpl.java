@@ -25,29 +25,27 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom{
     public VipDetailResDto findVipDetailByVipUUID(String vipUUID) {
         VipDetailResDto vipDetailResDto = queryFactory
                 .select(new QVipDetailResDto(
-                        user.userUUID,
-                        user.profileImgUrl,
-                        user.nickname,
-                        user.rating,
+                        vipInfo.user.userUUID,
+                        vipInfo.user.profileImgUrl,
+                        vipInfo.user.nickname,
+                        vipInfo.user.rating,
                         vipInfo.vipJob,
                         vipInfo.vipCareer,
                         vipInfo.vipIntroduce
                 ))
                 .from(vipInfo)
-                .leftJoin(vipInfo.user, user)
                 .where(vipInfo.user.userUUID.eq(vipUUID))
                 .fetchOne();
 
         List<VipProgressAuctionResDto> progressAuctionList = queryFactory
                 .select(new QVipProgressAuctionResDto(
-                        user.profileImgUrl,
+                        auction.user.profileImgUrl,
                         auction.auctionUUID,
                         auction.createdTime,
                         auction.currentHighestBidAmount,
                         auction.bidCount
                 ))
                 .from(auction)
-                .leftJoin(auction.user, user)
                 .where(auction.user.userUUID.eq(vipUUID)
                         .and(auction.auctionType.eq(AuctionType.PROGRESS)))
                 .fetch();
@@ -58,12 +56,11 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom{
 
         List<VipReceiveReviewResDto> receiveReviewList = queryFactory
                 .select(new QVipReceiveReviewResDto(
-                        user.nickname,
+                        review.writer.nickname,
                         review.reviewRating,
                         review.reviewContent
                 ))
                 .from(review)
-                .leftJoin(review.writer, user)
                 .where(review.receiver.userUUID.eq(vipUUID))
                 .fetch();
 

@@ -12,9 +12,9 @@ import shootingstar.var.entity.*;
 import shootingstar.var.entity.ticket.Ticket;
 import shootingstar.var.enums.type.AuctionType;
 import shootingstar.var.repository.AuctionRepository;
-import shootingstar.var.repository.Review.ReviewRepository;
-import shootingstar.var.repository.UserRepository;
-import shootingstar.var.repository.Vip.VipInfoRepository;
+import shootingstar.var.repository.review.ReviewRepository;
+import shootingstar.var.repository.user.UserRepository;
+import shootingstar.var.repository.vip.VipInfoRepository;
 import shootingstar.var.repository.banner.BannerRepository;
 import shootingstar.var.repository.ticket.TicketRepository;
 
@@ -112,7 +112,7 @@ class AllUserServiceTest {
 
         userRepository.flush();
 
-        VipInfo vipInfo = new VipInfo("dd", vip, vip.getName(), "개발자", "경력", "소개", VipApprovalType.APPROVE, "url");
+        VipInfo vipInfo = new VipInfo(vip, vip.getName(), "개발자", "경력", "소개", VipApprovalType.APPROVE, "url");
         vipInfoRepository.save(vipInfo);
         vipInfoRepository.flush();
 

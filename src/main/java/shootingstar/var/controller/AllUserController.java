@@ -71,7 +71,7 @@ public class AllUserController {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
     })
     @GetMapping("/duplicate/nickname/{nickname}")
-    public ResponseEntity<Boolean> checkNicknameDuplicate(@NotEmpty @PathVariable("nickname") String nickname){
+    public ResponseEntity<Boolean> checkNicknameDuplicate(@NotBlank @PathVariable("nickname") String nickname){
         return ResponseEntity.ok(duplicateService.checkNicknameDuplicate(nickname));
     }
 
@@ -127,8 +127,8 @@ public class AllUserController {
     }
 
     @GetMapping("/vipDetail/{vipUUID}")
-    public ResponseEntity<VipDetailResDto> vipDetail(@Valid @PathVariable("vipUUID") String vipUUID) {
-
-        return null;
+    public ResponseEntity<VipDetailResDto> vipDetail(@NotBlank @PathVariable("vipUUID") String vipUUID) {
+        VipDetailResDto vipDetail = allUserService.getVipDetail(vipUUID);
+        return ResponseEntity.ok().body(vipDetail);
     }
 }

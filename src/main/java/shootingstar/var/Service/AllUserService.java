@@ -56,6 +56,13 @@ public class AllUserService {
     }
 
     public VipDetailResDto getVipDetail(String vipUUID) {
+        User vip = userRepository.findByUserUUID(vipUUID)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        if (!vip.getUserType().equals(UserType.ROLE_VIP)) {
+            throw new CustomException(ErrorCode.VIP_INFO_NOT_FOUND);
+        }
+
         return userRepository.findVipDetailByVipUUID(vipUUID);
     }
 }

@@ -107,6 +107,8 @@ public class GlobalExceptionHandler {
                 errorCode = INCORRECT_FORMAT_NICKNAME;
             } else if (fieldName.contains("email")) {
                 errorCode = INCORRECT_FORMAT_EMAIL;
+            } else if (fieldName.contains("vipUUID")) {
+                errorCode = INCORRECT_FORMAT_USER_UUID;
             }
 
             if (!errorCode.equals(INCORRECT_FORMAT)) {
