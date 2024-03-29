@@ -75,11 +75,11 @@ public class UserService {
     }
 
     public Page<UserReceiveReviewDto> receiveReview(String userUUID, Pageable pageable){
-        return reviewRepository.findAllReceiveByuserUUID(userUUID,pageable);
+        return reviewRepository.findAllReceiveByUserUUID(userUUID,pageable);
     }
 
     public Page<UserSendReviewDto> sendReview(String userUUID, Pageable pageable){
-        return reviewRepository.findAllSendByuserUUID(userUUID,pageable);
+        return reviewRepository.findAllSendByUserUUID(userUUID,pageable);
     }
     public List<WarningListDto> findAllWarning(String userUUID) {
         return warningRepository.findAllWarnByUserUUID(userUUID);
@@ -121,7 +121,7 @@ public class UserService {
     }
 
     public Review findByReviewId(Long reviewId){
-        Optional<Review> optionalReview = reviewRepository.findByReviewId(reviewId);
+        Optional<Review> optionalReview = reviewRepository.findById(reviewId);
         if(optionalReview.isEmpty()){
             throw new CustomException(REVIEW_NOT_FOUND);
         }

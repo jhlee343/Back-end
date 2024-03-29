@@ -23,7 +23,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
     }
 
     @Override
-    public List<UserReceiveReviewDto> findReceiveByserUUID(String userUUID) {
+    public List<UserReceiveReviewDto> findReceiveByUserUUID(String userUUID) {
                 return queryFactory
                 .select(new QUserReceiveReviewDto(
                         review.reviewUUID,
@@ -38,7 +38,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
     }
 
     @Override
-    public Page<UserReceiveReviewDto> findAllReceiveByuserUUID(String userUUID, Pageable pageable) {
+    public Page<UserReceiveReviewDto> findAllReceiveByUserUUID(String userUUID, Pageable pageable) {
         List<UserReceiveReviewDto> content = queryFactory
                 .select(new QUserReceiveReviewDto(
                         review.reviewUUID,
@@ -62,7 +62,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
         return PageableExecutionUtils.getPage(content,pageable,countQuery::fetchOne);
     }
     @Override
-    public List<UserSendReviewDto> findSendByserUUID(String userUUID) {
+    public List<UserSendReviewDto> findSendByUserUUID(String userUUID) {
         return queryFactory
                 .select(new QUserSendReviewDto(
                         review.reviewUUID,
@@ -77,7 +77,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
     }
 
     @Override
-    public Page<UserSendReviewDto> findAllSendByuserUUID(String userUUID, Pageable pageable) {
+    public Page<UserSendReviewDto> findAllSendByUserUUID(String userUUID, Pageable pageable) {
         List<UserSendReviewDto> content = queryFactory
                 .select(new QUserSendReviewDto(
                         review.reviewUUID,

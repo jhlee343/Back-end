@@ -55,12 +55,18 @@ public class BasicController {
         return ResponseEntity.ok(userAuctionParticipateLists);
     }
 
-    @Operation(summary = "낙찰받은 경매 불러오기")
+    @Operation(summary = "낙찰받은 만남 전 경매 불러오기")
     @GetMapping("/auction/success")
-    public ResponseEntity<?> getSuccessAuctionList(HttpServletRequest request, @PageableDefault(size = 10) Pageable pageable){
+    public ResponseEntity<?> getSuccessBeforeAuctionList(HttpServletRequest request, @PageableDefault(size = 10) Pageable pageable){
         String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
-        Page<UserAuctionSuccessList> userAuctionSuccessLists = basicService.successAuctionList(userUUID,pageable);
+        Page<UserAuctionSuccessList> userAuctionSuccessLists = basicService.successBeforeAuctionList(userUUID,pageable);
         return ResponseEntity.ok(userAuctionSuccessLists);
     }
-
+    @Operation(summary = "낙찰받은 만남 후 경매 불러오기")
+    @GetMapping("/auction/success")
+    public ResponseEntity<?> getSuccessAfterAuctionList(HttpServletRequest request, @PageableDefault(size = 10) Pageable pageable){
+        String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
+        Page<UserAuctionSuccessList> userAuctionSuccessLists = basicService.successAfterAuctionList(userUUID,pageable);
+        return ResponseEntity.ok(userAuctionSuccessLists);
+    }
 }

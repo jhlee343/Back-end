@@ -95,7 +95,7 @@ public class UserController {
     @Operation(summary = "리뷰 신고") @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "review report success")
     })
-    @PostMapping("/review/report")
+    @PostMapping("/review/report/{reviewId}")
     public ResponseEntity<String> reportReview(@Valid @PathVariable("reviewId") Long reviewId){
         userService.reportReview(reviewId);
         return ResponseEntity.ok().body("review report success");

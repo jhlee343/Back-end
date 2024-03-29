@@ -32,7 +32,6 @@ public class BasicService {
     public void applyVip(String userUUID , UserApplyVipDto userApplyVipDto){
         User user = findByUserUUID(userUUID);
         VipInfo vipInfo = VipInfo.builder()
-                .vipInfoUUID(userUUID)
                 .user(user)
                 .vipName(userApplyVipDto.getVipName())
                 .vipJob(userApplyVipDto.getVipJob())
@@ -50,11 +49,15 @@ public class BasicService {
     }
 
 
-    public Page<UserAuctionSuccessList> successAuctionList(String userUUID, Pageable pageable){
-        return auctionRepository.findAllSuccessByuserUUID(userUUID, pageable);
+    public Page<UserAuctionSuccessList> successBeforeAuctionList(String userUUID, Pageable pageable){
+        return auctionRepository.findAllSuccessBeforeByuserUUID(userUUID, pageable);
     //    return null;
     }
 
+    public Page<UserAuctionSuccessList> successAfterAuctionList(String userUUID, Pageable pageable){
+        return auctionRepository.findAllSuccessAfterByuserUUID(userUUID, pageable);
+        //    return null;
+    }
     public Page<UserAuctionParticipateList> participateAuctionList(String userUUID, Pageable pageable){
         return auctionRepository.findAllParticipateByuserUUID(userUUID, pageable);
         //return null;

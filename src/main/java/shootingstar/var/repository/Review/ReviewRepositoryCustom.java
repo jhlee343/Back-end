@@ -8,11 +8,11 @@ import shootingstar.var.dto.res.UserSendReviewDto;
 import java.util.List;
 
 public interface ReviewRepositoryCustom {
-    List<UserReceiveReviewDto> findReceiveByserUUID(String userUUID);
-    Page<UserReceiveReviewDto> findAllReceiveByuserUUID(String userUUID, Pageable pageable);
+    List<UserReceiveReviewDto> findReceiveByUserUUID(String userUUID);
+    Page<UserReceiveReviewDto> findAllReceiveByUserUUID(String userUUID, Pageable pageable);
 
-    List<UserSendReviewDto> findSendByserUUID(String userUUID);
-    Page<UserSendReviewDto> findAllSendByuserUUID(String userUUID, Pageable pageable);
+    List<UserSendReviewDto> findSendByUserUUID(String userUUID);
+    Page<UserSendReviewDto> findAllSendByUserUUID(String userUUID, Pageable pageable);
 
 
 }

@@ -22,7 +22,7 @@ public class WarningRepositoryCustomImpl implements WarningRepositoryCustom{
         return queryFactory
                 .select(new QWarningListDto(
                         warning.warningUUID,
-                        warning.userId.userUUID,
+                        warning.user.userUUID,
                         warning.warningContent
                 ))
                 .from(warning)
@@ -32,6 +32,6 @@ public class WarningRepositoryCustomImpl implements WarningRepositoryCustom{
 
 
     private BooleanExpression IdEq(UUID userUUID){
-        return userUUID !=null ? warning.userId.userUUID.eq(String.valueOf(userUUID)) : null;
+        return userUUID !=null ? warning.user.userUUID.eq(String.valueOf(userUUID)) : null;
     }
 }
