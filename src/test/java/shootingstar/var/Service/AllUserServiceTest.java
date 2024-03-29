@@ -1,5 +1,6 @@
 package shootingstar.var.Service;
 
+import jakarta.transaction.Transactional;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,6 +23,7 @@ class AllUserServiceTest {
 
     @Test
     @DisplayName("베너 생성 테스트")
+    @Transactional
     public void createBanner() throws Exception {
         //given
         String imgUrl = "www.testImgUrl.com";
@@ -45,6 +47,7 @@ class AllUserServiceTest {
 
     @Test
     @DisplayName("모든 베너 조회")
+    @Transactional
     public void findAllBanner() throws Exception {
         //given
         String imgUrl = "www.testImgUrl.com";

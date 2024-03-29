@@ -114,6 +114,11 @@ public class AllUserController {
         return ResponseEntity.ok().body("이메일 인증에 성공하였습니다.");
     }
 
+    @Operation(summary = "배너 전체 조회 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "배너 전체 조회, 리스트 타입", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = GetBannerResDto.class))}),
+    })
     @GetMapping("/banner")
     public ResponseEntity<List<GetBannerResDto>> getBanner() {
         List<GetBannerResDto> banners = allUserService.getBanner();
