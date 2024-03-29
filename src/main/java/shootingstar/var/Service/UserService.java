@@ -19,7 +19,7 @@ import shootingstar.var.jwt.JwtTokenProvider;
 import shootingstar.var.repository.FollowRepository;
 import shootingstar.var.repository.Review.ReviewRepository;
 import shootingstar.var.repository.ReviewReport.ReviewReportRepository;
-import shootingstar.var.repository.UserRepository;
+import shootingstar.var.repository.User.UserRepository;
 import shootingstar.var.repository.Warning.WarningRepository;
 import shootingstar.var.util.MailRedisUtil;
 

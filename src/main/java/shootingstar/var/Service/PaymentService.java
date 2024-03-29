@@ -17,7 +17,7 @@ import shootingstar.var.exception.ErrorCode;
 import shootingstar.var.jwt.JwtTokenProvider;
 import shootingstar.var.repository.ExchangeFormRepository;
 import shootingstar.var.repository.PaymentRepository;
-import shootingstar.var.repository.UserRepository;
+import shootingstar.var.repository.User.UserRepository;
 
 import java.util.Optional;
 import java.util.UUID;

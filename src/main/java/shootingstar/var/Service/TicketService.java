@@ -22,7 +22,7 @@ import shootingstar.var.exception.ErrorCode;
 import shootingstar.var.repository.ticket.TicketMeetingTimeRepository;
 import shootingstar.var.repository.ticket.TicketReportRepository;
 import shootingstar.var.repository.ticket.TicketRepository;
-import shootingstar.var.repository.UserRepository;
+import shootingstar.var.repository.User.UserRepository;
 
 @Slf4j
 @Service

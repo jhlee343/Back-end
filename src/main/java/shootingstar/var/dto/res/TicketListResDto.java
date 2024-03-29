@@ -16,10 +16,10 @@ public class TicketListResDto {
     private String profileImgUrl;
 
     @QueryProjection
-    public TicketListResDto(String userName, LocalDateTime meetingDate, Double userRating, String profileImgUrl) {
+    public TicketListResDto(String userName, String meetingLocation, LocalDateTime meetingDate, Double userRating, String profileImgUrl) {
         this.userName = userName;
         this.meetingDate = meetingDate;
-//        this.meetingLocation = meetingLocation;
+        this.meetingLocation = meetingLocation;
         this.userRating = userRating;
         this.profileImgUrl = profileImgUrl;
     }

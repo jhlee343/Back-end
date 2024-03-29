@@ -12,6 +12,7 @@ import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.util.StringUtils;
 import shootingstar.var.dto.res.QTicketListResDto;
 import shootingstar.var.dto.res.TicketListResDto;
+import shootingstar.var.enums.type.AuctionType;
 import shootingstar.var.enums.type.TicketSortType;
 
 import java.util.List;
@@ -24,9 +25,11 @@ public class TicketRepositoryImpl implements TicketRepositoryCustom{
 
     @Override
     public List<TicketListResDto> findTicketByuserUUID(String userUUID) {
+      //  return null;
         return queryFactory
                 .select(new QTicketListResDto(
                         ticket.organizer.name,
+                        ticket.auction.meetingLocation,
                         ticket.auction.meetingDate,
                         ticket.organizer.rating,
                         ticket.organizer.profileImgUrl
@@ -41,12 +44,13 @@ public class TicketRepositoryImpl implements TicketRepositoryCustom{
         List<TicketListResDto> content = queryFactory
                 .select(new QTicketListResDto(
                         ticket.organizer.name,
+                        ticket.auction.meetingLocation,
                         ticket.auction.meetingDate,
                         ticket.organizer.rating,
                         ticket.organizer.profileImgUrl
                 ))
                 .from(ticket)
-                .where(userIdEq(userUUID), containName(search))
+                .where(userIdEq(userUUID), containName(search), ticket.auction.auctionType.eq(AuctionType.SUCCESS))
                 .orderBy(orderType(ticketSortType))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())

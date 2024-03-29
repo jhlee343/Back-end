@@ -26,7 +26,7 @@ import shootingstar.var.exception.ErrorCode;
 import shootingstar.var.quartz.TicketCreationJob;
 import shootingstar.var.repository.AuctionRepository;
 import shootingstar.var.repository.ScheduledTaskRepository;
-import shootingstar.var.repository.UserRepository;
+import shootingstar.var.repository.User.UserRepository;
 import shootingstar.var.dto.req.AuctionCreateReqDto;
 
 @Slf4j

@@ -13,7 +13,7 @@ import shootingstar.var.entity.User;
 import shootingstar.var.entity.VipApprovalType;
 import shootingstar.var.entity.VipInfo;
 import shootingstar.var.exception.CustomException;
-import shootingstar.var.repository.UserRepository;
+import shootingstar.var.repository.User.UserRepository;
 import shootingstar.var.repository.Vip.VipInfoRepository;
 import shootingstar.var.repository.ticket.TicketRepository;
 
@@ -49,11 +49,11 @@ public class BasicService {
 
 
     public Page<UserAuctionSuccessList> successAuctionList(String userUUID, Pageable pageable){
+
         return null;
     }
 
-    public Page<UserAuctionParticipateList> participateAuctionList(String userUUID, Pageable pageable){
-        return null;
+    public Page<UserAuctionParticipateList> participateAuctionList(String userUUID, Pageable pageable){return null;
     }
 
     public User findByUserUUID(String userUUID) {

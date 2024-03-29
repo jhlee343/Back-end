@@ -2,7 +2,7 @@ package shootingstar.var.Service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import shootingstar.var.repository.UserRepository;
+import shootingstar.var.repository.User.UserRepository;
 
 @Service
 @RequiredArgsConstructor
