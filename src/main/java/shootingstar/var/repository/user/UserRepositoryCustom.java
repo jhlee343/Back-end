@@ -1,4 +1,4 @@
-package shootingstar.var.repository;
+package shootingstar.var.repository.user;
 
 import shootingstar.var.dto.res.VipDetailResDto;
 

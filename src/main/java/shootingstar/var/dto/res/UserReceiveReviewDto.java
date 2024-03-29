@@ -10,15 +10,15 @@ public class UserReceiveReviewDto {
     private String ticketUUID;
     private String reviewContent;
     private Double reviewRating;
-    private String writerId;
+    private String writer;
     //나에게 보낸사람 uuid
     @QueryProjection
     public UserReceiveReviewDto(String reviewUUID, String ticketUUID, String reviewContent
-    ,Double reviewRating, String writerId){
+    ,Double reviewRating, String writer){
         this.reviewUUID = reviewUUID;
         this.ticketUUID = ticketUUID;
         this.reviewContent = reviewContent;
         this.reviewRating = reviewRating;
-        this.writerId = writerId;
+        this.writer = writer;
     }
 }

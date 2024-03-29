@@ -83,11 +83,13 @@ public enum ErrorCode {
     TICKET_NOT_FOUND(NOT_FOUND, "6200", "존재하지 않는 식사권입니다."),
     TICKET_MEETING_TIME_NOT_FOUND(NOT_FOUND, "6201", "존재하지 않는 만남 시작 시간입니다."),
 
-    TICKET_MEETING_TIME_CONFLICT(CONFLICT, "6300", "이미 처리된 식사권 만남 시간입니다."),
+    TICKET_CONFLICT(CONFLICT, "6300", "이미 처리된 식사권 만남 시간입니다."),
     TICKET_REPORT_CONFLICT(CONFLICT, "6301", "이미 신고된 식사권입니다."),
     TICKET_CANCEL_CONFLICT(CONFLICT, "6302", "식사 시간이 지난 후에는 취소가 불가능합니다."),
     ALREADY_TICKET_CANCEL_CONFLICT(CONFLICT, "6303", "이미 취소된 식사권입니다."),
     REVIEW_CONFLICT(CONFLICT, "6304", "해당 식사권에 대한 리뷰를 작성한 적이 있습니다."),
+
+    VIP_INFO_NOT_FOUND(NOT_FOUND,"7200", "존재하지 않는 VIP 정보입니다.")
     ;
 
     private final HttpStatus httpStatus;

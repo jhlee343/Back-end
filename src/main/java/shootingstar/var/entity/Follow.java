@@ -21,16 +21,16 @@ public class Follow {
 
     @ManyToOne
     @JoinColumn(name = "follower_id")
-    private User followerId;
+    private User follower;
 
     @ManyToOne
     @JoinColumn(name = "following_id")
-    private User followingId;
+    private User following;
 
 
     public Follow(User follower, User following) {
         this.followUUID = UUID.randomUUID().toString();
-        this.followerId = follower;
-        this.followingId = following;
+        this.follower = follower;
+        this.following = following;
     }
 }

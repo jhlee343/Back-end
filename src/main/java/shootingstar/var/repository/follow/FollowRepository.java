@@ -1,7 +1,8 @@
-package shootingstar.var.repository;
+package shootingstar.var.repository.follow;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import shootingstar.var.entity.Follow;
+import shootingstar.var.repository.follow.FollowRepositoryCustom;
 
 import java.util.Optional;
 

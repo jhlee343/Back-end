@@ -4,19 +4,19 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import shootingstar.var.dto.req.FollowingDto;
 import shootingstar.var.dto.req.UserProfileDto;
+import org.springframework.transaction.annotation.Transactional;
 import shootingstar.var.dto.req.WarningListDto;
 import shootingstar.var.dto.res.UserReceiveReviewDto;
 import shootingstar.var.dto.res.UserSendReviewDto;
 import shootingstar.var.entity.*;
 import shootingstar.var.exception.CustomException;
-import shootingstar.var.repository.FollowRepository;
-import shootingstar.var.repository.Review.ReviewRepository;
-import shootingstar.var.repository.ReviewReport.ReviewReportRepository;
-import shootingstar.var.repository.UserRepository;
-import shootingstar.var.repository.Warning.WarningRepository;
+import shootingstar.var.repository.follow.FollowRepository;
+import shootingstar.var.repository.review.ReviewRepository;
+import shootingstar.var.repository.reviewReport.ReviewReportRepository;
+import shootingstar.var.repository.user.UserRepository;
+import shootingstar.var.repository.warning.WarningRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -71,11 +71,11 @@ public class UserService {
     }
 
     public Page<UserReceiveReviewDto> receiveReview(String userUUID, Pageable pageable){
-        return reviewRepository.findAllReceiveByuserUUID(userUUID,pageable);
+        return reviewRepository.findAllReceiveByUserUUID(userUUID,pageable);
     }
 
     public Page<UserSendReviewDto> sendReview(String userUUID, Pageable pageable){
-        return reviewRepository.findAllSendByuserUUID(userUUID,pageable);
+        return reviewRepository.findAllSendByUserUUID(userUUID,pageable);
     }
     public List<WarningListDto> findAllWarning(String userUUID) {
         return warningRepository.findAllWarnByUserUUID(userUUID);
@@ -117,7 +117,7 @@ public class UserService {
     }
 
     public Review findByReviewId(Long reviewId){
-        Optional<Review> optionalReview = reviewRepository.findByReviewId(reviewId);
+        Optional<Review> optionalReview = reviewRepository.findById(reviewId);
         if(optionalReview.isEmpty()){
             throw new CustomException(REVIEW_NOT_FOUND);
         }

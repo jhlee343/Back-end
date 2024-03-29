@@ -22,8 +22,8 @@ public class ReviewReport {
     private String reviewReportUUID;
 
     @ManyToOne
-    @JoinColumn(name = " review_id")
-    private Review reviewId;
+    @JoinColumn(name = "review_id")
+    private Review review;
 
     @NotNull
     private String reviewReportContent;
@@ -33,9 +33,9 @@ public class ReviewReport {
     private ReviewReportStatus reviewReportStatus;
 
     @Builder
-    public ReviewReport(Review reviewId, String reviewReportContent, ReviewReportStatus reviewReportStatus){
+    public ReviewReport(Review review, String reviewReportContent, ReviewReportStatus reviewReportStatus){
         this.reviewReportUUID= UUID.randomUUID().toString();
-        this.reviewId = reviewId;
+        this.review = review;
         this.reviewReportContent=reviewReportContent;
         this.reviewReportStatus = reviewReportStatus;
     }
