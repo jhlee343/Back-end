@@ -13,12 +13,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import shootingstar.var.Service.AllUserService;
 import shootingstar.var.Service.CheckDuplicateService;
 import shootingstar.var.Service.EmailService;
 import shootingstar.var.Service.UserService;
 import shootingstar.var.dto.req.CheckAuthCodeReqDto;
 import shootingstar.var.dto.req.SendAuthCodeReqDto;
 import shootingstar.var.dto.req.UserSignupReqDto;
+import shootingstar.var.dto.res.GetBannerResDto;
 import shootingstar.var.exception.ErrorResponse;
 
 @Tag(name = "AllUserController", description = "로그인하지 않아도 접속 가능한 컨트롤러")
@@ -28,7 +30,7 @@ import shootingstar.var.exception.ErrorResponse;
 @RequestMapping("/api/all")
 public class AllUserController {
 
-    private final UserService userService;
+    private final AllUserService allUserService;
     private final EmailService emailService;
     private final CheckDuplicateService duplicateService;
 
@@ -55,7 +57,7 @@ public class AllUserController {
     })
     @PostMapping("/signup")
     public ResponseEntity<String> signup(@Valid @RequestBody UserSignupReqDto reqDto) {
-        userService.signup(reqDto);
+        allUserService.signup(reqDto);
         return ResponseEntity.ok().body("회원가입에 성공하였습니다.");
     }
 
@@ -109,5 +111,11 @@ public class AllUserController {
     public ResponseEntity<String> checkAuthCode(@Valid @RequestBody CheckAuthCodeReqDto reqDto) {
         emailService.validateCode(reqDto.getEmail(), reqDto.getCode());
         return ResponseEntity.ok().body("이메일 인증에 성공하였습니다.");
+    }
+
+    @GetMapping("/banner")
+    public ResponseEntity<GetBannerResDto> getBanner() {
+
+        return ResponseEntity.ok().body(null);
     }
 }
