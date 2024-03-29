@@ -20,6 +20,7 @@ import shootingstar.var.dto.req.CheckAuthCodeReqDto;
 import shootingstar.var.dto.req.SendAuthCodeReqDto;
 import shootingstar.var.dto.req.UserSignupReqDto;
 import shootingstar.var.dto.res.GetBannerResDto;
+import shootingstar.var.dto.res.VipDetailResDto;
 import shootingstar.var.exception.ErrorResponse;
 
 import java.util.List;
@@ -123,5 +124,11 @@ public class AllUserController {
     public ResponseEntity<List<GetBannerResDto>> getBanner() {
         List<GetBannerResDto> banners = allUserService.getBanner();
         return ResponseEntity.ok().body(banners);
+    }
+
+    @GetMapping("/vipDetail/{vipUUID}")
+    public ResponseEntity<VipDetailResDto> vipDetail(@Valid @PathVariable("vipUUID") String vipUUID) {
+
+        return null;
     }
 }
