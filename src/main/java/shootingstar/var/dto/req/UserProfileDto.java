@@ -3,7 +3,7 @@ package shootingstar.var.dto.req;
 import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import shootingstar.var.entity.UserType;
+import shootingstar.var.enums.type.UserType;
 
 import java.time.LocalDateTime;
 

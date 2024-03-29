@@ -11,6 +11,7 @@ import shootingstar.var.dto.res.VipDetailResDto;
 import shootingstar.var.entity.*;
 import shootingstar.var.entity.ticket.Ticket;
 import shootingstar.var.enums.type.AuctionType;
+import shootingstar.var.enums.type.UserType;
 import shootingstar.var.repository.AuctionRepository;
 import shootingstar.var.repository.review.ReviewRepository;
 import shootingstar.var.repository.user.UserRepository;
@@ -21,8 +22,6 @@ import shootingstar.var.repository.ticket.TicketRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class AllUserServiceTest {

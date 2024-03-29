@@ -10,6 +10,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shootingstar.var.entity.ticket.Ticket;
+import shootingstar.var.enums.type.UserType;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

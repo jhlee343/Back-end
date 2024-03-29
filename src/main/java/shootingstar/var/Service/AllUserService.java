@@ -6,7 +6,7 @@ import shootingstar.var.dto.req.UserSignupReqDto;
 import shootingstar.var.dto.res.GetBannerResDto;
 import shootingstar.var.dto.res.VipDetailResDto;
 import shootingstar.var.entity.User;
-import shootingstar.var.entity.UserType;
+import shootingstar.var.enums.type.UserType;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
 import shootingstar.var.repository.user.UserRepository;
