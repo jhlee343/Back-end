@@ -23,6 +23,8 @@ import shootingstar.var.dto.req.UserSignupReqDto;
 import shootingstar.var.dto.res.GetBannerResDto;
 import shootingstar.var.exception.ErrorResponse;
 
+import java.util.List;
+
 @Tag(name = "AllUserController", description = "로그인하지 않아도 접속 가능한 컨트롤러")
 @RestController
 @RequiredArgsConstructor
@@ -114,8 +116,8 @@ public class AllUserController {
     }
 
     @GetMapping("/banner")
-    public ResponseEntity<GetBannerResDto> getBanner() {
-
-        return ResponseEntity.ok().body(null);
+    public ResponseEntity<List<GetBannerResDto>> getBanner() {
+        List<GetBannerResDto> banners = allUserService.getBanner();
+        return ResponseEntity.ok().body(banners);
     }
 }

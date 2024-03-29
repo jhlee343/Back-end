@@ -3,17 +3,23 @@ package shootingstar.var.Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import shootingstar.var.dto.req.UserSignupReqDto;
+import shootingstar.var.dto.res.GetBannerResDto;
 import shootingstar.var.entity.User;
 import shootingstar.var.entity.UserType;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
 import shootingstar.var.repository.UserRepository;
+import shootingstar.var.repository.banner.BannerRepository;
 import shootingstar.var.util.MailRedisUtil;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class AllUserService {
     private final UserRepository userRepository;
+    private final BannerRepository bannerRepository;
+
     private final MailRedisUtil mailRedisUtil;
     private final CheckDuplicateService duplicateService;
 
@@ -42,5 +48,9 @@ public class AllUserService {
         } else {
             throw new CustomException(ErrorCode.VALIDATE_ERROR_EMAIL);
         }
+    }
+
+    public List<GetBannerResDto> getBanner() {
+        return bannerRepository.findAllBanner();
     }
 }
