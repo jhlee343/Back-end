@@ -21,11 +21,11 @@ import shootingstar.var.entity.ticket.TicketReport;
 import shootingstar.var.entity.User;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
-import shootingstar.var.repository.Review.ReviewRepository;
+import shootingstar.var.repository.review.ReviewRepository;
 import shootingstar.var.repository.ticket.TicketMeetingTimeRepository;
 import shootingstar.var.repository.ticket.TicketReportRepository;
 import shootingstar.var.repository.ticket.TicketRepository;
-import shootingstar.var.repository.User.UserRepository;
+import shootingstar.var.repository.user.UserRepository;
 
 @Slf4j
 @Service

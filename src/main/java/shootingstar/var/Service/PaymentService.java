@@ -1,11 +1,9 @@
 package shootingstar.var.Service;
 
-import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.response.IamportResponse;
 import com.siot.IamportRestClient.response.Payment;
 import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shootingstar.var.dto.req.ExchangeReqDto;
@@ -14,13 +12,9 @@ import shootingstar.var.entity.PaymentsInfo;
 import shootingstar.var.entity.User;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
-import shootingstar.var.jwt.JwtTokenProvider;
 import shootingstar.var.repository.ExchangeFormRepository;
 import shootingstar.var.repository.PaymentRepository;
-import shootingstar.var.repository.User.UserRepository;
-
-import java.util.Optional;
-import java.util.UUID;
+import shootingstar.var.repository.user.UserRepository;
 
 import static shootingstar.var.exception.ErrorCode.*;
 

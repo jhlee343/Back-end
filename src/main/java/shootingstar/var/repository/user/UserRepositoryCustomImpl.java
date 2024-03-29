@@ -1,4 +1,4 @@
-package shootingstar.var.repository.User;
+package shootingstar.var.repository.user;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;

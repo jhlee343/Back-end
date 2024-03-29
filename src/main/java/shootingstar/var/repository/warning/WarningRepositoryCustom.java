@@ -1,9 +1,8 @@
-package shootingstar.var.repository.Warning;
+package shootingstar.var.repository.warning;
 
 import shootingstar.var.dto.req.WarningListDto;
 
 import java.util.List;
-import java.util.UUID;
 
 public interface WarningRepositoryCustom {
     List<WarningListDto> findAllWarnByUserUUID(String userUUID);

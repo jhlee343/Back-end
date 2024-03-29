@@ -1,4 +1,4 @@
-package shootingstar.var.repository.User;
+package shootingstar.var.repository.user;
 
 
 import org.springframework.data.jpa.repository.JpaRepository;

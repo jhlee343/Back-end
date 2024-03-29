@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 import shootingstar.var.entity.User;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
-import shootingstar.var.repository.User.UserRepository;
+import shootingstar.var.repository.user.UserRepository;
 import shootingstar.var.util.JwtRedisUtil;
 import shootingstar.var.util.LoginListRedisUtil;
 import shootingstar.var.util.TokenUtil;

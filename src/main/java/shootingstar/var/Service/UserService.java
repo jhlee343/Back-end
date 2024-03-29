@@ -1,26 +1,22 @@
 package shootingstar.var.Service;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import shootingstar.var.dto.req.FollowingDto;
 import shootingstar.var.dto.req.UserProfileDto;
-import shootingstar.var.dto.req.UserSignupReqDto;
 import org.springframework.transaction.annotation.Transactional;
 import shootingstar.var.dto.req.WarningListDto;
 import shootingstar.var.dto.res.UserReceiveReviewDto;
 import shootingstar.var.dto.res.UserSendReviewDto;
 import shootingstar.var.entity.*;
 import shootingstar.var.exception.CustomException;
-import shootingstar.var.exception.ErrorCode;
-import shootingstar.var.jwt.JwtTokenProvider;
 import shootingstar.var.repository.follow.FollowRepository;
-import shootingstar.var.repository.Review.ReviewRepository;
-import shootingstar.var.repository.ReviewReport.ReviewReportRepository;
-import shootingstar.var.repository.User.UserRepository;
-import shootingstar.var.repository.Warning.WarningRepository;
+import shootingstar.var.repository.review.ReviewRepository;
+import shootingstar.var.repository.reviewReport.ReviewReportRepository;
+import shootingstar.var.repository.user.UserRepository;
+import shootingstar.var.repository.warning.WarningRepository;
 
 import java.util.List;
 import java.util.Optional;

@@ -1,4 +1,4 @@
-package shootingstar.var.repository.Warning;
+package shootingstar.var.repository.warning;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;

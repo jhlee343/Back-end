@@ -1,4 +1,4 @@
-package shootingstar.var.repository.Review;
+package shootingstar.var.repository.review;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -11,7 +11,6 @@ import shootingstar.var.dto.res.QUserReceiveReviewDto;
 import shootingstar.var.dto.res.QUserSendReviewDto;
 import shootingstar.var.dto.res.UserReceiveReviewDto;
 import shootingstar.var.dto.res.UserSendReviewDto;
-import shootingstar.var.entity.Review;
 
 import java.util.List;
 import static shootingstar.var.entity.QReview.review;

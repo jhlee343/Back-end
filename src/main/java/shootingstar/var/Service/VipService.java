@@ -6,8 +6,8 @@ import shootingstar.var.dto.res.VipInfoDto;
 import shootingstar.var.entity.User;
 import shootingstar.var.entity.VipInfo;
 import shootingstar.var.exception.CustomException;
-import shootingstar.var.repository.User.UserRepository;
-import shootingstar.var.repository.Vip.VipInfoRepository;
+import shootingstar.var.repository.user.UserRepository;
+import shootingstar.var.repository.vip.VipInfoRepository;
 
 import java.util.Optional;
 

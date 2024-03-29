@@ -16,7 +16,7 @@ import shootingstar.var.exception.ErrorCode;
 import shootingstar.var.repository.AuctionRepository;
 import shootingstar.var.repository.ScheduledTaskRepository;
 import shootingstar.var.repository.ticket.TicketRepository;
-import shootingstar.var.repository.User.UserRepository;
+import shootingstar.var.repository.user.UserRepository;
 
 @Slf4j
 @Service
