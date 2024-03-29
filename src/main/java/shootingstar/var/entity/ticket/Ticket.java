@@ -17,6 +17,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shootingstar.var.entity.Auction;
 import shootingstar.var.entity.BaseTimeEntity;
+import shootingstar.var.entity.Review;
 import shootingstar.var.entity.User;
 
 @Entity
@@ -47,6 +48,9 @@ public class Ticket extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "ticket")
     private List<TicketMeetingTime> ticketMeetingTimes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "ticket")
+    private List<Review> reviews = new ArrayList<>();
 
     @Builder
     public Ticket(Auction auction, User winner, User organizer) {
