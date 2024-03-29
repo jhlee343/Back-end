@@ -35,7 +35,7 @@ public class SchedulerService {
                 .orElseThrow(() -> new CustomException(ErrorCode.AUCTION_NOT_FOUND));
 
         // 아무도 경매에 참여하지 않았을 경우
-        if (auction.getCurrentHighestBidderId() == null) {
+        if (auction.getCurrentHighestBidderUUID() == null) {
             log.info("아무도 경매에 참여하지 않음");
             // 경매 타입 유찰로 변경
             log.info("변경 전 경매 타입 : {}", auction.getAuctionType());
@@ -57,7 +57,7 @@ public class SchedulerService {
 
         log.info("식사권 생성 & 경매 타입 변경");
         // 한 명 이라도 경매에 참여했을 경우
-        User winner = userRepository.findByUserUUID(auction.getCurrentHighestBidderId())
+        User winner = userRepository.findByUserUUID(auction.getCurrentHighestBidderUUID())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         // 식사권 생성

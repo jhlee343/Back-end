@@ -48,7 +48,7 @@ public class TicketService {
         }
 
         Auction auction = ticket.getAuction();
-        User winner = userRepository.findByUserUUID(auction.getCurrentHighestBidderId())
+        User winner = userRepository.findByUserUUID(auction.getCurrentHighestBidderUUID())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         BigDecimal donationCommission = new BigDecimal(0.05);
