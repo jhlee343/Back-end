@@ -16,7 +16,7 @@ import shootingstar.var.entity.*;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
 import shootingstar.var.jwt.JwtTokenProvider;
-import shootingstar.var.repository.FollowRepository;
+import shootingstar.var.repository.follow.FollowRepository;
 import shootingstar.var.repository.Review.ReviewRepository;
 import shootingstar.var.repository.ReviewReport.ReviewReportRepository;
 import shootingstar.var.repository.User.UserRepository;

@@ -1,4 +1,4 @@
-package shootingstar.var.repository;
+package shootingstar.var.repository.follow;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static shootingstar.var.entity.QFollow.follow;
-public class FollowRepositoryCustomImpl implements FollowRepositoryCustom{
+public class FollowRepositoryCustomImpl implements shootingstar.var.repository.follow.FollowRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     public FollowRepositoryCustomImpl(EntityManager em) {
