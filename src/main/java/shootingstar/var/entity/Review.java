@@ -1,7 +1,8 @@
 package shootingstar.var.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -11,41 +12,41 @@ import shootingstar.var.entity.ticket.Ticket;
 @Entity
 @Getter
 @NoArgsConstructor
-public class Review {
+public class Review extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long reviewId;
 
-    @NotNull
     private String reviewUUID;
 
-    private String reviewContent;
-    private Double reviewRating;
-
-    private Boolean isShowed;
-
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "writer_id")
-    private User writerId;
+    private User writer;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "receiver_id")
-    private User receiverId;
+    private User receiver;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ticket_id")
-    private Ticket ticketId;
+    private Ticket ticket;
 
+    @NotBlank
+    private String reviewContent;
 
+    private double reviewRating;
 
-    public Review(User writerId, User receiverId, String reviewContent,
-                  double reviewRating, Ticket ticketId, Boolean isShowed){
+    private boolean isShowed;
+
+    @Builder
+    public Review(User writer, User receiver, Ticket ticket, String reviewContent,
+                  double reviewRating) {
         this.reviewUUID = UUID.randomUUID().toString();
-        this.receiverId = receiverId;
-        this.writerId = writerId;
+        this.writer = writer;
+        this.receiver = receiver;
+        this.ticket = ticket;
         this.reviewContent = reviewContent;
         this.reviewRating = reviewRating;
-        this.ticketId = ticketId;
-        this.isShowed =isShowed;
+        this.isShowed = true;
     }
 }
