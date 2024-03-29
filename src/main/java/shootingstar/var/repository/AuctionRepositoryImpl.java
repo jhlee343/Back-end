@@ -22,6 +22,13 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
     }
     @Override
     public List<UserAuctionSuccessList> findSuccessList(String userUUID, Pageable pageable) {
+//        return queryFactory
+//                .select(new QUserAuctionSuccessList(
+//                        auction.user.name,
+//                        auction.meetingDate,
+//                        auction.bid.bidderNickname
+//                ))
+//        )
         return null;
     }
 

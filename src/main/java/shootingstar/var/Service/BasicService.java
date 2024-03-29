@@ -13,6 +13,7 @@ import shootingstar.var.entity.User;
 import shootingstar.var.entity.VipApprovalType;
 import shootingstar.var.entity.VipInfo;
 import shootingstar.var.exception.CustomException;
+import shootingstar.var.repository.AuctionRepository;
 import shootingstar.var.repository.User.UserRepository;
 import shootingstar.var.repository.Vip.VipInfoRepository;
 import shootingstar.var.repository.ticket.TicketRepository;
@@ -27,6 +28,7 @@ public class BasicService {
     private final VipInfoRepository vipInfoRepository;
     private final TicketRepository ticketRepository;
     private final UserRepository userRepository;
+    private final AuctionRepository auctionRepository;
     public void applyVip(String userUUID , UserApplyVipDto userApplyVipDto){
         User user = findByUserUUID(userUUID);
         VipInfo vipInfo = VipInfo.builder()
@@ -49,11 +51,13 @@ public class BasicService {
 
 
     public Page<UserAuctionSuccessList> successAuctionList(String userUUID, Pageable pageable){
-
-        return null;
+        return auctionRepository.findAllSuccessByuserUUID(userUUID, pageable);
+    //    return null;
     }
 
-    public Page<UserAuctionParticipateList> participateAuctionList(String userUUID, Pageable pageable){return null;
+    public Page<UserAuctionParticipateList> participateAuctionList(String userUUID, Pageable pageable){
+        return auctionRepository.findAllParticipateByuserUUID(userUUID, pageable);
+        //return null;
     }
 
     public User findByUserUUID(String userUUID) {
