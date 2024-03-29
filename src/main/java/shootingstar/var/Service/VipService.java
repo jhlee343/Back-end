@@ -27,8 +27,7 @@ public class VipService {
         return new VipInfoDto(
                 vipInfo.getVipJob(),
                 vipInfo.getVipIntroduce(),
-                vipInfo.getVipCareer(),
-                vipInfo.getVipEvidenceUrl()
+                vipInfo.getVipCareer()
         );
     }
 

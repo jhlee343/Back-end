@@ -24,7 +24,7 @@ import static shootingstar.var.exception.ErrorCode.USER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
-public class BasicService {
+public class BasicUserService {
     private final VipInfoRepository vipInfoRepository;
     private final TicketRepository ticketRepository;
     private final UserRepository userRepository;

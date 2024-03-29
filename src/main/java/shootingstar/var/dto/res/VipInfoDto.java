@@ -16,15 +16,13 @@ public class VipInfoDto {
     private String vipCareer;
     @NotNull
     private String vipIntroduce;
-    @NotNull
-    private String vipEvidenceUrl;
+
 
     @Builder
     public VipInfoDto(String vipJob,
-                   String vipCareer, String vipIntroduce, String vipEvidenceUrl){
+                   String vipCareer, String vipIntroduce){
         this.vipCareer = vipCareer;
         this.vipIntroduce = vipIntroduce;
         this.vipJob = vipJob;
-        this.vipEvidenceUrl = vipEvidenceUrl;
     }
 }

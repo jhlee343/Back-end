@@ -28,7 +28,7 @@ public class TicketRepositoryImpl implements TicketRepositoryCustom{
       //  return null;
         return queryFactory
                 .select(new QTicketListResDto(
-                        ticket.organizer.name,
+                        ticket.organizer.nickname,
                         ticket.auction.meetingLocation,
                         ticket.auction.meetingDate,
                         ticket.organizer.rating,
@@ -43,7 +43,7 @@ public class TicketRepositoryImpl implements TicketRepositoryCustom{
     public Page<TicketListResDto> findAllTicketByuserUUID(String userUUID, TicketSortType ticketSortType, String search, Pageable pageable) {
         List<TicketListResDto> content = queryFactory
                 .select(new QTicketListResDto(
-                        ticket.organizer.name,
+                        ticket.organizer.nickname,
                         ticket.auction.meetingLocation,
                         ticket.auction.meetingDate,
                         ticket.organizer.rating,

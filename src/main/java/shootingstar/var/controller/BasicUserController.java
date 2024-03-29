@@ -11,7 +11,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import shootingstar.var.Service.BasicService;
+import shootingstar.var.Service.BasicUserService;
 import shootingstar.var.dto.req.UserApplyVipDto;
 import shootingstar.var.dto.res.TicketListResDto;
 import shootingstar.var.dto.res.UserAuctionParticipateList;
@@ -24,16 +24,16 @@ import shootingstar.var.jwt.JwtTokenProvider;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/basic")
-public class BasicController {
+public class BasicUserController {
     private final JwtTokenProvider jwtTokenProvider;
-    private final BasicService basicService;
+    private final BasicUserService basicUserService;
 
     @Operation(summary = "vip 신청")
     @PostMapping("/applyVip")
     public ResponseEntity<String> applyVip(HttpServletRequest request,
                                            @Valid @RequestBody UserApplyVipDto userApplyVipDto){
             String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
-            basicService.applyVip(userUUID,userApplyVipDto);
+            basicUserService.applyVip(userUUID,userApplyVipDto);
             return ResponseEntity.ok().body("vip apply success");
     }
 
@@ -44,14 +44,14 @@ public class BasicController {
                                            @RequestParam(value = "search", required = false) String search,
                                            @PageableDefault(size =10) Pageable pageable){
         String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
-        Page<TicketListResDto> findAllTicketListDto = basicService.getAllTicketList(userUUID, ticketSortType,search, pageable);
+        Page<TicketListResDto> findAllTicketListDto = basicUserService.getAllTicketList(userUUID, ticketSortType,search, pageable);
         return ResponseEntity.ok(findAllTicketListDto);
     }
     @Operation(summary = "참여중인 경매 불러오기")
     @GetMapping("/auction/participate")
     public ResponseEntity<?> getParticipateAuctionList(HttpServletRequest request,@PageableDefault(size = 10) Pageable pageable){
         String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
-        Page<UserAuctionParticipateList> userAuctionParticipateLists =basicService.participateAuctionList(userUUID,pageable);
+        Page<UserAuctionParticipateList> userAuctionParticipateLists = basicUserService.participateAuctionList(userUUID,pageable);
         return ResponseEntity.ok(userAuctionParticipateLists);
     }
 
@@ -59,14 +59,14 @@ public class BasicController {
     @GetMapping("/auction/successBefore")
     public ResponseEntity<?> getSuccessBeforeAuctionList(HttpServletRequest request, @PageableDefault(size = 10) Pageable pageable){
         String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
-        Page<UserAuctionSuccessList> userAuctionSuccessLists = basicService.successBeforeAuctionList(userUUID,pageable);
+        Page<UserAuctionSuccessList> userAuctionSuccessLists = basicUserService.successBeforeAuctionList(userUUID,pageable);
         return ResponseEntity.ok(userAuctionSuccessLists);
     }
     @Operation(summary = "낙찰받은 만남 후 경매 불러오기")
     @GetMapping("/auction/successAfter")
     public ResponseEntity<?> getSuccessAfterAuctionList(HttpServletRequest request, @PageableDefault(size = 10) Pageable pageable){
         String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
-        Page<UserAuctionSuccessList> userAuctionSuccessLists = basicService.successAfterAuctionList(userUUID,pageable);
+        Page<UserAuctionSuccessList> userAuctionSuccessLists = basicUserService.successAfterAuctionList(userUUID,pageable);
         return ResponseEntity.ok(userAuctionSuccessLists);
     }
 }

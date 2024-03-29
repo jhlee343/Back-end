@@ -29,7 +29,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
                         review.ticket.ticketUUID,
                         review.reviewContent,
                         review.reviewRating,
-                        review.writer.userUUID
+                        review.writer.nickname
                 ))
                 .from(review)
                 .where(userEqReceiver(userUUID))
@@ -44,7 +44,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
                         review.ticket.ticketUUID,
                         review.reviewContent,
                         review.reviewRating,
-                        review.writer.userUUID
+                        review.writer.nickname
                 ))
                 .from(review)
                 .where(userEqReceiver(userUUID), review.receiver.isWithdrawn.eq(false))
@@ -68,7 +68,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
                         review.ticket.ticketUUID,
                         review.reviewContent,
                         review.reviewRating,
-                        review.receiver.userUUID
+                        review.receiver.nickname
                 ))
                 .from(review)
                 .where(userEqWriter(userUUID))
@@ -83,7 +83,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
                         review.ticket.ticketUUID,
                         review.reviewContent,
                         review.reviewRating,
-                        review.receiver.userUUID
+                        review.receiver.nickname
                 ))
                 .from(review)
                 .where(userEqWriter(userUUID), review.writer.isWithdrawn.eq(false))

@@ -3,7 +3,7 @@ package shootingstar.var.Service;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import shootingstar.var.dto.req.UserSignupReqDto;
-import shootingstar.var.repository.UserRepository;
+import shootingstar.var.repository.user.UserRepository;
 
 @SpringBootTest
 class AuctionServiceTest {
