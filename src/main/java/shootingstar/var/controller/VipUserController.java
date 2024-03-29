@@ -32,13 +32,6 @@ public class VipUserController {
 
     }
 
-    @Operation(summary = "vip 소개 수정하기")
-    @PatchMapping("/editInfo")
-    public ResponseEntity<String> editInfo(HttpServletRequest request, @RequestBody VipInfoDto vipInfoDto){
-        String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
-        vipService.editInfo(userUUID,vipInfoDto);
-        return ResponseEntity.ok().body("edit Vip Info success");
-    }
 
 
 }

@@ -66,8 +66,8 @@ public class TicketRepositoryImpl implements TicketRepositoryCustom{
 
     private OrderSpecifier orderType(TicketSortType ticketSortType) {
         return switch (ticketSortType) {
-            case TIME_ASC -> new OrderSpecifier<>(Order.DESC, ticket.createdTime);
-            case TIME_DESC -> new OrderSpecifier<>(Order.ASC, ticket.createdTime);
+            case TIME_ASC -> new OrderSpecifier<>(Order.ASC, ticket.createdTime);
+            case TIME_DESC -> new OrderSpecifier<>(Order.DESC, ticket.createdTime);
         };
     }
     private BooleanExpression userIdEq(String userUUID) {

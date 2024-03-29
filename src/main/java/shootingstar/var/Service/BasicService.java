@@ -45,7 +45,7 @@ public class BasicService {
     }
 
     public Page<TicketListResDto> getAllTicketList(String userUUID, TicketSortType ticketSortType, String search, Pageable pageable){
-        return ticketRepository.findAllTicketByuserUUID(userUUID, ticketSortType,search,pageable);
+        return ticketRepository.findAllTicketByuserUUID(userUUID, ticketSortType, search, pageable);
     }
 
 
