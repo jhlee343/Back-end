@@ -10,8 +10,7 @@ public class VipDetailResDto {
     private String vipUserUUID;
     private String vipProfileImgUrl;
     private String vipNickname;
-    private String vipRating;
-    private boolean isFollow;
+    private Double vipRating;
     private String vipJop;
     private String vipCareer;
     private String vipIntroduce;
@@ -19,16 +18,13 @@ public class VipDetailResDto {
     private List<VipReceiveReviewResDto> receiveReviewList;
 
     @QueryProjection
-    public VipDetailResDto(String vipUserUUID, String vipProfileImgUrl, String vipNickname, String vipRating, boolean isFollow, String vipJop, String vipCareer, String vipIntroduce, List<VipProgressAuctionResDto> progressAuctionList, List<VipReceiveReviewResDto> receiveReviewList) {
+    public VipDetailResDto(String vipUserUUID, String vipProfileImgUrl, String vipNickname, Double vipRating, String vipJop, String vipCareer, String vipIntroduce) {
         this.vipUserUUID = vipUserUUID;
         this.vipProfileImgUrl = vipProfileImgUrl;
         this.vipNickname = vipNickname;
         this.vipRating = vipRating;
-        this.isFollow = isFollow;
         this.vipJop = vipJop;
         this.vipCareer = vipCareer;
         this.vipIntroduce = vipIntroduce;
-        this.progressAuctionList = progressAuctionList;
-        this.receiveReviewList = receiveReviewList;
     }
 }

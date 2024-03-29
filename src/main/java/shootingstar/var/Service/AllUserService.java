@@ -56,7 +56,6 @@ public class AllUserService {
     }
 
     public VipDetailResDto getVipDetail(String vipUUID) {
-
-        return null;
+        return userRepository.findVipDetailByVipUUID(vipUUID);
     }
 }

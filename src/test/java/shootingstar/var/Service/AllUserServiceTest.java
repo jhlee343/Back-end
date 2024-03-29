@@ -7,9 +7,18 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import shootingstar.var.dto.res.GetBannerResDto;
-import shootingstar.var.entity.Banner;
+import shootingstar.var.dto.res.VipDetailResDto;
+import shootingstar.var.entity.*;
+import shootingstar.var.entity.ticket.Ticket;
+import shootingstar.var.enums.type.AuctionType;
+import shootingstar.var.repository.AuctionRepository;
+import shootingstar.var.repository.Review.ReviewRepository;
+import shootingstar.var.repository.UserRepository;
+import shootingstar.var.repository.Vip.VipInfoRepository;
 import shootingstar.var.repository.banner.BannerRepository;
+import shootingstar.var.repository.ticket.TicketRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,6 +29,16 @@ class AllUserServiceTest {
 
     @Autowired
     private BannerRepository bannerRepository;
+    @Autowired
+    private AuctionRepository auctionRepository;
+    @Autowired
+    private ReviewRepository reviewRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private VipInfoRepository vipInfoRepository;
+    @Autowired
+    private TicketRepository ticketRepository;
 
     @Test
     @DisplayName("베너 생성 테스트")
@@ -78,5 +97,45 @@ class AllUserServiceTest {
         List<GetBannerResDto> allBanner = bannerRepository.findAllBanner();
         System.out.println(allBanner);
         Assertions.assertThat(allBanner).isNotEmpty();
+    }
+
+    @Test
+    @DisplayName("vip 정보 불러오기")
+    @Transactional
+    public void getVipInfo() throws Exception {
+        //given
+        User vip = new User("22", "실명", "유명인", "000-0000-0000", "test@ttt.com", "helloUrl", UserType.ROLE_VIP);
+        userRepository.save(vip);
+
+        User basic = new User("33", "실명", "일반인", "000-0000-0000", "test@ttt.com", "helloUrl", UserType.ROLE_BASIC);
+        userRepository.save(basic);
+
+        userRepository.flush();
+
+        VipInfo vipInfo = new VipInfo("dd", vip, vip.getName(), "개발자", "경력", "소개", VipApprovalType.APPROVE, "url");
+        vipInfoRepository.save(vipInfo);
+        vipInfoRepository.flush();
+
+        Auction progressAuction = new Auction(vip, 100000L, LocalDateTime.now(), "위치", "정보", "약속", "img", "img");
+        auctionRepository.save(progressAuction);
+        Auction successAuction = new Auction(vip, 100000L, LocalDateTime.now(), "위치", "정보", "약속", "img", "img");
+        auctionRepository.save(successAuction);
+        successAuction.changeAuctionType(AuctionType.SUCCESS);
+        auctionRepository.flush();
+
+        Ticket ticket = new Ticket(successAuction, basic, vip);
+        ticketRepository.save(ticket);
+        ticketRepository.flush();
+
+        Review review = new Review(basic, vip, ticket, "리뷰 내용", 4);
+        reviewRepository.save(review);
+        reviewRepository.flush();
+
+        //when
+        VipDetailResDto vipDetailByVipUUID = userRepository.findVipDetailByVipUUID(vip.getUserUUID());
+
+        //then
+        System.out.println(vipDetailByVipUUID.toString());
+
     }
 }
