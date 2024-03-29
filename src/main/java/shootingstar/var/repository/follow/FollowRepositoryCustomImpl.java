@@ -22,9 +22,9 @@ public class FollowRepositoryCustomImpl implements shootingstar.var.repository.f
     public List<FollowingDto> findAllByFollowerId(String followerId) {
         return queryFactory
                 .select(new QFollowingDto(
-                        follow.followingId.nickname,
-                        follow.followingId.profileImgUrl,
-                        follow.followingId.userId
+                        follow.following.nickname,
+                        follow.following.profileImgUrl,
+                        follow.following.userId
                 ))
                 .from(follow)
                 .where(IdEq(followerId))
@@ -32,6 +32,6 @@ public class FollowRepositoryCustomImpl implements shootingstar.var.repository.f
     }
 
     private BooleanExpression IdEq(String followerId){
-        return followerId !=null ? follow.followerId.userUUID.eq(followerId) : null;
+        return followerId !=null ? follow.follower.userUUID.eq(followerId) : null;
     }
 }

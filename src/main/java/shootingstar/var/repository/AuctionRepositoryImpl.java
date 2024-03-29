@@ -120,7 +120,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
         return null;
     }
     private BooleanExpression currentHighestBidderIdEq(String userUUID){
-        return userUUID != null ? auction.currentHighestBidderId.eq(userUUID) : null;
+        return userUUID != null ? auction.currentHighestBidderUUID.eq(userUUID) : null;
     }
 
 }
