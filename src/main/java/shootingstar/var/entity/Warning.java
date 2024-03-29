@@ -22,16 +22,16 @@ public class Warning {
 
     @ManyToOne
     @JoinColumn(name = "review_id")
-    private User userId;
+    private User user;
 
     @Column(columnDefinition = "TEXT")
     @NotBlank
     private String warningContent;
 
     @Builder
-    public Warning(User userId, String warningContent){
+    public Warning(User user, String warningContent){
         this.warningUUID= UUID.randomUUID().toString();
         this.warningContent=warningContent;
-        this.userId=userId;
+        this.user=user;
     }
 }

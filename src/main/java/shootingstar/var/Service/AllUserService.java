@@ -8,7 +8,7 @@ import shootingstar.var.entity.User;
 import shootingstar.var.entity.UserType;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
-import shootingstar.var.repository.UserRepository;
+import shootingstar.var.repository.user.UserRepository;
 import shootingstar.var.repository.banner.BannerRepository;
 import shootingstar.var.util.MailRedisUtil;
 

@@ -12,7 +12,7 @@ import shootingstar.var.enums.type.AuctionType;
 import shootingstar.var.entity.User;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.jwt.JwtTokenProvider;
-import shootingstar.var.repository.UserRepository;
+import shootingstar.var.repository.user.UserRepository;
 import shootingstar.var.util.LoginListRedisUtil;
 
 import java.time.Instant;

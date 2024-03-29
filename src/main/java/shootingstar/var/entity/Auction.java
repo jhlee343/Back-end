@@ -29,6 +29,7 @@ public class Auction extends BaseTimeEntity {
     @NotNull
     private User user;
 
+
     @Min(value = 100000)
     private long minBidAmount;
 

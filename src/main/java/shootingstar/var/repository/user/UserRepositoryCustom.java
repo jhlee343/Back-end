@@ -1,4 +1,4 @@
-package shootingstar.var.repository;
+package shootingstar.var.repository.user;
 
 public interface UserRepositoryCustom {
 }

@@ -1,4 +1,4 @@
-package shootingstar.var.repository;
+package shootingstar.var.repository.follow;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
