@@ -54,15 +54,28 @@ public class PaymentController {
             @ApiResponse(responseCode = "200", description = "Successful operation", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = Payment.class)) }),
             //@ApiResponse(responseCode = "405", description = "Invalid input")
     })
-    @PostMapping("/payment")
-    public IamportResponse<Payment> paymentComplete(HttpServletRequest request, @RequestBody PaymentReqDto paymentReqDto) throws IamportResponseException, IOException {
+    @PostMapping("/payment/point")
+    public IamportResponse<Payment> pointPayment(HttpServletRequest request, @RequestBody PaymentReqDto paymentReqDto) throws IamportResponseException, IOException {
         String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
 
         Long amount = paymentReqDto.getPaymentAmount();
 
         IamportResponse<Payment> ires = paymentLookup(paymentReqDto.getImp_uid());
 
-        paymentService.verifyIamportService(ires, amount, userUUID);
+        paymentService.verifyPointPayment(ires, amount, userUUID);
+
+        return ires;
+    }
+
+    @PostMapping("/payment/subscribe")
+    public IamportResponse<Payment> subscribePayment(HttpServletRequest request, @RequestBody PaymentReqDto paymentReqDto) throws IamportResponseException, IOException {
+        String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
+
+        Long amount = paymentReqDto.getPaymentAmount();
+
+        IamportResponse<Payment> ires = paymentLookup(paymentReqDto.getImp_uid());
+
+        paymentService.verifySubscribePayment(ires, amount, userUUID);
 
         return ires;
     }

@@ -103,4 +103,8 @@ public class User extends BaseTimeEntity {
         this.isWithdrawn = true;
         this.withdrawnTime = LocalDateTime.now();
     }
+
+    public void subscribeActivate() {
+        this.subscribe = LocalDateTime.now().plusDays(30L);
+    }
 }
