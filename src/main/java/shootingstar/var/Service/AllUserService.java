@@ -4,8 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import shootingstar.var.dto.req.UserSignupReqDto;
 import shootingstar.var.dto.res.GetBannerResDto;
+import shootingstar.var.dto.res.VipDetailResDto;
 import shootingstar.var.entity.User;
-import shootingstar.var.entity.UserType;
+import shootingstar.var.enums.type.UserType;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
 import shootingstar.var.repository.user.UserRepository;
@@ -52,5 +53,16 @@ public class AllUserService {
 
     public List<GetBannerResDto> getBanner() {
         return bannerRepository.findAllBanner();
+    }
+
+    public VipDetailResDto getVipDetail(String vipUUID) {
+        User vip = userRepository.findByUserUUID(vipUUID)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        if (!vip.getUserType().equals(UserType.ROLE_VIP)) {
+            throw new CustomException(ErrorCode.VIP_INFO_NOT_FOUND);
+        }
+
+        return userRepository.findVipDetailByVipUUID(vipUUID);
     }
 }

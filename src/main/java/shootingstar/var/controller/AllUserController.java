@@ -20,6 +20,7 @@ import shootingstar.var.dto.req.CheckAuthCodeReqDto;
 import shootingstar.var.dto.req.SendAuthCodeReqDto;
 import shootingstar.var.dto.req.UserSignupReqDto;
 import shootingstar.var.dto.res.GetBannerResDto;
+import shootingstar.var.dto.res.VipDetailResDto;
 import shootingstar.var.exception.ErrorResponse;
 
 import java.util.List;
@@ -70,7 +71,7 @@ public class AllUserController {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
     })
     @GetMapping("/duplicate/nickname/{nickname}")
-    public ResponseEntity<Boolean> checkNicknameDuplicate(@NotEmpty @PathVariable("nickname") String nickname){
+    public ResponseEntity<Boolean> checkNicknameDuplicate(@NotBlank @PathVariable("nickname") String nickname){
         return ResponseEntity.ok(duplicateService.checkNicknameDuplicate(nickname));
     }
 
@@ -123,5 +124,24 @@ public class AllUserController {
     public ResponseEntity<List<GetBannerResDto>> getBanner() {
         List<GetBannerResDto> banners = allUserService.getBanner();
         return ResponseEntity.ok().body(banners);
+    }
+
+    @Operation(summary = "모든 사용자가 접근 가능한 VIP 상세정보 조회 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "VIP 상세 정보 조회", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = VipDetailResDto.class))}),
+            @ApiResponse(responseCode = "400",
+                    description = "잘못된 형식의 사용자 고유번호 : 1008",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+            @ApiResponse(responseCode = "404",
+                    description =
+                                    "- 존재하지 않는 사용자 : 1201\n" +
+                                    "- 존재하지 않는 VIP 정보 : 7200",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+    })
+    @GetMapping("/vipDetail/{vipUUID}")
+    public ResponseEntity<VipDetailResDto> vipDetail(@NotBlank @PathVariable("vipUUID") String vipUUID) {
+        VipDetailResDto vipDetail = allUserService.getVipDetail(vipUUID);
+        return ResponseEntity.ok().body(vipDetail);
     }
 }

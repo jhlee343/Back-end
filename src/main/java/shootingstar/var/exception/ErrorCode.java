@@ -39,6 +39,7 @@ public enum ErrorCode {
     INCORRECT_FORMAT_USER_NAME(BAD_REQUEST, "1005", "잘못된 형식의 사용자 이름입니다."),
     INCORRECT_FORMAT_PHONE_NUMBER(BAD_REQUEST, "1006", "잘못된 형식의 휴대폰 번호입니다."),
     INCORRECT_FORMAT_PROFILE_IMG_URL(BAD_REQUEST, "1007", "잘못된 형식의 프로필 이미지 주소입니다."),
+    INCORRECT_FORMAT_USER_UUID(BAD_REQUEST, "1008", "잘못된 형식의 사용자 고유번호입니다."),
 
     AUTH_ERROR_EMAIL(UNAUTHORIZED, "1101", "잘못된 키 혹은 잘못(만료) 된 인증 코드입니다."),
     VALIDATE_ERROR_EMAIL(UNAUTHORIZED, "1102", "인증이 만료되었거나 인증되지 않은 이메일입니다."),
