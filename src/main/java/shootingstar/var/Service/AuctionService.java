@@ -26,7 +26,7 @@ import shootingstar.var.exception.ErrorCode;
 import shootingstar.var.quartz.TicketCreationJob;
 import shootingstar.var.repository.AuctionRepository;
 import shootingstar.var.repository.ScheduledTaskRepository;
-import shootingstar.var.repository.UserRepository;
+import shootingstar.var.repository.user.UserRepository;
 import shootingstar.var.dto.req.AuctionCreateReqDto;
 
 @Slf4j
@@ -127,8 +127,8 @@ public class AuctionService {
         log.info("경매가 취소되었습니다. auctionUUID : {}", findAuction.getAuctionUUID());
 
         // 입찰에 참여한 유저가 있을 때, 현재 최고 입찰자에게 현재 최고 입찰 금액 반환
-        if (findAuction.getCurrentHighestBidderId() != null) {
-            User findCurrentHighestBidder = userRepository.findByUserUUID(findAuction.getCurrentHighestBidderId())
+        if (findAuction.getCurrentHighestBidderUUID() != null) {
+            User findCurrentHighestBidder = userRepository.findByUserUUID(findAuction.getCurrentHighestBidderUUID())
                     .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
             BigDecimal beforePoint = findCurrentHighestBidder.getPoint();

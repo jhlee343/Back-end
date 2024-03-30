@@ -1,4 +1,4 @@
-package shootingstar.var.repository;
+package shootingstar.var.repository.follow;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static shootingstar.var.entity.QFollow.follow;
-public class FollowRepositoryCustomImpl implements FollowRepositoryCustom{
+public class FollowRepositoryCustomImpl implements shootingstar.var.repository.follow.FollowRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     public FollowRepositoryCustomImpl(EntityManager em) {
@@ -22,9 +22,9 @@ public class FollowRepositoryCustomImpl implements FollowRepositoryCustom{
     public List<FollowingDto> findAllByFollowerId(String followerId) {
         return queryFactory
                 .select(new QFollowingDto(
-                        follow.followingId.nickname,
-                        follow.followingId.profileImgUrl,
-                        follow.followingId.userId
+                        follow.following.nickname,
+                        follow.following.profileImgUrl,
+                        follow.following.userId
                 ))
                 .from(follow)
                 .where(IdEq(followerId))
@@ -32,6 +32,6 @@ public class FollowRepositoryCustomImpl implements FollowRepositoryCustom{
     }
 
     private BooleanExpression IdEq(String followerId){
-        return followerId !=null ? follow.followerId.userUUID.eq(followerId) : null;
+        return followerId !=null ? follow.follower.userUUID.eq(followerId) : null;
     }
 }

@@ -14,7 +14,7 @@ import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
 import shootingstar.var.repository.exchange.ExchangeRepository;
 import shootingstar.var.repository.payment.PaymentRepository;
-import shootingstar.var.repository.UserRepository;
+import shootingstar.var.repository.user.UserRepository;
 
 import static shootingstar.var.exception.ErrorCode.*;
 

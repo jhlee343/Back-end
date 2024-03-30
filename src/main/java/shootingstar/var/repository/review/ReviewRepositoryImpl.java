@@ -1,4 +1,4 @@
-package shootingstar.var.repository.Review;
+package shootingstar.var.repository.review;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -11,7 +11,6 @@ import shootingstar.var.dto.res.QUserReceiveReviewDto;
 import shootingstar.var.dto.res.QUserSendReviewDto;
 import shootingstar.var.dto.res.UserReceiveReviewDto;
 import shootingstar.var.dto.res.UserSendReviewDto;
-import shootingstar.var.entity.Review;
 
 import java.util.List;
 import static shootingstar.var.entity.QReview.review;
@@ -23,14 +22,14 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
     }
 
     @Override
-    public List<UserReceiveReviewDto> findReceiveByserUUID(String userUUID) {
+    public List<UserReceiveReviewDto> findReceiveByUserUUID(String userUUID) {
                 return queryFactory
                 .select(new QUserReceiveReviewDto(
                         review.reviewUUID,
                         review.ticket.ticketUUID,
                         review.reviewContent,
                         review.reviewRating,
-                        review.writer.userUUID
+                        review.writer.nickname
                 ))
                 .from(review)
                 .where(userEqReceiver(userUUID))
@@ -38,14 +37,14 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
     }
 
     @Override
-    public Page<UserReceiveReviewDto> findAllReceiveByuserUUID(String userUUID, Pageable pageable) {
+    public Page<UserReceiveReviewDto> findAllReceiveByUserUUID(String userUUID, Pageable pageable) {
         List<UserReceiveReviewDto> content = queryFactory
                 .select(new QUserReceiveReviewDto(
                         review.reviewUUID,
                         review.ticket.ticketUUID,
                         review.reviewContent,
                         review.reviewRating,
-                        review.writer.userUUID
+                        review.writer.nickname
                 ))
                 .from(review)
                 .where(userEqReceiver(userUUID), review.receiver.isWithdrawn.eq(false))
@@ -62,14 +61,14 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
         return PageableExecutionUtils.getPage(content,pageable,countQuery::fetchOne);
     }
     @Override
-    public List<UserSendReviewDto> findSendByserUUID(String userUUID) {
+    public List<UserSendReviewDto> findSendByUserUUID(String userUUID) {
         return queryFactory
                 .select(new QUserSendReviewDto(
                         review.reviewUUID,
                         review.ticket.ticketUUID,
                         review.reviewContent,
                         review.reviewRating,
-                        review.receiver.userUUID
+                        review.receiver.nickname
                 ))
                 .from(review)
                 .where(userEqWriter(userUUID))
@@ -77,14 +76,14 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
     }
 
     @Override
-    public Page<UserSendReviewDto> findAllSendByuserUUID(String userUUID, Pageable pageable) {
+    public Page<UserSendReviewDto> findAllSendByUserUUID(String userUUID, Pageable pageable) {
         List<UserSendReviewDto> content = queryFactory
                 .select(new QUserSendReviewDto(
                         review.reviewUUID,
                         review.ticket.ticketUUID,
                         review.reviewContent,
                         review.reviewRating,
-                        review.receiver.userUUID
+                        review.receiver.nickname
                 ))
                 .from(review)
                 .where(userEqWriter(userUUID), review.writer.isWithdrawn.eq(false))

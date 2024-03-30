@@ -11,7 +11,7 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class VipInfo {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long vipInfoId;
 
     private String vipInfoUUID;
@@ -39,7 +39,7 @@ public class VipInfo {
     private String vipEvidenceUrl;
 
     @Builder
-    public VipInfo(String vipInfoUUID, User user, String vipName ,String vipJob,
+    public VipInfo(User user, String vipName ,String vipJob,
                    String vipCareer, String vipIntroduce, VipApprovalType vipApprovalType, String vipEvidenceUrl){
         this.vipInfoUUID = UUID.randomUUID().toString();
         this.user = user;

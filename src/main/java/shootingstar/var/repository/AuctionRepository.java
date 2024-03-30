@@ -5,6 +5,6 @@ import shootingstar.var.entity.Auction;
 
 import java.util.Optional;
 
-public interface AuctionRepository extends JpaRepository<Auction, Long> {
+public interface AuctionRepository extends JpaRepository<Auction, Long>, AuctionRepositoryCustom {
     Optional<Auction> findByAuctionUUID(String auctionUUID);
 }

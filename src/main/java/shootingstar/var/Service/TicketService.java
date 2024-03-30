@@ -21,11 +21,11 @@ import shootingstar.var.entity.ticket.TicketReport;
 import shootingstar.var.entity.User;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
-import shootingstar.var.repository.Review.ReviewRepository;
+import shootingstar.var.repository.review.ReviewRepository;
 import shootingstar.var.repository.ticket.TicketMeetingTimeRepository;
 import shootingstar.var.repository.ticket.TicketReportRepository;
 import shootingstar.var.repository.ticket.TicketRepository;
-import shootingstar.var.repository.UserRepository;
+import shootingstar.var.repository.user.UserRepository;
 
 @Slf4j
 @Service
@@ -48,7 +48,7 @@ public class TicketService {
         }
 
         Auction auction = ticket.getAuction();
-        User winner = userRepository.findByUserUUID(auction.getCurrentHighestBidderId())
+        User winner = userRepository.findByUserUUID(auction.getCurrentHighestBidderUUID())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         BigDecimal donationCommission = new BigDecimal(0.05);
@@ -83,7 +83,7 @@ public class TicketService {
         TicketMeetingTime findTicketMeetingTime = ticketMeetingTimeRepository.findByTicketIdAndUserNickname(reqDto.getTicketId(), findUser.getNickname())
                 .orElse(null);
         if (findTicketMeetingTime != null) {
-            throw new CustomException(ErrorCode.TICKET_MEETING_TIME_CONFLICT);
+            throw new CustomException(ErrorCode.TICKET_MEETING_TIME_NOT_FOUND);
         }
 
         // 로그인한 사용자에 해당하는 식사권의 만남 시작 버튼 누른 여부를 true로 변경
