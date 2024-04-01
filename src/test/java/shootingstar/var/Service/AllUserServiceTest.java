@@ -100,66 +100,71 @@ class AllUserServiceTest {
 
     @Test
     @DisplayName("vip 정보 불러오기")
-//    @Transactional
+    @Transactional
     public void getVipInfo() throws Exception {
         //given
         User vip = new User("22", "실명", "유명인", "000-0000-0000", "test@ttt.com", "helloUrl", UserType.ROLE_VIP);
-        userRepository.save(vip);
-
         User basic = new User("33", "실명", "일반인", "000-0000-0000", "test@ttt.com", "helloUrl", UserType.ROLE_BASIC);
+
+        userRepository.save(vip);
         userRepository.save(basic);
 
         userRepository.flush();
 
         VipInfo vipInfo = new VipInfo(vip, vip.getName(), "개발자", "경력", "소개", VipApprovalType.APPROVE, "url");
         vipInfoRepository.save(vipInfo);
+
         vipInfoRepository.flush();
 
         Auction progressAuction = new Auction(vip, 100000L, LocalDateTime.now(), "위치", "정보", "약속", "img", "img");
-        auctionRepository.save(progressAuction);
         Auction progressAuction1 = new Auction(vip, 100000L, LocalDateTime.now(), "위치", "정보", "약속", "img", "img");
-        auctionRepository.save(progressAuction1);
         Auction progressAuction2 = new Auction(vip, 100000L, LocalDateTime.now(), "위치", "정보", "약속", "img", "img");
-        auctionRepository.save(progressAuction2);
         Auction progressAuction3 = new Auction(vip, 100000L, LocalDateTime.now(), "위치", "정보", "약속", "img", "img");
-        auctionRepository.save(progressAuction3);
         Auction progressAuction4 = new Auction(vip, 100000L, LocalDateTime.now(), "위치", "정보", "약속", "img", "img");
+
+        auctionRepository.save(progressAuction);
+        auctionRepository.save(progressAuction1);
+        auctionRepository.save(progressAuction2);
+        auctionRepository.save(progressAuction3);
         auctionRepository.save(progressAuction4);
 
         Auction successAuction = new Auction(vip, 100000L, LocalDateTime.now(), "위치", "정보", "약속", "img", "img");
-        auctionRepository.save(successAuction);
         Auction successAuction1 = new Auction(vip, 100000L, LocalDateTime.now(), "위치", "정보", "약속", "img", "img");
-        auctionRepository.save(successAuction1);
         Auction successAuction2 = new Auction(vip, 100000L, LocalDateTime.now(), "위치", "정보", "약속", "img", "img");
-        auctionRepository.save(successAuction2);
         Auction successAuction3 = new Auction(vip, 100000L, LocalDateTime.now(), "위치", "정보", "약속", "img", "img");
-        auctionRepository.save(successAuction3);
 
         successAuction.changeAuctionType(AuctionType.SUCCESS);
         successAuction1.changeAuctionType(AuctionType.SUCCESS);
         successAuction2.changeAuctionType(AuctionType.SUCCESS);
         successAuction3.changeAuctionType(AuctionType.SUCCESS);
 
+        auctionRepository.save(successAuction);
+        auctionRepository.save(successAuction1);
+        auctionRepository.save(successAuction2);
+        auctionRepository.save(successAuction3);
+
         auctionRepository.flush();
 
         Ticket ticket = new Ticket(successAuction, basic, vip);
-        ticketRepository.save(ticket);
         Ticket ticket1 = new Ticket(successAuction1, basic, vip);
-        ticketRepository.save(ticket1);
         Ticket ticket2 = new Ticket(successAuction2, basic, vip);
-        ticketRepository.save(ticket2);
         Ticket ticket3 = new Ticket(successAuction3, basic, vip);
+
+        ticketRepository.save(ticket);
+        ticketRepository.save(ticket1);
+        ticketRepository.save(ticket2);
         ticketRepository.save(ticket3);
 
         ticketRepository.flush();
 
         Review review = new Review(basic, vip, ticket, "리뷰 내용", 4);
-        reviewRepository.save(review);
         Review review1 = new Review(basic, vip, ticket1, "리뷰 내용", 4);
-        reviewRepository.save(review1);
         Review review2 = new Review(basic, vip, ticket2, "리뷰 내용", 4);
-        reviewRepository.save(review2);
         Review review3 = new Review(basic, vip, ticket3, "리뷰 내용", 4);
+
+        reviewRepository.save(review);
+        reviewRepository.save(review1);
+        reviewRepository.save(review2);
         reviewRepository.save(review3);
 
         reviewRepository.flush();
