@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import shootingstar.var.Service.AdminService;
+import shootingstar.var.dto.req.AdminLoginReqDto;
 import shootingstar.var.dto.req.AdminSignupReqDto;
 import shootingstar.var.jwt.TokenInfo;
 import shootingstar.var.jwt.TokenProperty;
@@ -22,7 +23,7 @@ public class AdminController {
     }
 
     @PostMapping("/login")
-    public void login(@RequestBody AdminSignupReqDto reqDto, HttpServletResponse response) {
+    public void login(@RequestBody AdminLoginReqDto reqDto, HttpServletResponse response) {
         TokenInfo tokenInfo = adminService.login(reqDto.getLoginId(), reqDto.getPassword());
         TokenUtil.addHeader(response, tokenInfo.getAccessToken());
         TokenUtil.updateCookie(response, tokenInfo.getRefreshToken(), tokenProperty.getREFRESH_EXPIRE());
