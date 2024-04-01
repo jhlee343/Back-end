@@ -69,6 +69,18 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom{
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
 
+    @Override
+    public Page<VipReceiveReviewResDto> findVipReceivedReview(String vipUUID, Pageable pageable) {
+        List<VipReceiveReviewResDto> content = getReceiveReviewList(vipUUID, pageable.getOffset(), pageable.getPageSize());
+
+        JPAQuery<Long> countQuery = queryFactory.
+                select(review.count())
+                .from(review)
+                .where(review.receiver.userUUID.eq(vipUUID));
+
+        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
+    }
+
 
     private List<VipProgressAuctionResDto> getProgressAutionList(String vipUUID, Long offset, Integer pageSize) {
         return queryFactory

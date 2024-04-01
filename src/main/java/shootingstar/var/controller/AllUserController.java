@@ -25,6 +25,7 @@ import shootingstar.var.dto.req.UserSignupReqDto;
 import shootingstar.var.dto.res.GetBannerResDto;
 import shootingstar.var.dto.res.VipDetailResDto;
 import shootingstar.var.dto.res.VipProgressAuctionResDto;
+import shootingstar.var.dto.res.VipReceiveReviewResDto;
 import shootingstar.var.exception.ErrorResponse;
 
 import java.util.List;
@@ -167,5 +168,24 @@ public class AllUserController {
     public ResponseEntity<Page<VipProgressAuctionResDto>> vipProgressAuction(@NotBlank @PathVariable("vipUUID") String vipUUID, @PageableDefault(size = 10) Pageable pageable) {
         Page<VipProgressAuctionResDto> vipProgressAuction = allUserService.getVipProgressAuction(vipUUID, pageable);
         return ResponseEntity.ok().body(vipProgressAuction);
+    }
+
+    @Operation(summary = "모든 사용자가 접근 가능한 VIP 받은 리뷰 조회 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "VIP 받은 리뷰 조회", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = VipReceiveReviewResDto.class))}),
+            @ApiResponse(responseCode = "400",
+                    description = "잘못된 형식의 사용자 고유번호 : 1008",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+            @ApiResponse(responseCode = "404",
+                    description =
+                                    "- 존재하지 않는 사용자 : 1201\n" +
+                                    "- 존재하지 않는 VIP 정보 : 7200",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+    })
+    @GetMapping("/review/{vipUUID}")
+    public ResponseEntity<Page<VipReceiveReviewResDto>> vipReceivedReview(@NotBlank @PathVariable("vipUUID") String vipUUID, @PageableDefault(size = 10) Pageable pageable) {
+        Page<VipReceiveReviewResDto> vipReceivedReview = allUserService.getVipReceivedReview(vipUUID, pageable);
+        return ResponseEntity.ok().body(vipReceivedReview);
     }
 }
