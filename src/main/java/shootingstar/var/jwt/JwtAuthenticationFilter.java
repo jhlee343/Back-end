@@ -35,10 +35,9 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
         String requestURI = httpRequest.getRequestURI();
         log.info("JwtAuthenticationFilter requestURI :  {}, addr : {}", requestURI, httpRequest.getRemoteAddr());
         /*
-          /api/auth/refresh, /api/auth/logout, /error 엔드 포인트는 JWT 검증을 하지 않는다
-          /api/auth/refresh, /api/auth/logout 엔드 포인트는 Controller, Service 에서 별도의 검증을 한다.
+          /error 엔드 포인트는 JWT 검증을 하지 않는다
          */
-        if (requestURI.equals("/api/auth/refresh") || requestURI.equals("/api/auth/logout") || requestURI.equals("/error")) {
+        if (requestURI.equals("/error")) {
             chain.doFilter(request, response);
             return;
         }
