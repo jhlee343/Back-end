@@ -16,5 +16,5 @@ public class ReviewSaveReqDto {
 
     @Min(value = 1)
     @Max(value = 5)
-    private double reviewRating;
+    private int reviewRating;
 }
