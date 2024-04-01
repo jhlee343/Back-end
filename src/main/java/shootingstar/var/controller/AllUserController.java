@@ -133,7 +133,10 @@ public class AllUserController {
     @Operation(summary = "모든 사용자가 접근 가능한 VIP 리스트 조회 API")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "VIP 리스트 조회", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = VipListResDto.class))})
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = VipListResDto.class))}),
+            @ApiResponse(responseCode = "404",
+                    description = "액세스 토큰 전달 시 존재하지 않는 사용자 : 1201",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
     })
     @GetMapping("/vipList")
     public ResponseEntity<Page<VipListResDto>> vipList(@PageableDefault(size = 10) Pageable pageable, @RequestParam(value = "search", required = false) String search, HttpServletRequest request) {
@@ -151,6 +154,7 @@ public class AllUserController {
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
             @ApiResponse(responseCode = "404",
                     description =
+                                    "- 액세스 토큰 전달 시 존재하지 않는 사용자 : 1201\n" +
                                     "- 존재하지 않는 사용자 : 1201\n" +
                                     "- 존재하지 않는 VIP 정보 : 7200",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
