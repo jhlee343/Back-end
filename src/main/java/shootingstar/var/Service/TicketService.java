@@ -202,25 +202,29 @@ public class TicketService {
         BigDecimal zero = new BigDecimal(0);
         BigDecimal vipCommission = calculateCommission(meetingDate, meetingDateTime);
 
+        User organizer = userRepository.findByUserUUIDWithPessimisticLock(ticket.getOrganizer().getUserUUID())
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         // 주최자에게 수수료 제공
         if (vipCommission.compareTo(zero) == 1) {
-            log.info("주최자 수수료 받기 전 포인트 : {}", ticket.getOrganizer().getPoint());
-            ticket.getOrganizer().increasePoint(BigDecimal.valueOf(ticket.getAuction().getCurrentHighestBidAmount()).multiply(vipCommission));
-            log.info("주최자 수수료 받은 후 포인트 : {}", ticket.getOrganizer().getPoint());
+            log.info("주최자 수수료 받기 전 포인트 : {}", organizer.getPoint());
+            organizer.increasePoint(BigDecimal.valueOf(ticket.getAuction().getCurrentHighestBidAmount()).multiply(vipCommission));
+            log.info("주최자 수수료 받은 후 포인트 : {}", organizer.getPoint());
         }
 
         BigDecimal basicCommission = new BigDecimal(0.7).subtract(vipCommission);
         // 낙찰자에게 수수료 제외한 금액 반환
         if (basicCommission.compareTo(zero) == 1) {
-            log.info("낙찰자 수수료 받기 전 포인트 : {}", ticket.getWinner().getPoint());
-            ticket.getWinner().increasePoint(BigDecimal.valueOf(ticket.getAuction().getCurrentHighestBidAmount()).multiply(basicCommission));
-            log.info("낙찰자 수수료 받은 후 포인트 : {}", ticket.getWinner().getPoint());
+            User winner = userRepository.findByUserUUIDWithPessimisticLock(ticket.getWinner().getUserUUID())
+                    .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+            log.info("낙찰자 수수료 받기 전 포인트 : {}", winner.getPoint());
+            winner.increasePoint(BigDecimal.valueOf(ticket.getAuction().getCurrentHighestBidAmount()).multiply(basicCommission));
+            log.info("낙찰자 수수료 받은 후 포인트 : {}", winner.getPoint());
         }
 
         // 주최자에게 최소 입찰 금액 반환
-        log.info("주최자 수수료 받기 전 포인트 : {}", ticket.getOrganizer().getPoint());
-        ticket.getOrganizer().increasePoint(BigDecimal.valueOf(ticket.getAuction().getMinBidAmount()));
-        log.info("주최자 수수료 받은 후 포인트 : {}", ticket.getOrganizer().getPoint());
+        log.info("주최자 수수료 받기 전 포인트 : {}", organizer.getPoint());
+        organizer.increasePoint(BigDecimal.valueOf(ticket.getAuction().getMinBidAmount()));
+        log.info("주최자 수수료 받은 후 포인트 : {}", organizer.getPoint());
     }
 
     private BigDecimal calculateCommission(LocalDate meetingDate, LocalDateTime meetingDateTime) {
@@ -249,9 +253,11 @@ public class TicketService {
         log.info("-----------주최자 식사권 취소");
 
         // 낙찰자에게 전체 환불 & 주최자에게는 최소 입찰 금액 반환X
-        log.info("낙찰자 환불 받기 전 포인트 : {}", ticket.getWinner().getPoint());
-        ticket.getWinner().increasePoint(BigDecimal.valueOf(ticket.getAuction().getCurrentHighestBidAmount()));
-        log.info("낙찰자 환불 받은 후 포인트 : {}", ticket.getWinner().getPoint());
+        User winner = userRepository.findByUserUUIDWithPessimisticLock(ticket.getWinner().getUserUUID())
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        log.info("낙찰자 환불 받기 전 포인트 : {}", winner.getPoint());
+        winner.increasePoint(BigDecimal.valueOf(ticket.getAuction().getCurrentHighestBidAmount()));
+        log.info("낙찰자 환불 받은 후 포인트 : {}", winner.getPoint());
     }
 
     @Transactional
