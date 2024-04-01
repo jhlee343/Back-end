@@ -13,6 +13,7 @@ import shootingstar.var.entity.ticket.Ticket;
 import shootingstar.var.enums.type.AuctionType;
 import shootingstar.var.enums.type.UserType;
 import shootingstar.var.repository.AuctionRepository;
+import shootingstar.var.repository.follow.FollowRepository;
 import shootingstar.var.repository.review.ReviewRepository;
 import shootingstar.var.repository.user.UserRepository;
 import shootingstar.var.repository.vip.VipInfoRepository;
@@ -38,6 +39,8 @@ class AllUserServiceTest {
     private VipInfoRepository vipInfoRepository;
     @Autowired
     private TicketRepository ticketRepository;
+    @Autowired
+    private FollowRepository followRepository;
 
     @Test
     @DisplayName("베너 생성 테스트")
@@ -169,8 +172,12 @@ class AllUserServiceTest {
 
         reviewRepository.flush();
 
+        Follow follow = new Follow(basic, vip);
+        followRepository.save(follow);
+        followRepository.flush();
+
         //when
-        VipDetailResDto vipDetailByVipUUID = userRepository.findVipDetailByVipUUID(vip.getUserUUID());
+        VipDetailResDto vipDetailByVipUUID = userRepository.findVipDetailByVipUUID(vip.getUserUUID(), basic.getUserUUID());
 
         //then
         System.out.println(vipDetailByVipUUID.toString());
