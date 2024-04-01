@@ -8,13 +8,16 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import shootingstar.var.Service.AuctionService;
 import shootingstar.var.dto.req.AuctionCreateReqDto;
+import shootingstar.var.enums.type.UserType;
 import shootingstar.var.jwt.JwtTokenProvider;
 
+@Slf4j
 @Tag(name = "경매 컨트롤러", description= "vip 권한만 사용 가능합니다.")
 @RestController
 @RequiredArgsConstructor
@@ -38,7 +41,7 @@ public class AuctionController {
     @PatchMapping("/cancel/{auctionUUID}")
     public ResponseEntity<String> cancel(@PathVariable("auctionUUID") String auctionUUID, HttpServletRequest request) {
         String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
-        auctionService.cancel(auctionUUID, userUUID);
+        auctionService.cancel(auctionUUID, userUUID, UserType.ROLE_VIP.toString());
         return ResponseEntity.ok().body("경매 취소 성공");
     }
 }
