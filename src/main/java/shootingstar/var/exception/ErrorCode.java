@@ -81,7 +81,7 @@ public enum ErrorCode {
     INCORRECT_FORMAT_REVIEW_RATING(BAD_REQUEST, "6006", "잘못된 형식의 리뷰 점수입니다."),
     MEETING_TIME_NOT_PASSED(BAD_REQUEST, "6007", "만남이 끝나기 전에 리뷰 작성을 할 수 없습니다."),
 
-    TICKET_ACCESS_DENIED(FORBIDDEN, "2100", "접근 권한이 없습니다."),
+    TICKET_ACCESS_DENIED(FORBIDDEN, "6100", "접근 권한이 없습니다."),
 
     TICKET_NOT_FOUND(NOT_FOUND, "6200", "존재하지 않는 식사권입니다."),
     TICKET_MEETING_TIME_NOT_FOUND(NOT_FOUND, "6201", "존재하지 않는 만남 시작 시간입니다."),

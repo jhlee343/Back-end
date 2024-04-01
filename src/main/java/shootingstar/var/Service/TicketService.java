@@ -274,7 +274,7 @@ public class TicketService {
 
         // 식사권이 닫힌 경우
         if (!ticket.isTicketIsOpened()) {
-            throw new CustomException(ErrorCode.ALREADY_TICKET_CANCEL_CONFLICT);
+            throw new CustomException(ErrorCode.TICKET_ACCESS_DENIED);
         }
 
         // 해당 식사권에 대한 리뷰를 작성한 적이 있는 경우
