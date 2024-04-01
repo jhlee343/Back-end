@@ -41,13 +41,7 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom{
                         user.profileImgUrl,
                         user.nickname,
                         user.rating,
-                        userUUID != null ?
-                                JPAExpressions
-                                        .select(follow.followId.count())
-                                        .from(follow)
-                                        .where(follow.follower.userUUID.eq(userUUID)
-                                                .and(follow.following.userUUID.eq(user.userUUID)))
-                                        .gt(0L) : Expressions.asBoolean(false).isTrue()
+                        getIsFollow(userUUID)
                 ))
                 .from(user)
                 .where(vipCondition.and(searchCondition))
@@ -67,7 +61,7 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom{
     }
 
     @Override
-    public VipDetailResDto findVipDetailByVipUUID(String vipUUID) {
+    public VipDetailResDto findVipDetailByVipUUID(String vipUUID, String userUUID) {
         VipDetailResDto vipDetailResDto = queryFactory
                 .select(new QVipDetailResDto(
                         vipInfo.user.userUUID,
@@ -76,7 +70,8 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom{
                         vipInfo.user.rating,
                         vipInfo.vipJob,
                         vipInfo.vipCareer,
-                        vipInfo.vipIntroduce
+                        vipInfo.vipIntroduce,
+                        getIsFollow(userUUID)
                 ))
                 .from(vipInfo)
                 .where(vipInfo.user.userUUID.eq(vipUUID))
@@ -154,5 +149,15 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom{
                 .offset(offset)
                 .limit(pageSize)
                 .fetch();
+    }
+
+    private BooleanExpression getIsFollow(String userUUID) {
+        return userUUID != null ?
+                JPAExpressions
+                        .select(follow.followId.count())
+                        .from(follow)
+                        .where(follow.follower.userUUID.eq(userUUID)
+                                .and(follow.following.userUUID.eq(user.userUUID)))
+                        .gt(0L) : Expressions.asBoolean(false).isTrue();
     }
 }

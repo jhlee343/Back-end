@@ -8,7 +8,7 @@ import shootingstar.var.dto.res.VipProgressAuctionResDto;
 import shootingstar.var.dto.res.VipReceiveReviewResDto;
 
 public interface UserRepositoryCustom {
-    VipDetailResDto findVipDetailByVipUUID(String vipUUID);
+    VipDetailResDto findVipDetailByVipUUID(String vipUUID, String userUUID);
 
     Page<VipProgressAuctionResDto> findVipProgressAuction(String vipUUID, Pageable pageable);
     Page<VipReceiveReviewResDto> findVipReceivedReview(String vipUUID, Pageable pageable);

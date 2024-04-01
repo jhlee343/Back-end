@@ -59,23 +59,6 @@ public class AllUserService {
         return bannerRepository.findAllBanner();
     }
 
-    public VipDetailResDto getVipDetail(String vipUUID) {
-        User vip = checkUserAndVipRole(vipUUID);
-
-        return userRepository.findVipDetailByVipUUID(vipUUID);
-    }
-
-    public Page<VipProgressAuctionResDto> getVipProgressAuction(String vipUUID, Pageable pageable) {
-        User vip = checkUserAndVipRole(vipUUID);
-
-        return userRepository.findVipProgressAuction(vipUUID, pageable);
-    }
-
-    public Page<VipReceiveReviewResDto> getVipReceivedReview(String vipUUID, Pageable pageable) {
-        User vip = checkUserAndVipRole(vipUUID);
-        return userRepository.findVipReceivedReview(vipUUID, pageable);
-    }
-
     public Page<VipListResDto> getVipList(Pageable pageable, String search, String accessToken) {
         String userUUID = null;
 
@@ -88,6 +71,33 @@ public class AllUserService {
             userUUID = tokenUserUUID;
         }
         return userRepository.findVipList(pageable, search, userUUID);
+    }
+
+    public VipDetailResDto getVipDetail(String vipUUID, String accessToken) {
+        User vip = checkUserAndVipRole(vipUUID);
+
+        String userUUID = null;
+
+        if (accessToken != null) {
+            Authentication authentication = tokenProvider.getAuthenticationFromAccessToken(accessToken);
+            String tokenUserUUID = authentication.getName();
+            User user = userRepository.findByUserUUID(tokenUserUUID)
+                    .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+            userUUID = tokenUserUUID;
+        }
+        return userRepository.findVipDetailByVipUUID(vipUUID, userUUID);
+    }
+
+    public Page<VipProgressAuctionResDto> getVipProgressAuction(String vipUUID, Pageable pageable) {
+        User vip = checkUserAndVipRole(vipUUID);
+
+        return userRepository.findVipProgressAuction(vipUUID, pageable);
+    }
+
+    public Page<VipReceiveReviewResDto> getVipReceivedReview(String vipUUID, Pageable pageable) {
+        User vip = checkUserAndVipRole(vipUUID);
+        return userRepository.findVipReceivedReview(vipUUID, pageable);
     }
 
     private User checkUserAndVipRole(String vipUUID) {

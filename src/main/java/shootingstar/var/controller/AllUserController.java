@@ -156,8 +156,9 @@ public class AllUserController {
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
     })
     @GetMapping("/vipDetail/{vipUUID}")
-    public ResponseEntity<VipDetailResDto> vipDetail(@NotBlank @PathVariable("vipUUID") String vipUUID) {
-        VipDetailResDto vipDetail = allUserService.getVipDetail(vipUUID);
+    public ResponseEntity<VipDetailResDto> vipDetail(@NotBlank @PathVariable("vipUUID") String vipUUID, HttpServletRequest request) {
+        String accessToken = TokenUtil.getTokenFromHeader(request);
+        VipDetailResDto vipDetail = allUserService.getVipDetail(vipUUID, accessToken);
         return ResponseEntity.ok().body(vipDetail);
     }
 
