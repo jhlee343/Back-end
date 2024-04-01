@@ -1,5 +1,8 @@
 package shootingstar.var.repository.user;
 
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
@@ -8,10 +11,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 import shootingstar.var.dto.res.*;
 import shootingstar.var.enums.type.AuctionType;
+import shootingstar.var.enums.type.UserType;
 
 import java.util.List;
 
 import static shootingstar.var.entity.QAuction.auction;
+import static shootingstar.var.entity.QFollow.follow;
 import static shootingstar.var.entity.QReview.review;
 import static shootingstar.var.entity.QUser.user;
 import static shootingstar.var.entity.QVipInfo.vipInfo;
@@ -24,6 +29,42 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom{
         this.queryFactory = new JPAQueryFactory(em);
     }
 
+    @Override
+    public Page<VipListResDto> findVipList(Pageable pageable, String search, String userUUID) {
+        BooleanExpression searchCondition = search != null ? user.nickname.contains(search) : null;
+        BooleanExpression vipCondition = user.userType.eq(UserType.ROLE_VIP)
+                .and(user.isWithdrawn.eq(false));
+
+        List<VipListResDto> content = queryFactory
+                .select(new QVipListResDto(
+                        user.userUUID,
+                        user.profileImgUrl,
+                        user.nickname,
+                        user.rating,
+                        userUUID != null ?
+                                JPAExpressions
+                                        .select(follow.followId.count())
+                                        .from(follow)
+                                        .where(follow.follower.userUUID.eq(userUUID)
+                                                .and(follow.following.userUUID.eq(user.userUUID)))
+                                        .gt(0L) : Expressions.asBoolean(false).isTrue()
+                ))
+                .from(user)
+                .where(vipCondition.and(searchCondition))
+                .orderBy(user.nickname.asc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        JPAQuery<Long> countQuery = queryFactory
+                .select(user.count())
+                .from(user)
+                .where(user.userType.eq(UserType.ROLE_VIP)
+                        .and(user.isWithdrawn.eq(false))
+                        .and(search != null ? user.nickname.contains(search) : null));
+
+        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
+    }
 
     @Override
     public VipDetailResDto findVipDetailByVipUUID(String vipUUID) {

@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -22,11 +23,9 @@ import shootingstar.var.Service.EmailService;
 import shootingstar.var.dto.req.CheckAuthCodeReqDto;
 import shootingstar.var.dto.req.SendAuthCodeReqDto;
 import shootingstar.var.dto.req.UserSignupReqDto;
-import shootingstar.var.dto.res.GetBannerResDto;
-import shootingstar.var.dto.res.VipDetailResDto;
-import shootingstar.var.dto.res.VipProgressAuctionResDto;
-import shootingstar.var.dto.res.VipReceiveReviewResDto;
+import shootingstar.var.dto.res.*;
 import shootingstar.var.exception.ErrorResponse;
+import shootingstar.var.util.TokenUtil;
 
 import java.util.List;
 
@@ -47,7 +46,7 @@ public class AllUserController {
                     @Content(mediaType = "text/plain", schema = @Schema(implementation = String.class))}),
             @ApiResponse(responseCode = "400",
                     description =
-                                    "- 잘못된 형식의 이메일 : 1001\n" +
+                            "- 잘못된 형식의 이메일 : 1001\n" +
                                     "- 잘못된 형식의 닉네임 : 1003\n" +
                                     "- 잘못된 형식의 카카오 고유번호 : 1004\n" +
                                     "- 잘못된 형식의 사용자 이름 : 1005\n" +
@@ -58,7 +57,7 @@ public class AllUserController {
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
             @ApiResponse(responseCode = "409",
                     description =
-                                    "- 이미 사용중인 이메일로 회원가입 시도 : 1301\n" +
+                            "- 이미 사용중인 이메일로 회원가입 시도 : 1301\n" +
                                     "- 이미 사용중인 닉네임으로 회원가입 시도 : 1302",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
     })
@@ -76,7 +75,7 @@ public class AllUserController {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
     })
     @GetMapping("/duplicate/nickname/{nickname}")
-    public ResponseEntity<Boolean> checkNicknameDuplicate(@NotBlank @PathVariable("nickname") String nickname){
+    public ResponseEntity<Boolean> checkNicknameDuplicate(@NotBlank @PathVariable("nickname") String nickname) {
         return ResponseEntity.ok(duplicateService.checkNicknameDuplicate(nickname));
     }
 
@@ -88,7 +87,7 @@ public class AllUserController {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
     })
     @GetMapping("/duplicate/email/{email}")
-    public ResponseEntity<Boolean> checkEmailDuplicate(@NotBlank @PathVariable("email") String email){
+    public ResponseEntity<Boolean> checkEmailDuplicate(@NotBlank @PathVariable("email") String email) {
         return ResponseEntity.ok(duplicateService.checkEmailDuplicate(email));
     }
 
@@ -131,6 +130,18 @@ public class AllUserController {
         return ResponseEntity.ok().body(banners);
     }
 
+    @Operation(summary = "모든 사용자가 접근 가능한 VIP 리스트 조회 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "VIP 리스트 조회", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = VipListResDto.class))})
+    })
+    @GetMapping("/vipList")
+    public ResponseEntity<Page<VipListResDto>> vipList(@PageableDefault(size = 10) Pageable pageable, @RequestParam(value = "search", required = false) String search, HttpServletRequest request) {
+        String accessToken = TokenUtil.getTokenFromHeader(request);
+        Page<VipListResDto> vipList = allUserService.getVipList(pageable, search, accessToken);
+        return ResponseEntity.ok().body(vipList);
+    }
+
     @Operation(summary = "모든 사용자가 접근 가능한 VIP 상세정보 조회 API")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "VIP 상세 정보 조회", content = {
@@ -160,7 +171,7 @@ public class AllUserController {
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
             @ApiResponse(responseCode = "404",
                     description =
-                                    "- 존재하지 않는 사용자 : 1201\n" +
+                            "- 존재하지 않는 사용자 : 1201\n" +
                                     "- 존재하지 않는 VIP 정보 : 7200",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
     })

@@ -3,16 +3,15 @@ package shootingstar.var.Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import shootingstar.var.dto.req.UserSignupReqDto;
-import shootingstar.var.dto.res.GetBannerResDto;
-import shootingstar.var.dto.res.VipDetailResDto;
-import shootingstar.var.dto.res.VipProgressAuctionResDto;
-import shootingstar.var.dto.res.VipReceiveReviewResDto;
+import shootingstar.var.dto.res.*;
 import shootingstar.var.entity.User;
 import shootingstar.var.enums.type.UserType;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
+import shootingstar.var.jwt.JwtTokenProvider;
 import shootingstar.var.repository.user.UserRepository;
 import shootingstar.var.repository.banner.BannerRepository;
 import shootingstar.var.util.MailRedisUtil;
@@ -27,6 +26,7 @@ public class AllUserService {
 
     private final MailRedisUtil mailRedisUtil;
     private final CheckDuplicateService duplicateService;
+    private final JwtTokenProvider tokenProvider;
 
     public void signup(UserSignupReqDto reqDto) {
         if (duplicateService.checkEmailDuplicate(reqDto.getEmail())) {
@@ -74,6 +74,20 @@ public class AllUserService {
     public Page<VipReceiveReviewResDto> getVipReceivedReview(String vipUUID, Pageable pageable) {
         User vip = checkUserAndVipRole(vipUUID);
         return userRepository.findVipReceivedReview(vipUUID, pageable);
+    }
+
+    public Page<VipListResDto> getVipList(Pageable pageable, String search, String accessToken) {
+        String userUUID = null;
+
+        if (accessToken != null) {
+            Authentication authentication = tokenProvider.getAuthenticationFromAccessToken(accessToken);
+            String tokenUserUUID = authentication.getName();
+            User user = userRepository.findByUserUUID(tokenUserUUID)
+                    .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+            userUUID = tokenUserUUID;
+        }
+        return userRepository.findVipList(pageable, search, userUUID);
     }
 
     private User checkUserAndVipRole(String vipUUID) {
