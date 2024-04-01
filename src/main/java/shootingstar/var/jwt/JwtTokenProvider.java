@@ -334,4 +334,11 @@ public class JwtTokenProvider {
         Authentication authentication = getAuthenticationFromAccessToken(accessToken);
         return authentication.getName();
     }
+
+    public String getUserType(HttpServletRequest request) {
+        String accessToken = TokenUtil.getTokenFromHeader(request);
+        Authentication authentication = getAuthenticationFromAccessToken(accessToken);
+        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+        return authorities.isEmpty() ? "" : authorities.iterator().next().getAuthority();
+    }
 }
