@@ -8,6 +8,7 @@ import shootingstar.var.dto.req.UserSignupReqDto;
 import shootingstar.var.dto.res.GetBannerResDto;
 import shootingstar.var.dto.res.VipDetailResDto;
 import shootingstar.var.dto.res.VipProgressAuctionResDto;
+import shootingstar.var.dto.res.VipReceiveReviewResDto;
 import shootingstar.var.entity.User;
 import shootingstar.var.enums.type.UserType;
 import shootingstar.var.exception.CustomException;
@@ -68,6 +69,11 @@ public class AllUserService {
         User vip = checkUserAndVipRole(vipUUID);
 
         return userRepository.findVipProgressAuction(vipUUID, pageable);
+    }
+
+    public Page<VipReceiveReviewResDto> getVipReceivedReview(String vipUUID, Pageable pageable) {
+        User vip = checkUserAndVipRole(vipUUID);
+        return userRepository.findVipReceivedReview(vipUUID, pageable);
     }
 
     private User checkUserAndVipRole(String vipUUID) {
