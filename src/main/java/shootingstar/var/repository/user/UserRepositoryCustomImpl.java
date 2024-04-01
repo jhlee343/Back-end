@@ -53,9 +53,7 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom{
         JPAQuery<Long> countQuery = queryFactory
                 .select(user.count())
                 .from(user)
-                .where(user.userType.eq(UserType.ROLE_VIP)
-                        .and(user.isWithdrawn.eq(false))
-                        .and(search != null ? user.nickname.contains(search) : null));
+                .where(vipCondition.and(searchCondition));
 
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
