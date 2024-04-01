@@ -1,5 +1,6 @@
 package shootingstar.var.Service;
 
+import jakarta.persistence.OptimisticLockException;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -21,6 +22,7 @@ import shootingstar.var.enums.type.AuctionType;
 import shootingstar.var.entity.ScheduledTask;
 import shootingstar.var.enums.type.TaskType;
 import shootingstar.var.entity.User;
+import shootingstar.var.enums.type.UserType;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
 import shootingstar.var.quartz.TicketCreationJob;
@@ -46,15 +48,7 @@ public class AuctionService {
         User findUser = userRepository.findByUserUUID(userUUID)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        // 최소 입찰 금액이 10000원 단위가 아닐 경우
-        if (reqDto.getMinBidAmount() % 10000 != 0) {
-            throw new CustomException(ErrorCode.INCORRECT_FORMAT_MIN_BID_AMOUNT);
-        }
-
-        // 보유 포인트보다 최소 입찰 금액이 더 클 경우
-        if (findUser.getPoint().compareTo(BigDecimal.valueOf(reqDto.getMinBidAmount())) == -1) {
-            throw new CustomException(ErrorCode.MIN_BID_AMOUNT_INCORRECT_FORMAT);
-        }
+        validateMinBidAmount(reqDto, findUser);
 
         // 경매 생성
         Auction auction = Auction.builder()
@@ -76,6 +70,23 @@ public class AuctionService {
         log.info("사용자 감소 후 포인트 : {}", findUser.getPoint());
 
         // 스케줄링 저장
+        schedulingCreateTicket(auction, findUser);
+    }
+
+    private void validateMinBidAmount(AuctionCreateReqDto reqDto, User findUser) {
+        // 최소 입찰 금액이 10000원 단위가 아닐 경우
+        if (reqDto.getMinBidAmount() % 10000 != 0) {
+            throw new CustomException(ErrorCode.INCORRECT_FORMAT_MIN_BID_AMOUNT);
+        }
+
+        // 보유 포인트보다 최소 입찰 금액이 더 클 경우
+        if (findUser.getPoint().compareTo(BigDecimal.valueOf(reqDto.getMinBidAmount())) == -1) {
+            throw new CustomException(ErrorCode.MIN_BID_AMOUNT_INCORRECT_FORMAT);
+        }
+    }
+
+    @Transactional
+    private void schedulingCreateTicket(Auction auction, User findUser) {
         LocalDateTime scheduleTime = LocalDateTime.now().plusMinutes(1);
         ScheduledTask task = ScheduledTask.builder()
                 .auctionId(auction.getAuctionId())
@@ -107,18 +118,18 @@ public class AuctionService {
     }
 
     @Transactional
-    public void cancel(String auctionUUID, String userUUID) {
+    public void cancel(String auctionUUID, String userUUID, String userType) {
         // uuid에 해당하는 경매가 존재하는지 확인
         Auction findAuction = auctionRepository.findByAuctionUUID(auctionUUID)
                 .orElseThrow(() -> new CustomException(ErrorCode.AUCTION_NOT_FOUND));
 
         // 찾은 경매가 로그인한 유저가 생성한 게 맞는지 확인
-        if (!findAuction.getUser().getUserUUID().equals(userUUID)) {
+        if (!findAuction.isOwner(userUUID) && !userType.equals(UserType.ROLE_ADMIN.toString())) {
             throw new CustomException(ErrorCode.AUCTION_ACCESS_DENIED);
         }
 
         // 경매 타입이 PROGRESS인지 확인
-        if (!findAuction.getAuctionType().equals(AuctionType.PROGRESS)) {
+        if (!findAuction.isProgress()) {
             throw new CustomException(ErrorCode.AUCTION_CONFLICT);
         }
 
@@ -149,7 +160,11 @@ public class AuctionService {
         BigDecimal afterPoint = findAuction.getUser().getPoint();
         log.info("포인트가 추가되었습니다. userId : {}, 추가 후 포인트 : {}", findAuction.getUser().getUserId(), afterPoint);
 
+        deleteScheduling(findAuction);
+    }
 
+    @Transactional
+    private void deleteScheduling(Auction findAuction) {
         ScheduledTask task = scheduledTaskRepository.findByAuctionId(findAuction.getAuctionId())
                 .orElseThrow(() -> new CustomException(ErrorCode.TASK_NOT_FOUND));
 
