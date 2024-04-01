@@ -10,6 +10,9 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +24,7 @@ import shootingstar.var.dto.req.SendAuthCodeReqDto;
 import shootingstar.var.dto.req.UserSignupReqDto;
 import shootingstar.var.dto.res.GetBannerResDto;
 import shootingstar.var.dto.res.VipDetailResDto;
+import shootingstar.var.dto.res.VipProgressAuctionResDto;
 import shootingstar.var.exception.ErrorResponse;
 
 import java.util.List;
@@ -143,5 +147,25 @@ public class AllUserController {
     public ResponseEntity<VipDetailResDto> vipDetail(@NotBlank @PathVariable("vipUUID") String vipUUID) {
         VipDetailResDto vipDetail = allUserService.getVipDetail(vipUUID);
         return ResponseEntity.ok().body(vipDetail);
+    }
+
+
+    @Operation(summary = "모든 사용자가 접근 가능한 VIP 진행중인 경매 조회 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "VIP 진행중인 경매 조회", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = VipProgressAuctionResDto.class))}),
+            @ApiResponse(responseCode = "400",
+                    description = "잘못된 형식의 사용자 고유번호 : 1008",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+            @ApiResponse(responseCode = "404",
+                    description =
+                                    "- 존재하지 않는 사용자 : 1201\n" +
+                                    "- 존재하지 않는 VIP 정보 : 7200",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+    })
+    @GetMapping("/auction/{vipUUID}")
+    public ResponseEntity<Page<VipProgressAuctionResDto>> vipProgressAuction(@NotBlank @PathVariable("vipUUID") String vipUUID, @PageableDefault(size = 10) Pageable pageable) {
+        Page<VipProgressAuctionResDto> vipProgressAuction = allUserService.getVipProgressAuction(vipUUID, pageable);
+        return ResponseEntity.ok().body(vipProgressAuction);
     }
 }

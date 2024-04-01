@@ -1,10 +1,13 @@
 package shootingstar.var.Service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import shootingstar.var.dto.req.UserSignupReqDto;
 import shootingstar.var.dto.res.GetBannerResDto;
 import shootingstar.var.dto.res.VipDetailResDto;
+import shootingstar.var.dto.res.VipProgressAuctionResDto;
 import shootingstar.var.entity.User;
 import shootingstar.var.enums.type.UserType;
 import shootingstar.var.exception.CustomException;
@@ -56,6 +59,18 @@ public class AllUserService {
     }
 
     public VipDetailResDto getVipDetail(String vipUUID) {
+        User vip = checkUserAndVipRole(vipUUID);
+
+        return userRepository.findVipDetailByVipUUID(vipUUID);
+    }
+
+    public Page<VipProgressAuctionResDto> getVipProgressAuction(String vipUUID, Pageable pageable) {
+        User vip = checkUserAndVipRole(vipUUID);
+
+        return userRepository.findVipProgressAuction(vipUUID, pageable);
+    }
+
+    private User checkUserAndVipRole(String vipUUID) {
         User vip = userRepository.findByUserUUID(vipUUID)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
@@ -63,6 +78,6 @@ public class AllUserService {
             throw new CustomException(ErrorCode.VIP_INFO_NOT_FOUND);
         }
 
-        return userRepository.findVipDetailByVipUUID(vipUUID);
+        return vip;
     }
 }
