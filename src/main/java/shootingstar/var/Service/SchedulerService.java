@@ -43,7 +43,7 @@ public class SchedulerService {
             log.info("변경 후 경매 타입 : {}", auction.getAuctionType());
 
             // 경매 생성자에게 최소 입찰 금액만큼의 포인트 돌려주기
-            User user = userRepository.findById(userId)
+            User user = userRepository.findByUserIdWithPessimisticLock(userId)
                     .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
             log.info("사용자 증가 전 포인트 : {}", user.getPoint());
             user.increasePoint(BigDecimal.valueOf(auction.getMinBidAmount()));
@@ -65,9 +65,7 @@ public class SchedulerService {
         ticketRepository.save(ticket);
 
         // 경매 타입 낙찰로 변경
-        Auction findAuction = auctionRepository.findById(auction.getAuctionId())
-                .orElseThrow(() -> new CustomException(ErrorCode.AUCTION_NOT_FOUND));
-        findAuction.changeAuctionType(AuctionType.SUCCESS);
+        auction.changeAuctionType(AuctionType.SUCCESS);
 
         // scheduledTask 타입 완료로 변경
         ScheduledTask task = scheduledTaskRepository.findById(scheduledTaskId)
