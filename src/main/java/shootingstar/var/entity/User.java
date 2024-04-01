@@ -73,6 +73,7 @@ public class User extends BaseTimeEntity {
     @OneToMany(mappedBy = "winner", fetch = FetchType.LAZY)
     private final List<Ticket> winningTicket = new ArrayList<>();
 
+
     @Builder
     public User(String kakaoId, String name, String nickname, String phone, String email, String profileImgUrl, UserType userType) {
         this.userUUID = UUID.randomUUID().toString();
