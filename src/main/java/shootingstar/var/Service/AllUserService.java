@@ -7,8 +7,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import shootingstar.var.dto.req.UserSignupReqDto;
 import shootingstar.var.dto.res.*;
+import shootingstar.var.entity.Auction;
 import shootingstar.var.entity.User;
 import shootingstar.var.enums.type.AuctionSortType;
+import shootingstar.var.enums.type.AuctionType;
 import shootingstar.var.enums.type.UserType;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
@@ -105,6 +107,31 @@ public class AllUserService {
 
     public Page<ProgressAuctionResDto> getProgressGeneralAuction(Pageable pageable, AuctionSortType sortType, String search) {
         return auctionRepository.findProgressGeneralAuction(pageable, sortType, search);
+    }
+
+    public AuctionDetailResDto getAuctionDetail(String auctionUUID) {
+        Auction auction = auctionRepository.findByAuctionUUID(auctionUUID).orElseThrow(
+                () -> new CustomException(ErrorCode.AUCTION_NOT_FOUND));
+
+        User vip = auction.getUser();
+
+        String location = auction.getMeetingLocation();
+        String[] parts = location.split(" ");
+        String trimmedLocation = parts[0] + " " + parts[1];
+
+        return AuctionDetailResDto.builder()
+                .vipUUID(vip.getUserUUID())
+                .vipNickname(vip.getNickname())
+                .vipProfileImgUrl(vip.getProfileImgUrl())
+                .vipRating(vip.getRating())
+                .auctionUUID(auction.getAuctionUUID())
+                .auctionCreatedTime(auction.getCreatedTime())
+                .meetingDate(auction.getMeetingDate())
+                .meetingLocation(trimmedLocation)
+                .currentHighestBidAmount(auction.getCurrentHighestBidAmount())
+                .meetingInfoText(auction.getMeetingInfoText())
+                .meetingPromiseText(auction.getMeetingPromiseText())
+                .build();
     }
 
     private User checkUserAndVipRole(String vipUUID) {

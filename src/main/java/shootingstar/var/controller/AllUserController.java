@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -216,5 +217,19 @@ public class AllUserController {
                                                 @RequestParam(value = "search", required = false) String search) {
         Page<ProgressAuctionResDto> progressGeneralAuction = allUserService.getProgressGeneralAuction(pageable, sortType, search);
         return ResponseEntity.ok().body(progressGeneralAuction);
+    }
+
+    @Operation(summary = "일반 경매 상세정보 조회 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "일반 경매 상세정보 조회", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = AuctionDetailResDto.class))}),
+            @ApiResponse(responseCode = "404",
+                    description = "존재하지 않는 경매 : 2200",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+    })
+    @GetMapping("/auction/general/{auctionUUID}")
+    public ResponseEntity<AuctionDetailResDto> auctionDetail(@NotEmpty @PathVariable("auctionUUID") String auctionUUID) {
+        AuctionDetailResDto auctionDetail = allUserService.getAuctionDetail(auctionUUID);
+        return ResponseEntity.ok().body(auctionDetail);
     }
 }

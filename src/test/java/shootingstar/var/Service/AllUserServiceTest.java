@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import shootingstar.var.dto.res.AuctionDetailResDto;
 import shootingstar.var.dto.res.GetBannerResDto;
 import shootingstar.var.dto.res.ProgressAuctionResDto;
 import shootingstar.var.dto.res.VipDetailResDto;
@@ -46,6 +47,9 @@ class AllUserServiceTest {
     private TicketRepository ticketRepository;
     @Autowired
     private FollowRepository followRepository;
+
+    @Autowired
+    private AllUserService allUserService;
 
     @Test
     @DisplayName("베너 생성 테스트")
@@ -230,5 +234,38 @@ class AllUserServiceTest {
         //then
         System.out.println(progressGeneralAuction.getContent());
         Assertions.assertThat(progressGeneralAuction.get().count()).isEqualTo(5);
+    }
+
+    @Test
+    @DisplayName("경매 상세정보 조회")
+    @Transactional
+    public void auctionDetail() throws Exception {
+        //given
+        User vip1 = new User("22", "실명", "유명인1", "000-0000-0000", "test@ttt.com", "helloUrl", UserType.ROLE_VIP);
+        User vip2 = new User("22", "실명", "유명인2", "000-0000-0000", "test@ttt.com", "helloUrl", UserType.ROLE_VIP);
+
+        userRepository.save(vip1);
+        userRepository.save(vip2);
+
+        userRepository.flush();
+
+        Auction progressAuction1 = new Auction(vip1, 100000L, LocalDateTime.now(), "경기도 성남시 분당구 수내동 19-4", "정보", "약속", "img", "img");
+        Auction progressAuction2 = new Auction(vip2, 100000L, LocalDateTime.now(), "서울특별시 강남구 선릉로158길 11", "정보", "약속", "img", "img");
+
+        auctionRepository.save(progressAuction1);
+        auctionRepository.save(progressAuction2);
+
+        auctionRepository.flush();
+
+        //when
+        AuctionDetailResDto auctionDetail1 = allUserService.getAuctionDetail(progressAuction1.getAuctionUUID());
+        AuctionDetailResDto auctionDetail2 = allUserService.getAuctionDetail(progressAuction2.getAuctionUUID());
+
+        //then
+        System.out.println(auctionDetail1);
+        Assertions.assertThat(auctionDetail1.getAuctionUUID()).isEqualTo(progressAuction1.getAuctionUUID());
+
+        System.out.println(auctionDetail2);
+        Assertions.assertThat(auctionDetail2.getAuctionUUID()).isEqualTo(progressAuction2.getAuctionUUID());
     }
 }
