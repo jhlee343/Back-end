@@ -37,14 +37,16 @@ public class VipUserController {
     @GetMapping("/auction/{auctionType}")
     public ResponseEntity<?> getVipAuctionList(@NotBlank @PathVariable("auctionType")AuctionType auctionType, HttpServletRequest request){
         String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
-        if(auctionType.equals(AuctionType.CANCEL)){
-
+        if(auctionType.equals(AuctionType.INVALIDITY)){
+            //유찰
+            return ResponseEntity.ok("Auction Invalidity");
         }
         else if(auctionType.equals(AuctionType.PROGRESS)){
+            //진행중
 
         }
         else if(auctionType.equals(AuctionType.SUCCESS)){
-            
+            //성공
         }
         return null;
     }

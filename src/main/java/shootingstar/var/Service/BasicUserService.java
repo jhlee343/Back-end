@@ -51,16 +51,13 @@ public class BasicUserService {
 
     public Page<UserAuctionSuccessList> successBeforeAuctionList(String userUUID, Pageable pageable){
         return auctionRepository.findAllSuccessBeforeByuserUUID(userUUID, pageable);
-    //    return null;
     }
 
     public Page<UserAuctionSuccessList> successAfterAuctionList(String userUUID, Pageable pageable){
         return auctionRepository.findAllSuccessAfterByuserUUID(userUUID, pageable);
-        //    return null;
     }
     public Page<UserAuctionParticipateList> participateAuctionList(String userUUID, Pageable pageable){
         return auctionRepository.findAllParticipateByuserUUID(userUUID, pageable);
-        //return null;
     }
 
     public User findByUserUUID(String userUUID) {
