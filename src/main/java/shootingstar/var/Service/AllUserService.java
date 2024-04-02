@@ -8,10 +8,12 @@ import org.springframework.stereotype.Service;
 import shootingstar.var.dto.req.UserSignupReqDto;
 import shootingstar.var.dto.res.*;
 import shootingstar.var.entity.User;
+import shootingstar.var.enums.type.AuctionSortType;
 import shootingstar.var.enums.type.UserType;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
 import shootingstar.var.jwt.JwtTokenProvider;
+import shootingstar.var.repository.AuctionRepository;
 import shootingstar.var.repository.user.UserRepository;
 import shootingstar.var.repository.banner.BannerRepository;
 import shootingstar.var.util.MailRedisUtil;
@@ -23,6 +25,7 @@ import java.util.List;
 public class AllUserService {
     private final UserRepository userRepository;
     private final BannerRepository bannerRepository;
+    private final AuctionRepository auctionRepository;
 
     private final MailRedisUtil mailRedisUtil;
     private final CheckDuplicateService duplicateService;
@@ -89,7 +92,7 @@ public class AllUserService {
         return userRepository.findVipDetailByVipUUID(vipUUID, userUUID);
     }
 
-    public Page<VipProgressAuctionResDto> getVipProgressAuction(String vipUUID, Pageable pageable) {
+    public Page<ProgressAuctionResDto> getVipProgressAuction(String vipUUID, Pageable pageable) {
         User vip = checkUserAndVipRole(vipUUID);
 
         return userRepository.findVipProgressAuction(vipUUID, pageable);
@@ -98,6 +101,10 @@ public class AllUserService {
     public Page<VipReceiveReviewResDto> getVipReceivedReview(String vipUUID, Pageable pageable) {
         User vip = checkUserAndVipRole(vipUUID);
         return userRepository.findVipReceivedReview(vipUUID, pageable);
+    }
+
+    public Page<ProgressAuctionResDto> getProgressGeneralAuction(Pageable pageable, AuctionSortType sortType, String search) {
+        return auctionRepository.findProgressGeneralAuction(pageable, sortType, search);
     }
 
     private User checkUserAndVipRole(String vipUUID) {

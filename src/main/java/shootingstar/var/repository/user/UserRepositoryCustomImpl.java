@@ -31,7 +31,7 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom{
 
     @Override
     public Page<VipListResDto> findVipList(Pageable pageable, String search, String userUUID) {
-        BooleanExpression searchCondition = search != null ? user.nickname.contains(search) : null;
+        BooleanExpression searchCondition = search != null ? user.nickname.contains(search) : Expressions.asBoolean(true).isTrue();
         BooleanExpression vipCondition = user.userType.eq(UserType.ROLE_VIP)
                 .and(user.isWithdrawn.eq(false));
 
@@ -75,7 +75,7 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom{
                 .where(vipInfo.user.userUUID.eq(vipUUID))
                 .fetchOne();
 
-        List<VipProgressAuctionResDto> progressAuctionList = getProgressAutionList(vipUUID, 0L, 3);
+        List<ProgressAuctionResDto> progressAuctionList = getProgressAutionList(vipUUID, 0L, 3);
 
         if (vipDetailResDto != null) {
             vipDetailResDto.setProgressAuctionList(progressAuctionList);
@@ -91,8 +91,8 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom{
     }
 
     @Override
-    public Page<VipProgressAuctionResDto> findVipProgressAuction(String vipUUID, Pageable pageable) {
-        List<VipProgressAuctionResDto> content = getProgressAutionList(vipUUID, pageable.getOffset(), pageable.getPageSize());
+    public Page<ProgressAuctionResDto> findVipProgressAuction(String vipUUID, Pageable pageable) {
+        List<ProgressAuctionResDto> content = getProgressAutionList(vipUUID, pageable.getOffset(), pageable.getPageSize());
 
         JPAQuery<Long> countQuery = queryFactory.
                 select(auction.count())
@@ -116,10 +116,11 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom{
     }
 
 
-    private List<VipProgressAuctionResDto> getProgressAutionList(String vipUUID, Long offset, Integer pageSize) {
+    private List<ProgressAuctionResDto> getProgressAutionList(String vipUUID, Long offset, Integer pageSize) {
         return queryFactory
-                .select(new QVipProgressAuctionResDto(
+                .select(new QProgressAuctionResDto(
                         auction.user.profileImgUrl,
+                        auction.user.nickname,
                         auction.auctionUUID,
                         auction.createdTime,
                         auction.currentHighestBidAmount,
