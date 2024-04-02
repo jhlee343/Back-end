@@ -9,7 +9,7 @@ import lombok.Data;
 @Data
 public class ReviewSaveReqDto {
     @NotNull
-    private Long ticketId;
+    private String ticketUUID;
 
     @NotBlank
     private String reviewContent;

@@ -70,7 +70,7 @@ public class TicketService {
         User findUser = userRepository.findByUserUUID(userUUID)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        Ticket ticket = ticketRepository.findById(reqDto.getTicketId())
+        Ticket ticket = ticketRepository.findByTicketUUID(reqDto.getTicketUUID())
                 .orElseThrow(() -> new CustomException(ErrorCode.TICKET_NOT_FOUND));
 
         // 로그인한 사용자가 식사권의 낙찰자도 주최자도 아닐 경우
@@ -79,10 +79,10 @@ public class TicketService {
         }
 
         // 로그인한 사용자가 이미 만남 시작 버튼을 눌렀을 경우
-        TicketMeetingTime findTicketMeetingTime = ticketMeetingTimeRepository.findByTicketIdAndUserNickname(reqDto.getTicketId(), findUser.getNickname())
+        TicketMeetingTime findTicketMeetingTime = ticketMeetingTimeRepository.findByTicketUUIDAndUserNickname(reqDto.getTicketUUID(), findUser.getNickname())
                 .orElse(null);
         if (findTicketMeetingTime != null) {
-            throw new CustomException(ErrorCode.TICKET_MEETING_TIME_NOT_FOUND);
+            throw new CustomException(ErrorCode.TICKET_MEETING_TIME_CONFLICT);
         }
 
         // 로그인한 사용자에 해당하는 식사권의 만남 시작 버튼 누른 여부를 true로 변경
@@ -123,7 +123,7 @@ public class TicketService {
 
     @Transactional
     public void reportTicket(TicketReportReqDto reqDto, String userUUID) {
-        Ticket ticket = ticketRepository.findById(reqDto.getTicketId())
+        Ticket ticket = ticketRepository.findByTicketUUID(reqDto.getTicketUUID())
                 .orElseThrow(() -> new CustomException(ErrorCode.TICKET_NOT_FOUND));
 
         // 로그인한 사용자가 경매의 낙찰자도 주최자도 아닐 때
@@ -139,7 +139,7 @@ public class TicketService {
         }
 
         // 로그인한 사용자가 이미 해당 식사권에 대해 신고 경험이 있는 경우
-        TicketReport findTicketReport = ticketReportRepository.findByTicketIdAndTicketReportNickname(reqDto.getTicketId(), ticketReportNickname)
+        TicketReport findTicketReport = ticketReportRepository.findByTicketUUIdAndTicketReportNickname(reqDto.getTicketUUID(), ticketReportNickname)
                 .orElse(null);
         if (findTicketReport != null) {
             throw new CustomException(ErrorCode.TICKET_REPORT_CONFLICT);
@@ -264,7 +264,7 @@ public class TicketService {
 
     @Transactional
     public void saveReview(ReviewSaveReqDto reqDto, String userUUID) {
-        Ticket ticket = ticketRepository.findById(reqDto.getTicketId())
+        Ticket ticket = ticketRepository.findByTicketUUID(reqDto.getTicketUUID())
                 .orElseThrow(() -> new CustomException(ErrorCode.TICKET_NOT_FOUND));
 
         // 로그인한 사용자가 식사권의 낙찰자도 주최자도 아닐 경우
@@ -306,5 +306,18 @@ public class TicketService {
                 .build();
 
         reviewRepository.save(review);
+
+        List<Review> reviewsReceived = receiver.getReviewsReceived();
+        double ratingAverage = Math.round(calculateUserRating(reviewsReceived) * 100) / 100.0;
+        log.info("평균 별점 : {}", ratingAverage);
+        receiver.updateRating(ratingAverage);
+    }
+
+    public double calculateUserRating(List<Review> reviewsReceived) {
+        double sum = reviewsReceived.stream()
+                .mapToDouble(Review::getReviewRating)
+                .sum();
+        log.info("별점 합 : {}", sum);
+        return sum / reviewsReceived.size();
     }
 }

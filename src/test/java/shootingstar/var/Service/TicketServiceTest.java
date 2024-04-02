@@ -5,9 +5,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Commit;
+import shootingstar.var.dto.req.MeetingTimeSaveReqDto;
 
 @SpringBootTest
 class TicketServiceTest {
@@ -16,6 +19,24 @@ class TicketServiceTest {
     TicketService ticketService;
 
     @Test
+    @DisplayName("만남 시간 저장 테스트")
+    @Commit
+    void saveMeetingTime() {
+        // given
+        MeetingTimeSaveReqDto reqDto = new MeetingTimeSaveReqDto();
+        reqDto.setTicketUUID("82412cef-f22d-4321-b435-5b58261c2fe8");
+        reqDto.setStartMeetingTime("2024-04-01T15:47:57");
+
+        String userUUID = "fb3ebae0-e0bb-470f-86e1-20a69384a4d6";
+
+        // when
+        ticketService.saveMeetingTime(reqDto, userUUID);
+
+        // then
+    }
+
+    @Test
+    @DisplayName("vip 수수료 계산")
     void calculateCommission() {
         // given
         LocalDate meetingDate = LocalDate.of(2024, 5, 1);
