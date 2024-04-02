@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import shootingstar.var.Service.VipUserService;
+import shootingstar.var.dto.res.UserAuctionInvalidityResDto;
+import shootingstar.var.dto.res.UserAuctionParticipateList;
 import shootingstar.var.dto.res.UserAuctionSuccessList;
 import shootingstar.var.dto.res.VipInfoDto;
 import shootingstar.var.enums.type.AuctionType;
@@ -30,7 +32,7 @@ public class VipUserController {
 
     @Operation(summary = "vip 소개 불러오기")
     @GetMapping("/info")
-    public ResponseEntity<VipInfoDto> getVipInfo(HttpServletRequest request){
+    public ResponseEntity<VipInfoDto> getVipInfo(HttpServletRequest request) {
         String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
         VipInfoDto vipInfo = vipService.getVipInfo(userUUID);
         return ResponseEntity.ok(vipInfo);
@@ -39,22 +41,23 @@ public class VipUserController {
 
     @Operation(summary = "경매 불러오기")
     @GetMapping("/auction/{auctionType}")
-    public ResponseEntity<?> getVipAuctionList(@NotBlank @PathVariable("auctionType")AuctionType auctionType,
-                                               HttpServletRequest request, @PageableDefault(size = 10) Pageable pageable){
+    public ResponseEntity<?> getVipAuctionList(@NotBlank @PathVariable("auctionType") AuctionType auctionType,
+                                               HttpServletRequest request, @PageableDefault(size = 10) Pageable pageable) {
         String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
-        if(auctionType.equals(AuctionType.INVALIDITY)){
-            //유찰
-            return ResponseEntity.ok("Auction Invalidity");
-        }
-        else if(auctionType.equals(AuctionType.PROGRESS)){
+        if (auctionType.equals(AuctionType.PROGRESS)) {
             //진행중
-        }
-        else if(auctionType.equals(AuctionType.SUCCESS)){
+            Page<UserAuctionParticipateList> userAuctionParticipateLists = vipService.getVipUserAuctionProgress(userUUID, pageable);
+            return ResponseEntity.ok(userAuctionParticipateLists);
+        } else if (auctionType.equals(AuctionType.SUCCESS)) {
             //성공
+            Page<UserAuctionSuccessList> userAuctionSuccessLists = vipService.getVipUserAuctionSuccess(userUUID, pageable);
+            return ResponseEntity.ok(userAuctionSuccessLists);
         }
-        return null;
+        else {
+            //유찰
+            Page<UserAuctionInvalidityResDto> userAuctionInvalidityLists = vipService.getVipUserAuctionInvalidity(userUUID,pageable);
+            return ResponseEntity.ok(userAuctionInvalidityLists);
+        }
     }
-
-
 
 }

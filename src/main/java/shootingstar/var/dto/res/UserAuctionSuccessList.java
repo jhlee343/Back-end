@@ -20,8 +20,12 @@ public class UserAuctionSuccessList {
     @NotNull
     private String basicUserName;
 
+    @NotNull
+    private String profileImgUrl;
+
     @QueryProjection
-    public UserAuctionSuccessList(String vipUserName, LocalDateTime meetDate, String basicUserName){
+    public UserAuctionSuccessList(String profileImgUrl,String vipUserName, LocalDateTime meetDate, String basicUserName){
+        this.profileImgUrl = profileImgUrl;
         this.vipUserName = vipUserName;
         this.meetDate = meetDate;
         this.basicUserName = basicUserName;

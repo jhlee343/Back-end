@@ -20,9 +20,12 @@ public class UserAuctionParticipateList {
     @NotNull
     private long currentHighestBidAmount;
 
+    @NotNull
+    private String profileImgUrl;
     @QueryProjection
-    public UserAuctionParticipateList(String vipUserName, LocalDateTime auctionCreatedDate,
+    public UserAuctionParticipateList(String profileImgUrl, String vipUserName, LocalDateTime auctionCreatedDate,
                                       long bidCount, long currentHighestBidAmount){
+        this.profileImgUrl = profileImgUrl;
         this.vipUserName = vipUserName;
         this.auctionCreatedDate = auctionCreatedDate;
         this.bidCount = bidCount;

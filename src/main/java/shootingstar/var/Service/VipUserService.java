@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import shootingstar.var.dto.res.UserAuctionInvalidityResDto;
 import shootingstar.var.dto.res.UserAuctionParticipateList;
 import shootingstar.var.dto.res.UserAuctionSuccessList;
 import shootingstar.var.dto.res.VipInfoDto;
@@ -53,11 +54,14 @@ public class VipUserService {
         return optionalVipInfo.get();
     }
 
-    public Page<UserAuctionSuccessList> getVipAuctionSuccess(String userUUID, Pageable pageable){
+    public Page<UserAuctionSuccessList> getVipUserAuctionSuccess(String userUUID, Pageable pageable){
         return auctionRepository.findAllVipSuccessByUserUUID(userUUID,pageable);
     }
-    public Page<UserAuctionParticipateList> getVipAuctionProgress(String userUUID, Pageable pageable){
+    public Page<UserAuctionParticipateList> getVipUserAuctionProgress(String userUUID, Pageable pageable){
         return auctionRepository.findAllVipProgressByUserUUID(userUUID,pageable);
+    }
+    public Page<UserAuctionInvalidityResDto> getVipUserAuctionInvalidity(String userUUID, Pageable pageable){
+        return auctionRepository.findAllVipInvalidityByUserUUID(userUUID,pageable);
     }
 
 }

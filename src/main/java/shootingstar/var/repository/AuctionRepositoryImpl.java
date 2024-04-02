@@ -7,10 +7,7 @@ import jakarta.persistence.EntityManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
-import shootingstar.var.dto.res.QUserAuctionParticipateList;
-import shootingstar.var.dto.res.UserAuctionParticipateList;
-import shootingstar.var.dto.res.UserAuctionSuccessList;
-import shootingstar.var.dto.res.QUserAuctionSuccessList;
+import shootingstar.var.dto.res.*;
 import shootingstar.var.enums.type.AuctionType;
 
 import java.util.List;
@@ -27,8 +24,9 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
     //basicUser auction
     @Override
     public Page<UserAuctionSuccessList> findAllSuccessBeforeByUserUUID(String userUUID, Pageable pageable) {
-        List<UserAuctionSuccessList> contnet = queryFactory
+        List<UserAuctionSuccessList> content = queryFactory
                 .select(new QUserAuctionSuccessList(
+                        auction.user.profileImgUrl,
                         auction.user.name,
                         auction.meetingDate,
                         user.nickname
@@ -43,13 +41,14 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
                 .from(auction)
                 .where(currentHighestBidderIdEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS));
 
-        return PageableExecutionUtils.getPage(contnet, pageable, countQuery::fetchOne);
+        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
 
     @Override
     public Page<UserAuctionSuccessList> findAllSuccessAfterByUserUUID(String userUUID, Pageable pageable) {
-        List<UserAuctionSuccessList> contnet = queryFactory
+        List<UserAuctionSuccessList> content = queryFactory
                 .select(new QUserAuctionSuccessList(
+                        auction.user.profileImgUrl,
                         auction.user.name,
                         auction.meetingDate,
                         user.nickname
@@ -64,14 +63,15 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
                 .from(auction)
                 .where(currentHighestBidderIdEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS));
 
-        return PageableExecutionUtils.getPage(contnet, pageable, countQuery::fetchOne);
+        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
 
     @Override
     public List<UserAuctionParticipateList> findParticipateList(String userUUID, Pageable pageable) {
         return queryFactory
                 .select(new QUserAuctionParticipateList(
-                        auction.user.name,
+                        auction.user.profileImgUrl,
+                        auction.user.nickname,
                         auction.createdTime,
                         auction.bidCount,
                         auction.currentHighestBidAmount
@@ -90,8 +90,9 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
     //vipUser auction
     @Override
     public Page<UserAuctionSuccessList> findAllVipSuccessByUserUUID(String userUUID, Pageable pageable) {
-        List<UserAuctionSuccessList> contnet = queryFactory
+        List<UserAuctionSuccessList> content = queryFactory
                 .select(new QUserAuctionSuccessList(
+                        auction.user.profileImgUrl,
                         auction.user.nickname,
                         auction.createdTime,
                         auction.currentHighestBidderUUID
@@ -106,13 +107,14 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
                 .from(auction)
                 .where(vipUserUUIDEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS));
 
-        return PageableExecutionUtils.getPage(contnet, pageable, countQuery::fetchOne);
+        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
 
     @Override
     public Page<UserAuctionParticipateList> findAllVipProgressByUserUUID(String userUUID, Pageable pageable) {
-        List<UserAuctionParticipateList> contnet = queryFactory
+        List<UserAuctionParticipateList> content = queryFactory
                 .select(new QUserAuctionParticipateList(
+                        auction.user.profileImgUrl,
                         auction.user.nickname,
                         auction.createdTime,
                         auction.currentHighestBidAmount,
@@ -128,7 +130,28 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
                 .from(auction)
                 .where(vipUserUUIDEq(userUUID),auction.auctionType.eq(AuctionType.PROGRESS));
 
-        return PageableExecutionUtils.getPage(contnet, pageable, countQuery::fetchOne);
+        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
+    }
+
+    @Override
+    public Page<UserAuctionInvalidityResDto> findAllVipInvalidityByUserUUID(String userUUID, Pageable pageable) {
+        List<UserAuctionInvalidityResDto> content = queryFactory
+                .select(new QUserAuctionInvalidityResDto(
+                        auction.user.profileImgUrl,
+                        auction.user.nickname,
+                        auction.createdTime
+                ))
+                .from(auction)
+                .where(vipUserUUIDEq(userUUID), auction.auctionType.eq(AuctionType.INVALIDITY))
+                .orderBy(auction.createdTime.asc())
+                .fetch();
+
+        JPAQuery<Long> countQuery = queryFactory
+                .select(auction.count())
+                .from(auction)
+                .where(vipUserUUIDEq(userUUID),auction.auctionType.eq(AuctionType.INVALIDITY));
+
+        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
 
     private BooleanExpression currentHighestBidderIdEq(String userUUID){
