@@ -1,4 +1,4 @@
-package shootingstar.var.quartz;
+package shootingstar.var.scheduling.quartz;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
