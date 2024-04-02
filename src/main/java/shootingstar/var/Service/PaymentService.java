@@ -29,7 +29,7 @@ public class PaymentService {
 
     @Transactional
     public void verifyPointPayment(IamportResponse<Payment> ires, Long amount, String userUUID) {
-        User user = userRepository.findByUserUUID(userUUID)
+        User user = userRepository.findByUserUUIDWithPessimisticLock(userUUID)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         if (ires.getResponse().getAmount().longValue() != amount) {
@@ -59,7 +59,7 @@ public class PaymentService {
 
     @Transactional
     public void applyExchange(ExchangeReqDto exchangeReqDto, String userUUID) {
-        User user = userRepository.findByUserUUID(userUUID)
+        User user = userRepository.findByUserUUIDWithPessimisticLock(userUUID)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         if (!exchangeReqDto.getExchangeAccountHolder().equals(user.getName())) {
