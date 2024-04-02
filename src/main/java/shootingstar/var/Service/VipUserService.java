@@ -5,8 +5,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import shootingstar.var.dto.res.UserAuctionInvalidityResDto;
-import shootingstar.var.dto.res.UserAuctionParticipateList;
-import shootingstar.var.dto.res.UserAuctionSuccessList;
+import shootingstar.var.dto.res.UserAuctionParticipateResDto;
+import shootingstar.var.dto.res.UserAuctionSuccessResDto;
 import shootingstar.var.dto.res.VipInfoDto;
 import shootingstar.var.entity.Auction;
 import shootingstar.var.entity.User;
@@ -54,10 +54,10 @@ public class VipUserService {
         return optionalVipInfo.get();
     }
 
-    public Page<UserAuctionSuccessList> getVipUserAuctionSuccess(String userUUID, Pageable pageable){
+    public Page<UserAuctionSuccessResDto> getVipUserAuctionSuccess(String userUUID, Pageable pageable){
         return auctionRepository.findAllVipSuccessByUserUUID(userUUID,pageable);
     }
-    public Page<UserAuctionParticipateList> getVipUserAuctionProgress(String userUUID, Pageable pageable){
+    public Page<UserAuctionParticipateResDto> getVipUserAuctionProgress(String userUUID, Pageable pageable){
         return auctionRepository.findAllVipProgressByUserUUID(userUUID,pageable);
     }
     public Page<UserAuctionInvalidityResDto> getVipUserAuctionInvalidity(String userUUID, Pageable pageable){

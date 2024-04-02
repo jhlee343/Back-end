@@ -6,8 +6,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import shootingstar.var.dto.req.UserApplyVipDto;
 import shootingstar.var.dto.res.TicketListResDto;
-import shootingstar.var.dto.res.UserAuctionParticipateList;
-import shootingstar.var.dto.res.UserAuctionSuccessList;
+import shootingstar.var.dto.res.UserAuctionParticipateResDto;
+import shootingstar.var.dto.res.UserAuctionSuccessResDto;
 import shootingstar.var.enums.type.TicketSortType;
 import shootingstar.var.entity.User;
 import shootingstar.var.entity.VipApprovalType;
@@ -49,14 +49,14 @@ public class BasicUserService {
     }
 
 
-    public Page<UserAuctionSuccessList> successBeforeAuctionList(String userUUID, Pageable pageable){
+    public Page<UserAuctionSuccessResDto> successBeforeAuctionList(String userUUID, Pageable pageable){
         return auctionRepository.findAllSuccessBeforeByUserUUID(userUUID, pageable);
     }
 
-    public Page<UserAuctionSuccessList> successAfterAuctionList(String userUUID, Pageable pageable){
+    public Page<UserAuctionSuccessResDto> successAfterAuctionList(String userUUID, Pageable pageable){
         return auctionRepository.findAllSuccessAfterByUserUUID(userUUID, pageable);
     }
-    public Page<UserAuctionParticipateList> participateAuctionList(String userUUID, Pageable pageable){
+    public Page<UserAuctionParticipateResDto> participateAuctionList(String userUUID, Pageable pageable){
         return auctionRepository.findAllParticipateByUserUUID(userUUID, pageable);
     }
 

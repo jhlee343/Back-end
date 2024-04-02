@@ -23,9 +23,9 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
 
     //basicUser auction
     @Override
-    public Page<UserAuctionSuccessList> findAllSuccessBeforeByUserUUID(String userUUID, Pageable pageable) {
-        List<UserAuctionSuccessList> content = queryFactory
-                .select(new QUserAuctionSuccessList(
+    public Page<UserAuctionSuccessResDto> findAllSuccessBeforeByUserUUID(String userUUID, Pageable pageable) {
+        List<UserAuctionSuccessResDto> content = queryFactory
+                .select(new QUserAuctionSuccessResDto(
                         auction.user.profileImgUrl,
                         auction.user.name,
                         auction.meetingDate,
@@ -45,9 +45,9 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
     }
 
     @Override
-    public Page<UserAuctionSuccessList> findAllSuccessAfterByUserUUID(String userUUID, Pageable pageable) {
-        List<UserAuctionSuccessList> content = queryFactory
-                .select(new QUserAuctionSuccessList(
+    public Page<UserAuctionSuccessResDto> findAllSuccessAfterByUserUUID(String userUUID, Pageable pageable) {
+        List<UserAuctionSuccessResDto> content = queryFactory
+                .select(new QUserAuctionSuccessResDto(
                         auction.user.profileImgUrl,
                         auction.user.name,
                         auction.meetingDate,
@@ -67,9 +67,9 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
     }
 
     @Override
-    public List<UserAuctionParticipateList> findParticipateList(String userUUID, Pageable pageable) {
+    public List<UserAuctionParticipateResDto> findParticipateList(String userUUID, Pageable pageable) {
         return queryFactory
-                .select(new QUserAuctionParticipateList(
+                .select(new QUserAuctionParticipateResDto(
                         auction.user.profileImgUrl,
                         auction.user.nickname,
                         auction.createdTime,
@@ -82,16 +82,16 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
     }
 
     @Override
-    public Page<UserAuctionParticipateList> findAllParticipateByUserUUID(String userUUID, Pageable pageable) {
+    public Page<UserAuctionParticipateResDto> findAllParticipateByUserUUID(String userUUID, Pageable pageable) {
         return null;
     }
 
 
     //vipUser auction
     @Override
-    public Page<UserAuctionSuccessList> findAllVipSuccessByUserUUID(String userUUID, Pageable pageable) {
-        List<UserAuctionSuccessList> content = queryFactory
-                .select(new QUserAuctionSuccessList(
+    public Page<UserAuctionSuccessResDto> findAllVipSuccessByUserUUID(String userUUID, Pageable pageable) {
+        List<UserAuctionSuccessResDto> content = queryFactory
+                .select(new QUserAuctionSuccessResDto(
                         auction.user.profileImgUrl,
                         auction.user.nickname,
                         auction.createdTime,
@@ -111,9 +111,9 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
     }
 
     @Override
-    public Page<UserAuctionParticipateList> findAllVipProgressByUserUUID(String userUUID, Pageable pageable) {
-        List<UserAuctionParticipateList> content = queryFactory
-                .select(new QUserAuctionParticipateList(
+    public Page<UserAuctionParticipateResDto> findAllVipProgressByUserUUID(String userUUID, Pageable pageable) {
+        List<UserAuctionParticipateResDto> content = queryFactory
+                .select(new QUserAuctionParticipateResDto(
                         auction.user.profileImgUrl,
                         auction.user.nickname,
                         auction.createdTime,

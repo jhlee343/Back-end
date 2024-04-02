@@ -13,8 +13,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import shootingstar.var.Service.VipUserService;
 import shootingstar.var.dto.res.UserAuctionInvalidityResDto;
-import shootingstar.var.dto.res.UserAuctionParticipateList;
-import shootingstar.var.dto.res.UserAuctionSuccessList;
+import shootingstar.var.dto.res.UserAuctionParticipateResDto;
+import shootingstar.var.dto.res.UserAuctionSuccessResDto;
 import shootingstar.var.dto.res.VipInfoDto;
 import shootingstar.var.enums.type.AuctionType;
 import shootingstar.var.jwt.JwtTokenProvider;
@@ -46,11 +46,11 @@ public class VipUserController {
         String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
         if (auctionType.equals(AuctionType.PROGRESS)) {
             //진행중
-            Page<UserAuctionParticipateList> userAuctionParticipateLists = vipService.getVipUserAuctionProgress(userUUID, pageable);
+            Page<UserAuctionParticipateResDto> userAuctionParticipateLists = vipService.getVipUserAuctionProgress(userUUID, pageable);
             return ResponseEntity.ok(userAuctionParticipateLists);
         } else if (auctionType.equals(AuctionType.SUCCESS)) {
             //성공
-            Page<UserAuctionSuccessList> userAuctionSuccessLists = vipService.getVipUserAuctionSuccess(userUUID, pageable);
+            Page<UserAuctionSuccessResDto> userAuctionSuccessLists = vipService.getVipUserAuctionSuccess(userUUID, pageable);
             return ResponseEntity.ok(userAuctionSuccessLists);
         }
         else {
