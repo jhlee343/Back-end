@@ -1,9 +1,6 @@
 package shootingstar.var.repository;
 
-import com.querydsl.core.types.Order;
-import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.DateTimePath;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
@@ -16,11 +13,9 @@ import shootingstar.var.dto.res.UserAuctionSuccessList;
 import shootingstar.var.dto.res.QUserAuctionSuccessList;
 import shootingstar.var.enums.type.AuctionType;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import static shootingstar.var.entity.QAuction.auction;
 import static shootingstar.var.entity.QUser.user;
-import static shootingstar.var.entity.ticket.QTicket.ticket;
 
 public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
     private final JPAQueryFactory queryFactory;
@@ -82,10 +77,8 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
                         auction.currentHighestBidAmount
                 ))
                 .from(auction)
-                //bid에서 useruuid찾아서 경매 참여한거 uuid 찾아오기
                 .where(auction.auctionType.eq(AuctionType.PROGRESS))
                 .fetch();
-//        return null;
     }
 
     @Override
@@ -93,9 +86,27 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
         return null;
     }
 
+
+    //vipUser auction
     @Override
     public Page<UserAuctionSuccessList> findAllVipSuccessByUserUUID(String userUUID, Pageable pageable) {
-        return null;
+        List<UserAuctionSuccessList> contnet = queryFactory
+                .select(new QUserAuctionSuccessList(
+                        auction.user.nickname,
+                        auction.createdTime,
+                        auction.currentHighestBidderUUID
+                ))
+                .from(auction)
+                .where(auction.auctionType.eq(AuctionType.SUCCESS))
+                .orderBy(auction.meetingDate.asc())
+                .fetch();
+
+        JPAQuery<Long> countQuery = queryFactory
+                .select(auction.count())
+                .from(auction)
+                .where(vipUserUUIDEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS));
+
+        return PageableExecutionUtils.getPage(contnet, pageable, countQuery::fetchOne);
     }
 
     @Override
@@ -115,7 +126,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
         JPAQuery<Long> countQuery = queryFactory
                 .select(auction.count())
                 .from(auction)
-                .where(currentHighestBidderIdEq(userUUID),auction.auctionType.eq(AuctionType.PROGRESS));
+                .where(vipUserUUIDEq(userUUID),auction.auctionType.eq(AuctionType.PROGRESS));
 
         return PageableExecutionUtils.getPage(contnet, pageable, countQuery::fetchOne);
     }

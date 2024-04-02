@@ -54,10 +54,10 @@ public class VipUserService {
     }
 
     public Page<UserAuctionSuccessList> getVipAuctionSuccess(String userUUID, Pageable pageable){
-        return null;
+        return auctionRepository.findAllVipSuccessByUserUUID(userUUID,pageable);
     }
     public Page<UserAuctionParticipateList> getVipAuctionProgress(String userUUID, Pageable pageable){
-        return auctionRepository.findAllvipProgressByuserUUID(userUUID,pageable);
+        return auctionRepository.findAllVipProgressByUserUUID(userUUID,pageable);
     }
 
 }
