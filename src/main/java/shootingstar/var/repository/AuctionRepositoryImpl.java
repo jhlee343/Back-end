@@ -27,25 +27,11 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
     public AuctionRepositoryImpl(EntityManager em){
         this.queryFactory = new JPAQueryFactory(em);
     }
+
+
+    //basicUser auction
     @Override
-    public List<UserAuctionSuccessList> findSuccessBeforeList(String userUUID, Pageable pageable) {
-        return queryFactory
-                .select(new QUserAuctionSuccessList(
-                        auction.user.name,
-                        auction.meetingDate,
-                        user.nickname
-                ))
-                .from(auction)
-                .where(currentHighestBidderIdEq(userUUID) , auction.auctionType.eq(AuctionType.SUCCESS))
-                .orderBy(auction.meetingDate.desc())
-                .fetch();
-
-    }
-
-
-    //만남 전 만남후 api 두개 만들어야함
-    @Override
-    public Page<UserAuctionSuccessList> findAllSuccessBeforeByuserUUID(String userUUID, Pageable pageable) {
+    public Page<UserAuctionSuccessList> findAllSuccessBeforeByUserUUID(String userUUID, Pageable pageable) {
         List<UserAuctionSuccessList> contnet = queryFactory
                 .select(new QUserAuctionSuccessList(
                         auction.user.name,
@@ -66,21 +52,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
     }
 
     @Override
-    public List<UserAuctionSuccessList> findSuccessAfterList(String userUUID, Pageable pageable) {
-        return queryFactory
-                .select(new QUserAuctionSuccessList(
-                        auction.user.name,
-                        auction.meetingDate,
-                        user.nickname
-                ))
-                .from(auction)
-                .where(currentHighestBidderIdEq(userUUID) , auction.auctionType.eq(AuctionType.SUCCESS))
-                .orderBy(auction.meetingDate.asc())
-                .fetch();
-    }
-
-    @Override
-    public Page<UserAuctionSuccessList> findAllSuccessAfterByuserUUID(String userUUID, Pageable pageable) {
+    public Page<UserAuctionSuccessList> findAllSuccessAfterByUserUUID(String userUUID, Pageable pageable) {
         List<UserAuctionSuccessList> contnet = queryFactory
                 .select(new QUserAuctionSuccessList(
                         auction.user.name,
@@ -115,12 +87,45 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
                 .fetch();
 //        return null;
     }
+
     @Override
-    public Page<UserAuctionParticipateList> findAllParticipateByuserUUID(String userUUID, Pageable pageable) {
+    public Page<UserAuctionParticipateList> findAllParticipateByUserUUID(String userUUID, Pageable pageable) {
         return null;
     }
+
+    @Override
+    public Page<UserAuctionSuccessList> findAllVipSuccessByUserUUID(String userUUID, Pageable pageable) {
+        return null;
+    }
+
+    @Override
+    public Page<UserAuctionParticipateList> findAllVipProgressByUserUUID(String userUUID, Pageable pageable) {
+        List<UserAuctionParticipateList> contnet = queryFactory
+                .select(new QUserAuctionParticipateList(
+                        auction.user.nickname,
+                        auction.createdTime,
+                        auction.currentHighestBidAmount,
+                        auction.bidCount
+                ))
+                .from(auction)
+                .where(vipUserUUIDEq(userUUID) , auction.auctionType.eq(AuctionType.PROGRESS))
+                .orderBy(auction.createdTime.asc())
+                .fetch();
+
+        JPAQuery<Long> countQuery = queryFactory
+                .select(auction.count())
+                .from(auction)
+                .where(currentHighestBidderIdEq(userUUID),auction.auctionType.eq(AuctionType.PROGRESS));
+
+        return PageableExecutionUtils.getPage(contnet, pageable, countQuery::fetchOne);
+    }
+
     private BooleanExpression currentHighestBidderIdEq(String userUUID){
         return userUUID != null ? auction.currentHighestBidderUUID.eq(userUUID) : null;
+    }
+
+    private BooleanExpression vipUserUUIDEq(String userUUID){
+        return userUUID != null ? auction.user.userUUID.eq(userUUID) : null;
     }
 
 }

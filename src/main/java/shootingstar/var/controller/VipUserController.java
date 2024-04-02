@@ -5,10 +5,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import shootingstar.var.Service.VipUserService;
+import shootingstar.var.dto.res.UserAuctionSuccessList;
 import shootingstar.var.dto.res.VipInfoDto;
 import shootingstar.var.enums.type.AuctionType;
 import shootingstar.var.jwt.JwtTokenProvider;
@@ -35,7 +39,8 @@ public class VipUserController {
 
     @Operation(summary = "경매 불러오기")
     @GetMapping("/auction/{auctionType}")
-    public ResponseEntity<?> getVipAuctionList(@NotBlank @PathVariable("auctionType")AuctionType auctionType, HttpServletRequest request){
+    public ResponseEntity<?> getVipAuctionList(@NotBlank @PathVariable("auctionType")AuctionType auctionType,
+                                               HttpServletRequest request, @PageableDefault(size = 10) Pageable pageable){
         String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
         if(auctionType.equals(AuctionType.INVALIDITY)){
             //유찰
@@ -43,7 +48,6 @@ public class VipUserController {
         }
         else if(auctionType.equals(AuctionType.PROGRESS)){
             //진행중
-
         }
         else if(auctionType.equals(AuctionType.SUCCESS)){
             //성공
