@@ -17,7 +17,7 @@ import static shootingstar.var.exception.ErrorCode.VIP_INFO_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
-public class VipService {
+public class VipUserService {
     private final VipInfoRepository vipInfoRepository;
     private final UserRepository userRepository;
 
