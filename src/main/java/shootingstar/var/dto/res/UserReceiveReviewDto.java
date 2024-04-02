@@ -9,12 +9,12 @@ public class UserReceiveReviewDto {
     private String reviewUUID;
     private String ticketUUID;
     private String reviewContent;
-    private Double reviewRating;
+    private Integer reviewRating;
     private String writer;
     //나에게 보낸사람 uuid
     @QueryProjection
     public UserReceiveReviewDto(String reviewUUID, String ticketUUID, String reviewContent
-    ,Double reviewRating, String writer){
+    ,Integer reviewRating, String writer){
         this.reviewUUID = reviewUUID;
         this.ticketUUID = ticketUUID;
         this.reviewContent = reviewContent;

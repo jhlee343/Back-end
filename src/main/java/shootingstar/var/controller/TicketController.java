@@ -63,7 +63,7 @@ public class TicketController {
                     description = "- 사용자 타입이 VIP, BASIC일 때 : 만남 시작 시간 저장 성공"),
             @ApiResponse(responseCode = "400",
                     description =
-                                    "- 잘못된 형식의 식사권 고유번호 입력 시 : 6001\n" +
+                                    "- 잘못된 형식의 식사권 UUID 입력 시 : 6001\n" +
                                     "- 잘못된 형식의 만남 시작 시간 입력 시 : 6002\n",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
             @ApiResponse(responseCode = "404",
@@ -112,6 +112,7 @@ public class TicketController {
                     description = "- 사용자 타입이 VIP, BASIC일 때 : 식사권 신고 성공"),
             @ApiResponse(responseCode = "400",
                     description =
+                                    "- 잘못된 형식의 식사권 UUID 입력 시 : 6001\n" +
                                     "- 잘못된 형식의 식사권 신고 내용 입력 시 : 6003\n" +
                                     "- 잘못된 형식의 식사권 신고 증거 URL 입력 시 : 6004\n",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
@@ -137,7 +138,9 @@ public class TicketController {
             @ApiResponse(responseCode = "200",
                     description = "- 식사권의 낙찰자이거나 주최자일 때 : 식사권 취소 성공"),
             @ApiResponse(responseCode = "404",
-                    description = "- 식사권 정보 조회 실패 : 6200",
+                    description =
+                                    "- 식사권 정보 조회 실패 : 6200\n" +
+                                    "- 사용자 정보 조회 실패 : 1201",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
             @ApiResponse(responseCode = "403",
                     description = "- 로그인한 사용자가 경매의 낙찰자도 주최자도 아닐 때 : 0101",
@@ -161,7 +164,7 @@ public class TicketController {
                     description = "식사권 리뷰 작성 성공"),
             @ApiResponse(responseCode = "400",
                     description =
-                                    "- 잘못된 형식의 식사권 고유번호 입력 시 : 6001\n" +
+                                    "- 잘못된 형식의 식사권 UUID 입력 시 : 6001\n" +
                                     "- 잘못된 형식의 리뷰 내용 입력 시 : 6005\n" +
                                     "- 잘못된 형식의 리뷰 점수 입력 시 : 6006\n" +
                                     "- 만남 시간 + 2시간 전에 리뷰 작성 시 : 6007",
@@ -173,7 +176,9 @@ public class TicketController {
                     description = "- 해당 식사권에 대한 리뷰를 작성한 적이 있을 때 : 6304",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
             @ApiResponse(responseCode = "403",
-                    description = "- 로그인한 사용자가 식사권의 낙찰자도 주최자도 아닐 때 : 0101",
+                    description =
+                                    "- 로그인한 사용자가 식사권의 낙찰자도 주최자도 아닐 때 : 0101\n" +
+                                    "- 식사권이 닫힌 경우 : 6100",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
     })
     @PostMapping("/review")

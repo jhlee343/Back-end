@@ -1,5 +1,6 @@
 package shootingstar.var.Service;
 
+import java.awt.Point;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -14,13 +15,16 @@ import shootingstar.var.dto.req.ReviewSaveReqDto;
 import shootingstar.var.dto.req.TicketReportReqDto;
 import shootingstar.var.dto.res.DetailTicketResDto;
 import shootingstar.var.entity.Auction;
+import shootingstar.var.entity.PointLog;
 import shootingstar.var.entity.Review;
 import shootingstar.var.entity.ticket.Ticket;
 import shootingstar.var.entity.ticket.TicketMeetingTime;
 import shootingstar.var.entity.ticket.TicketReport;
 import shootingstar.var.entity.User;
+import shootingstar.var.enums.type.PointOriginType;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
+import shootingstar.var.repository.PointLogRepository;
 import shootingstar.var.repository.review.ReviewRepository;
 import shootingstar.var.repository.ticket.TicketMeetingTimeRepository;
 import shootingstar.var.repository.ticket.TicketReportRepository;
@@ -36,7 +40,7 @@ public class TicketService {
     private final TicketReportRepository ticketReportRepository;
     private final UserRepository userRepository;
     private final ReviewRepository reviewRepository;
-    private final ObjectProvider<TicketService> ticketServiceProvider;
+    private final PointLogRepository pointLogRepository;
 
     public DetailTicketResDto detailTicket(String ticketUUID, String userUUID) {
         Ticket ticket = ticketRepository.findByTicketUUID(ticketUUID)
@@ -71,7 +75,7 @@ public class TicketService {
         User findUser = userRepository.findByUserUUID(userUUID)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        Ticket ticket = ticketRepository.findById(reqDto.getTicketId())
+        Ticket ticket = ticketRepository.findByTicketUUID(reqDto.getTicketUUID())
                 .orElseThrow(() -> new CustomException(ErrorCode.TICKET_NOT_FOUND));
 
         // 로그인한 사용자가 식사권의 낙찰자도 주최자도 아닐 경우
@@ -80,10 +84,10 @@ public class TicketService {
         }
 
         // 로그인한 사용자가 이미 만남 시작 버튼을 눌렀을 경우
-        TicketMeetingTime findTicketMeetingTime = ticketMeetingTimeRepository.findByTicketIdAndUserNickname(reqDto.getTicketId(), findUser.getNickname())
+        TicketMeetingTime findTicketMeetingTime = ticketMeetingTimeRepository.findByTicketUUIDAndUserNickname(reqDto.getTicketUUID(), findUser.getNickname())
                 .orElse(null);
         if (findTicketMeetingTime != null) {
-            throw new CustomException(ErrorCode.TICKET_MEETING_TIME_NOT_FOUND);
+            throw new CustomException(ErrorCode.TICKET_MEETING_TIME_CONFLICT);
         }
 
         // 로그인한 사용자에 해당하는 식사권의 만남 시작 버튼 누른 여부를 true로 변경
@@ -124,7 +128,7 @@ public class TicketService {
 
     @Transactional
     public void reportTicket(TicketReportReqDto reqDto, String userUUID) {
-        Ticket ticket = ticketRepository.findById(reqDto.getTicketId())
+        Ticket ticket = ticketRepository.findByTicketUUID(reqDto.getTicketUUID())
                 .orElseThrow(() -> new CustomException(ErrorCode.TICKET_NOT_FOUND));
 
         // 로그인한 사용자가 경매의 낙찰자도 주최자도 아닐 때
@@ -140,7 +144,7 @@ public class TicketService {
         }
 
         // 로그인한 사용자가 이미 해당 식사권에 대해 신고 경험이 있는 경우
-        TicketReport findTicketReport = ticketReportRepository.findByTicketIdAndTicketReportNickname(reqDto.getTicketId(), ticketReportNickname)
+        TicketReport findTicketReport = ticketReportRepository.findByTicketUUIdAndTicketReportNickname(reqDto.getTicketUUID(), ticketReportNickname)
                 .orElse(null);
         if (findTicketReport != null) {
             throw new CustomException(ErrorCode.TICKET_REPORT_CONFLICT);
@@ -179,14 +183,13 @@ public class TicketService {
             throw new CustomException(ErrorCode.ALREADY_TICKET_CANCEL_CONFLICT);
         }
 
-        TicketService ticketService = ticketServiceProvider.getObject();
         // 로그인한 사용자가 낙찰자일 때
         if (ticket.getWinner().getUserUUID().equals(userUUID)) {
-            ticketService.cancelTicketByWinner(ticket, meetingDate, meetingDateTime);
+            cancelTicketByWinner(ticket, meetingDate, meetingDateTime);
 
             // 로그인한 사용자가 주최자일 때
         } else if (ticket.getOrganizer().getUserUUID().equals(userUUID)) {
-            ticketService.cancelTicketByOrganizer(ticket);
+            cancelTicketByOrganizer(ticket);
         }
 
         // 채팅방 닫는 로직
@@ -195,42 +198,60 @@ public class TicketService {
         ticket.changeTicketIsOpened(false);
     }
 
-    @Transactional
-    void cancelTicketByWinner(Ticket ticket, LocalDate meetingDate, LocalDateTime meetingDateTime) {
+    public void cancelTicketByWinner(Ticket ticket, LocalDate meetingDate, LocalDateTime meetingDateTime) {
         log.info("-----------낙찰자 식사권 취소");
 
         BigDecimal zero = new BigDecimal(0);
         BigDecimal vipCommission = calculateCommission(meetingDate, meetingDateTime);
+        log.info("주최자 수수료 : {}", vipCommission);
 
         User organizer = userRepository.findByUserUUIDWithPessimisticLock(ticket.getOrganizer().getUserUUID())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        PointLog pointLog;
         // 주최자에게 수수료 제공
         if (vipCommission.compareTo(zero) == 1) {
             log.info("주최자 수수료 받기 전 포인트 : {}", organizer.getPoint());
-            organizer.increasePoint(BigDecimal.valueOf(ticket.getAuction().getCurrentHighestBidAmount()).multiply(vipCommission));
+            BigDecimal point = BigDecimal.valueOf(ticket.getAuction().getCurrentHighestBidAmount()).multiply(vipCommission);
+            organizer.increasePoint(point);
             log.info("주최자 수수료 받은 후 포인트 : {}", organizer.getPoint());
+
+            pointLog = PointLog.createPointLogWithDeposit(organizer, PointOriginType.WINNER_TICKET_CANCEL, point);
+            pointLogRepository.save(pointLog);
         }
 
         BigDecimal basicCommission = new BigDecimal(0.7).subtract(vipCommission);
+        log.info("낙찰자 수수료 : {}", basicCommission);
         // 낙찰자에게 수수료 제외한 금액 반환
         if (basicCommission.compareTo(zero) == 1) {
             User winner = userRepository.findByUserUUIDWithPessimisticLock(ticket.getWinner().getUserUUID())
                     .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
             log.info("낙찰자 수수료 받기 전 포인트 : {}", winner.getPoint());
-            winner.increasePoint(BigDecimal.valueOf(ticket.getAuction().getCurrentHighestBidAmount()).multiply(basicCommission));
+            BigDecimal point = BigDecimal.valueOf(ticket.getAuction().getCurrentHighestBidAmount()).multiply(basicCommission);
+            winner.increasePoint(point);
             log.info("낙찰자 수수료 받은 후 포인트 : {}", winner.getPoint());
+
+            pointLog = PointLog.createPointLogWithDeposit(winner, PointOriginType.WINNER_TICKET_CANCEL, point);
+            pointLogRepository.save(pointLog);
         }
 
         // 주최자에게 최소 입찰 금액 반환
         log.info("주최자 수수료 받기 전 포인트 : {}", organizer.getPoint());
         organizer.increasePoint(BigDecimal.valueOf(ticket.getAuction().getMinBidAmount()));
         log.info("주최자 수수료 받은 후 포인트 : {}", organizer.getPoint());
+
+        pointLog = PointLog.createPointLogWithDeposit(organizer, PointOriginType.AUCTION_REGISTRATION_DEPOSIT, BigDecimal.valueOf(ticket.getAuction().getMinBidAmount()));
+        pointLogRepository.save(pointLog);
     }
 
-    private BigDecimal calculateCommission(LocalDate meetingDate, LocalDateTime meetingDateTime) {
+    public BigDecimal calculateCommission(LocalDate meetingDate, LocalDateTime meetingDateTime) {
         BigDecimal extraCommission = new BigDecimal(0);
-        // 식사 21일 ~ 15일 전
-        if (LocalDate.now().isAfter(meetingDate.minusDays(22)) && LocalDate.now().isBefore(meetingDate.minusDays(14))) {
+        // 식사 30일 ~ 22일 전
+        if (LocalDate.now().isAfter(meetingDate.minusDays(31)) && LocalDate.now().isBefore(meetingDate.minusDays(21))) {
+            extraCommission = new BigDecimal(0);
+
+            // 식사 21일 ~ 15일 전
+        } else if (LocalDate.now().isAfter(meetingDate.minusDays(22)) && LocalDate.now().isBefore(meetingDate.minusDays(14))) {
             extraCommission = new BigDecimal(0.1);
 
             //  식사 14일 ~ 8일 전
@@ -248,26 +269,34 @@ public class TicketService {
         return extraCommission;
     }
 
-    @Transactional
-    void cancelTicketByOrganizer(Ticket ticket) {
+    public void cancelTicketByOrganizer(Ticket ticket) {
         log.info("-----------주최자 식사권 취소");
 
         // 낙찰자에게 전체 환불 & 주최자에게는 최소 입찰 금액 반환X
         User winner = userRepository.findByUserUUIDWithPessimisticLock(ticket.getWinner().getUserUUID())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         log.info("낙찰자 환불 받기 전 포인트 : {}", winner.getPoint());
-        winner.increasePoint(BigDecimal.valueOf(ticket.getAuction().getCurrentHighestBidAmount()));
+        BigDecimal point = BigDecimal.valueOf(ticket.getAuction().getCurrentHighestBidAmount());
+        winner.increasePoint(point);
         log.info("낙찰자 환불 받은 후 포인트 : {}", winner.getPoint());
+
+        PointLog pointLog = PointLog.createPointLogWithDeposit(winner, PointOriginType.ORGANIZER_TICKET_CANCEL, point);
+        pointLogRepository.save(pointLog);
     }
 
     @Transactional
     public void saveReview(ReviewSaveReqDto reqDto, String userUUID) {
-        Ticket ticket = ticketRepository.findById(reqDto.getTicketId())
+        Ticket ticket = ticketRepository.findByTicketUUID(reqDto.getTicketUUID())
                 .orElseThrow(() -> new CustomException(ErrorCode.TICKET_NOT_FOUND));
 
         // 로그인한 사용자가 식사권의 낙찰자도 주최자도 아닐 경우
         if (!ticket.getWinner().getUserUUID().equals(userUUID) && !ticket.getOrganizer().getUserUUID().equals(userUUID)) {
             throw new CustomException(ErrorCode.ACCESS_DENIED);
+        }
+
+        // 식사권이 닫힌 경우
+        if (!ticket.isTicketIsOpened()) {
+            throw new CustomException(ErrorCode.TICKET_ACCESS_DENIED);
         }
 
         // 해당 식사권에 대한 리뷰를 작성한 적이 있는 경우
@@ -299,5 +328,18 @@ public class TicketService {
                 .build();
 
         reviewRepository.save(review);
+
+        List<Review> reviewsReceived = receiver.getReviewsReceived();
+        double ratingAverage = Math.round(calculateUserRating(reviewsReceived) * 100) / 100.0;
+        log.info("평균 별점 : {}", ratingAverage);
+        receiver.updateRating(ratingAverage);
+    }
+
+    public double calculateUserRating(List<Review> reviewsReceived) {
+        double sum = reviewsReceived.stream()
+                .mapToDouble(Review::getReviewRating)
+                .sum();
+        log.info("별점 합 : {}", sum);
+        return sum / reviewsReceived.size();
     }
 }
