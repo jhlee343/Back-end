@@ -24,6 +24,7 @@ import shootingstar.var.dto.req.CheckAuthCodeReqDto;
 import shootingstar.var.dto.req.SendAuthCodeReqDto;
 import shootingstar.var.dto.req.UserSignupReqDto;
 import shootingstar.var.dto.res.*;
+import shootingstar.var.enums.type.AuctionSortType;
 import shootingstar.var.exception.ErrorResponse;
 import shootingstar.var.util.TokenUtil;
 
@@ -170,7 +171,7 @@ public class AllUserController {
     @Operation(summary = "모든 사용자가 접근 가능한 VIP 진행중인 경매 조회 API")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "VIP 진행중인 경매 조회", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = VipProgressAuctionResDto.class))}),
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = ProgressAuctionResDto.class))}),
             @ApiResponse(responseCode = "400",
                     description = "잘못된 형식의 사용자 고유번호 : 1008",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
@@ -181,8 +182,8 @@ public class AllUserController {
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
     })
     @GetMapping("/auction/{vipUUID}")
-    public ResponseEntity<Page<VipProgressAuctionResDto>> vipProgressAuction(@NotBlank @PathVariable("vipUUID") String vipUUID, @PageableDefault(size = 10) Pageable pageable) {
-        Page<VipProgressAuctionResDto> vipProgressAuction = allUserService.getVipProgressAuction(vipUUID, pageable);
+    public ResponseEntity<Page<ProgressAuctionResDto>> vipProgressAuction(@NotBlank @PathVariable("vipUUID") String vipUUID, @PageableDefault(size = 10) Pageable pageable) {
+        Page<ProgressAuctionResDto> vipProgressAuction = allUserService.getVipProgressAuction(vipUUID, pageable);
         return ResponseEntity.ok().body(vipProgressAuction);
     }
 
@@ -203,5 +204,32 @@ public class AllUserController {
     public ResponseEntity<Page<VipReceiveReviewResDto>> vipReceivedReview(@NotBlank @PathVariable("vipUUID") String vipUUID, @PageableDefault(size = 10) Pageable pageable) {
         Page<VipReceiveReviewResDto> vipReceivedReview = allUserService.getVipReceivedReview(vipUUID, pageable);
         return ResponseEntity.ok().body(vipReceivedReview);
+    }
+
+    @Operation(summary = "진행중인 일반 경매 조회 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "진행중인 일반 경매 조회 ", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = ProgressAuctionResDto.class))}),
+    })
+    @GetMapping("/auction/generalList")
+    public ResponseEntity<Page<ProgressAuctionResDto>> progressGeneralAuctionList(@PageableDefault(size = 10) Pageable pageable,
+                                                @RequestParam(value = "sortType", required = false) AuctionSortType sortType,
+                                                @RequestParam(value = "search", required = false) String search) {
+        Page<ProgressAuctionResDto> progressGeneralAuction = allUserService.getProgressGeneralAuction(pageable, sortType, search);
+        return ResponseEntity.ok().body(progressGeneralAuction);
+    }
+
+    @Operation(summary = "일반 경매 상세정보 조회 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "일반 경매 상세정보 조회", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = AuctionDetailResDto.class))}),
+            @ApiResponse(responseCode = "404",
+                    description = "존재하지 않는 경매 : 2200",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+    })
+    @GetMapping("/auction/general/{auctionUUID}")
+    public ResponseEntity<AuctionDetailResDto> auctionDetail(@NotEmpty @PathVariable("auctionUUID") String auctionUUID) {
+        AuctionDetailResDto auctionDetail = allUserService.getAuctionDetail(auctionUUID);
+        return ResponseEntity.ok().body(auctionDetail);
     }
 }

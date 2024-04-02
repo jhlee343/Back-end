@@ -7,11 +7,15 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import shootingstar.var.dto.req.UserSignupReqDto;
 import shootingstar.var.dto.res.*;
+import shootingstar.var.entity.Auction;
 import shootingstar.var.entity.User;
+import shootingstar.var.enums.type.AuctionSortType;
+import shootingstar.var.enums.type.AuctionType;
 import shootingstar.var.enums.type.UserType;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
 import shootingstar.var.jwt.JwtTokenProvider;
+import shootingstar.var.repository.AuctionRepository;
 import shootingstar.var.repository.user.UserRepository;
 import shootingstar.var.repository.banner.BannerRepository;
 import shootingstar.var.util.MailRedisUtil;
@@ -23,6 +27,7 @@ import java.util.List;
 public class AllUserService {
     private final UserRepository userRepository;
     private final BannerRepository bannerRepository;
+    private final AuctionRepository auctionRepository;
 
     private final MailRedisUtil mailRedisUtil;
     private final CheckDuplicateService duplicateService;
@@ -89,7 +94,7 @@ public class AllUserService {
         return userRepository.findVipDetailByVipUUID(vipUUID, userUUID);
     }
 
-    public Page<VipProgressAuctionResDto> getVipProgressAuction(String vipUUID, Pageable pageable) {
+    public Page<ProgressAuctionResDto> getVipProgressAuction(String vipUUID, Pageable pageable) {
         User vip = checkUserAndVipRole(vipUUID);
 
         return userRepository.findVipProgressAuction(vipUUID, pageable);
@@ -98,6 +103,35 @@ public class AllUserService {
     public Page<VipReceiveReviewResDto> getVipReceivedReview(String vipUUID, Pageable pageable) {
         User vip = checkUserAndVipRole(vipUUID);
         return userRepository.findVipReceivedReview(vipUUID, pageable);
+    }
+
+    public Page<ProgressAuctionResDto> getProgressGeneralAuction(Pageable pageable, AuctionSortType sortType, String search) {
+        return auctionRepository.findProgressGeneralAuction(pageable, sortType, search);
+    }
+
+    public AuctionDetailResDto getAuctionDetail(String auctionUUID) {
+        Auction auction = auctionRepository.findByAuctionUUID(auctionUUID).orElseThrow(
+                () -> new CustomException(ErrorCode.AUCTION_NOT_FOUND));
+
+        User vip = auction.getUser();
+
+        String location = auction.getMeetingLocation();
+        String[] parts = location.split(" ");
+        String trimmedLocation = parts[0] + " " + parts[1];
+
+        return AuctionDetailResDto.builder()
+                .vipUUID(vip.getUserUUID())
+                .vipNickname(vip.getNickname())
+                .vipProfileImgUrl(vip.getProfileImgUrl())
+                .vipRating(vip.getRating())
+                .auctionUUID(auction.getAuctionUUID())
+                .auctionCreatedTime(auction.getCreatedTime())
+                .meetingDate(auction.getMeetingDate())
+                .meetingLocation(trimmedLocation)
+                .currentHighestBidAmount(auction.getCurrentHighestBidAmount())
+                .meetingInfoText(auction.getMeetingInfoText())
+                .meetingPromiseText(auction.getMeetingPromiseText())
+                .build();
     }
 
     private User checkUserAndVipRole(String vipUUID) {

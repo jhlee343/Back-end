@@ -6,17 +6,18 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-public class VipProgressAuctionResDto {
+public class ProgressAuctionResDto {
     private String profileImgUrl;
+    private String vipNickname;
     private String auctionUUID;
     private LocalDateTime createdTime;
     private Long currentHighestBidAmount;
     private Long bidCount;
 
     @QueryProjection
-
-    public VipProgressAuctionResDto(String profileImgUrl, String auctionUUID, LocalDateTime createdTime, Long currentHighestBidAmount, Long bidCount) {
+    public ProgressAuctionResDto(String profileImgUrl, String vipNickname, String auctionUUID, LocalDateTime createdTime, Long currentHighestBidAmount, Long bidCount) {
         this.profileImgUrl = profileImgUrl;
+        this.vipNickname = vipNickname;
         this.auctionUUID = auctionUUID;
         this.createdTime = createdTime;
         this.currentHighestBidAmount = currentHighestBidAmount;

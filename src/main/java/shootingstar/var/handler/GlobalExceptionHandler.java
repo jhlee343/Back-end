@@ -109,6 +109,8 @@ public class GlobalExceptionHandler {
                 errorCode = INCORRECT_FORMAT_EMAIL;
             } else if (fieldName.contains("vipUUID")) {
                 errorCode = INCORRECT_FORMAT_USER_UUID;
+            } else if (fieldName.contains("auctionUUID")) {
+                errorCode = INCORRECT_FORMAT_AUCTION_UUID;
             }
 
             if (!errorCode.equals(INCORRECT_FORMAT)) {
