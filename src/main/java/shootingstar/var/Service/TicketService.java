@@ -1,5 +1,6 @@
 package shootingstar.var.Service;
 
+import java.awt.Point;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -14,13 +15,16 @@ import shootingstar.var.dto.req.ReviewSaveReqDto;
 import shootingstar.var.dto.req.TicketReportReqDto;
 import shootingstar.var.dto.res.DetailTicketResDto;
 import shootingstar.var.entity.Auction;
+import shootingstar.var.entity.PointLog;
 import shootingstar.var.entity.Review;
 import shootingstar.var.entity.ticket.Ticket;
 import shootingstar.var.entity.ticket.TicketMeetingTime;
 import shootingstar.var.entity.ticket.TicketReport;
 import shootingstar.var.entity.User;
+import shootingstar.var.enums.type.PointOriginType;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
+import shootingstar.var.repository.PointLogRepository;
 import shootingstar.var.repository.review.ReviewRepository;
 import shootingstar.var.repository.ticket.TicketMeetingTimeRepository;
 import shootingstar.var.repository.ticket.TicketReportRepository;
@@ -36,6 +40,7 @@ public class TicketService {
     private final TicketReportRepository ticketReportRepository;
     private final UserRepository userRepository;
     private final ReviewRepository reviewRepository;
+    private final PointLogRepository pointLogRepository;
 
     public DetailTicketResDto detailTicket(String ticketUUID, String userUUID) {
         Ticket ticket = ticketRepository.findByTicketUUID(ticketUUID)
@@ -202,11 +207,17 @@ public class TicketService {
 
         User organizer = userRepository.findByUserUUIDWithPessimisticLock(ticket.getOrganizer().getUserUUID())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        PointLog pointLog;
         // 주최자에게 수수료 제공
         if (vipCommission.compareTo(zero) == 1) {
             log.info("주최자 수수료 받기 전 포인트 : {}", organizer.getPoint());
-            organizer.increasePoint(BigDecimal.valueOf(ticket.getAuction().getCurrentHighestBidAmount()).multiply(vipCommission));
+            BigDecimal point = BigDecimal.valueOf(ticket.getAuction().getCurrentHighestBidAmount()).multiply(vipCommission);
+            organizer.increasePoint(point);
             log.info("주최자 수수료 받은 후 포인트 : {}", organizer.getPoint());
+
+            pointLog = PointLog.createPointLogWithDeposit(organizer, PointOriginType.WINNER_TICKET_CANCEL, point);
+            pointLogRepository.save(pointLog);
         }
 
         BigDecimal basicCommission = new BigDecimal(0.7).subtract(vipCommission);
@@ -216,14 +227,21 @@ public class TicketService {
             User winner = userRepository.findByUserUUIDWithPessimisticLock(ticket.getWinner().getUserUUID())
                     .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
             log.info("낙찰자 수수료 받기 전 포인트 : {}", winner.getPoint());
-            winner.increasePoint(BigDecimal.valueOf(ticket.getAuction().getCurrentHighestBidAmount()).multiply(basicCommission));
+            BigDecimal point = BigDecimal.valueOf(ticket.getAuction().getCurrentHighestBidAmount()).multiply(basicCommission);
+            winner.increasePoint(point);
             log.info("낙찰자 수수료 받은 후 포인트 : {}", winner.getPoint());
+
+            pointLog = PointLog.createPointLogWithDeposit(winner, PointOriginType.WINNER_TICKET_CANCEL, point);
+            pointLogRepository.save(pointLog);
         }
 
         // 주최자에게 최소 입찰 금액 반환
         log.info("주최자 수수료 받기 전 포인트 : {}", organizer.getPoint());
         organizer.increasePoint(BigDecimal.valueOf(ticket.getAuction().getMinBidAmount()));
         log.info("주최자 수수료 받은 후 포인트 : {}", organizer.getPoint());
+
+        pointLog = PointLog.createPointLogWithDeposit(organizer, PointOriginType.AUCTION_REGISTRATION_DEPOSIT, BigDecimal.valueOf(ticket.getAuction().getMinBidAmount()));
+        pointLogRepository.save(pointLog);
     }
 
     public BigDecimal calculateCommission(LocalDate meetingDate, LocalDateTime meetingDateTime) {
@@ -258,8 +276,12 @@ public class TicketService {
         User winner = userRepository.findByUserUUIDWithPessimisticLock(ticket.getWinner().getUserUUID())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         log.info("낙찰자 환불 받기 전 포인트 : {}", winner.getPoint());
-        winner.increasePoint(BigDecimal.valueOf(ticket.getAuction().getCurrentHighestBidAmount()));
+        BigDecimal point = BigDecimal.valueOf(ticket.getAuction().getCurrentHighestBidAmount());
+        winner.increasePoint(point);
         log.info("낙찰자 환불 받은 후 포인트 : {}", winner.getPoint());
+
+        PointLog pointLog = PointLog.createPointLogWithDeposit(winner, PointOriginType.ORGANIZER_TICKET_CANCEL, point);
+        pointLogRepository.save(pointLog);
     }
 
     @Transactional

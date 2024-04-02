@@ -6,14 +6,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shootingstar.var.entity.Auction;
+import shootingstar.var.entity.PointLog;
 import shootingstar.var.enums.type.AuctionType;
 import shootingstar.var.entity.ScheduledTask;
+import shootingstar.var.enums.type.PointOriginType;
 import shootingstar.var.enums.type.TaskType;
 import shootingstar.var.entity.ticket.Ticket;
 import shootingstar.var.entity.User;
+import shootingstar.var.enums.type.TransactionType;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
 import shootingstar.var.repository.AuctionRepository;
+import shootingstar.var.repository.PointLogRepository;
 import shootingstar.var.repository.ScheduledTaskRepository;
 import shootingstar.var.repository.ticket.TicketRepository;
 import shootingstar.var.repository.user.UserRepository;
@@ -24,6 +28,7 @@ import shootingstar.var.repository.user.UserRepository;
 public class SchedulerService {
     private final TicketRepository ticketRepository;
     private final AuctionRepository auctionRepository;
+    private final PointLogRepository pointLogRepository;
     private final ScheduledTaskRepository scheduledTaskRepository;
     private final UserRepository userRepository;
 
@@ -48,6 +53,9 @@ public class SchedulerService {
             log.info("사용자 증가 전 포인트 : {}", user.getPoint());
             user.increasePoint(BigDecimal.valueOf(auction.getMinBidAmount()));
             log.info("사용자 증가 후 포인트 : {}", user.getPoint());
+
+            PointLog pointLog = PointLog.createPointLogWithDeposit(user, PointOriginType.AUCTION_REGISTRATION_DEPOSIT, BigDecimal.valueOf(auction.getMinBidAmount()));
+            pointLogRepository.save(pointLog);
 
             ScheduledTask task = scheduledTaskRepository.findById(scheduledTaskId)
                     .orElseThrow(() -> new CustomException(ErrorCode.TASK_NOT_FOUND));
