@@ -151,6 +151,9 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
     }
 
     private OrderSpecifier<?> orderType(AuctionSortType sortType) {
+        if (sortType == null) {
+            return new OrderSpecifier<>(Order.ASC, auction.createdTime);
+        }
         return switch (sortType) {
             case CREATE_ASC -> new OrderSpecifier<>(Order.ASC, auction.createdTime);
             case CREATE_DESC -> new OrderSpecifier<>(Order.DESC, auction.createdTime);

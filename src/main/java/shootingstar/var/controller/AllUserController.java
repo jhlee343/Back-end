@@ -205,6 +205,11 @@ public class AllUserController {
         return ResponseEntity.ok().body(vipReceivedReview);
     }
 
+    @Operation(summary = "진행중인 일반 경매 조회 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "진행중인 일반 경매 조회 ", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = ProgressAuctionResDto.class))}),
+    })
     @GetMapping("/auction/generalList")
     public ResponseEntity<Page<ProgressAuctionResDto>> progressGeneralAuctionList(@PageableDefault(size = 10) Pageable pageable,
                                                 @RequestParam(value = "sortType", required = false) AuctionSortType sortType,

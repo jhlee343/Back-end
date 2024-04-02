@@ -225,10 +225,10 @@ class AllUserServiceTest {
         AuctionSortType auctionSortType = AuctionSortType.CREATE_DESC;
         String search = "유명인1";
 
-        Page<ProgressAuctionResDto> progressGeneralAuction = auctionRepository.findProgressGeneralAuction(pageable, auctionSortType, search);
+        Page<ProgressAuctionResDto> progressGeneralAuction = auctionRepository.findProgressGeneralAuction(pageable, null, null);
 
         //then
         System.out.println(progressGeneralAuction.getContent());
-        Assertions.assertThat(progressGeneralAuction.get().count()).isEqualTo(3);
+        Assertions.assertThat(progressGeneralAuction.get().count()).isEqualTo(5);
     }
 }
