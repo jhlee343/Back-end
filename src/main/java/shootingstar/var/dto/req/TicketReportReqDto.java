@@ -6,8 +6,8 @@ import lombok.Data;
 
 @Data
 public class TicketReportReqDto {
-    @NotNull
-    private Long ticketId;
+    @NotBlank
+    private String ticketUUID;
 
     @NotBlank
     private String ticketReportContent;

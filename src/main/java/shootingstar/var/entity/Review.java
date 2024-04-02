@@ -1,6 +1,8 @@
 package shootingstar.var.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.Getter;
@@ -34,13 +36,15 @@ public class Review extends BaseTimeEntity {
     @NotBlank
     private String reviewContent;
 
-    private double reviewRating;
+    @Min(value = 1)
+    @Max(value = 5)
+    private int reviewRating;
 
     private boolean isShowed;
 
     @Builder
     public Review(User writer, User receiver, Ticket ticket, String reviewContent,
-                  double reviewRating) {
+                  int reviewRating) {
         this.reviewUUID = UUID.randomUUID().toString();
         this.writer = writer;
         this.receiver = receiver;

@@ -85,8 +85,7 @@ public class AuctionService {
         }
     }
 
-    @Transactional
-    private void schedulingCreateTicket(Auction auction, User findUser) {
+    public void schedulingCreateTicket(Auction auction, User findUser) {
         LocalDateTime scheduleTime = LocalDateTime.now().plusMinutes(1);
         ScheduledTask task = ScheduledTask.builder()
                 .auctionId(auction.getAuctionId())
@@ -163,8 +162,7 @@ public class AuctionService {
         deleteScheduling(findAuction);
     }
 
-    @Transactional
-    private void deleteScheduling(Auction findAuction) {
+    public void deleteScheduling(Auction findAuction) {
         ScheduledTask task = scheduledTaskRepository.findByAuctionId(findAuction.getAuctionId())
                 .orElseThrow(() -> new CustomException(ErrorCode.TASK_NOT_FOUND));
 
