@@ -6,10 +6,15 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import shootingstar.var.dto.res.GetBannerResDto;
+import shootingstar.var.dto.res.ProgressAuctionResDto;
 import shootingstar.var.dto.res.VipDetailResDto;
 import shootingstar.var.entity.*;
 import shootingstar.var.entity.ticket.Ticket;
+import shootingstar.var.enums.type.AuctionSortType;
 import shootingstar.var.enums.type.AuctionType;
 import shootingstar.var.enums.type.UserType;
 import shootingstar.var.repository.AuctionRepository;
@@ -183,5 +188,47 @@ class AllUserServiceTest {
         System.out.println(vipDetailByVipUUID.toString());
         Assertions.assertThat(vipDetailByVipUUID.getProgressAuctionList().size()).isEqualTo(3);
         Assertions.assertThat(vipDetailByVipUUID.getReceiveReviewList().size()).isEqualTo(3);
+    }
+
+    @Test
+    @DisplayName("진행중인 일반 경매 조회")
+    @Transactional
+    public void progressGeneralAuctionList() throws Exception {
+        //given
+        User vip1 = new User("22", "실명", "유명인1", "000-0000-0000", "test@ttt.com", "helloUrl", UserType.ROLE_VIP);
+        User vip2 = new User("22", "실명", "유명인2", "000-0000-0000", "test@ttt.com", "helloUrl", UserType.ROLE_VIP);
+        User vip3 = new User("22", "실명", "유명인3", "000-0000-0000", "test@ttt.com", "helloUrl", UserType.ROLE_VIP);
+
+        userRepository.save(vip1);
+        userRepository.save(vip2);
+        userRepository.save(vip3);
+
+        userRepository.flush();
+
+        Auction progressAuction1 = new Auction(vip1, 100000L, LocalDateTime.now(), "위치", "정보", "약속", "img", "img");
+        Auction progressAuction2 = new Auction(vip1, 100000L, LocalDateTime.now(), "위치", "정보", "약속", "img", "img");
+        Auction progressAuction3 = new Auction(vip1, 100000L, LocalDateTime.now(), "위치", "정보", "약속", "img", "img");
+        Auction progressAuction4 = new Auction(vip2, 100000L, LocalDateTime.now(), "위치", "정보", "약속", "img", "img");
+        Auction progressAuction5 = new Auction(vip3, 100000L, LocalDateTime.now(), "위치", "정보", "약속", "img", "img");
+
+        auctionRepository.save(progressAuction1);
+        auctionRepository.save(progressAuction2);
+        auctionRepository.save(progressAuction3);
+        auctionRepository.save(progressAuction4);
+        auctionRepository.save(progressAuction5);
+
+        auctionRepository.flush();
+
+        //when
+
+        Pageable pageable = PageRequest.of(0, 10);
+        AuctionSortType auctionSortType = AuctionSortType.CREATE_DESC;
+        String search = "유명인1";
+
+        Page<ProgressAuctionResDto> progressGeneralAuction = auctionRepository.findProgressGeneralAuction(pageable, auctionSortType, search);
+
+        //then
+        System.out.println(progressGeneralAuction.getContent());
+        Assertions.assertThat(progressGeneralAuction.get().count()).isEqualTo(3);
     }
 }
