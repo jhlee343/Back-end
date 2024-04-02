@@ -16,9 +16,11 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
+import shootingstar.var.entity.Admin;
 import shootingstar.var.entity.User;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
+import shootingstar.var.repository.admin.AdminRepository;
 import shootingstar.var.repository.user.UserRepository;
 import shootingstar.var.util.JwtRedisUtil;
 import shootingstar.var.util.LoginListRedisUtil;
@@ -44,17 +46,19 @@ public class JwtTokenProvider {
     private final JwtRedisUtil jwtRedisUtil;
     private final LoginListRedisUtil loginListRedisUtil;
     private final UserRepository userRepository;
+    private final AdminRepository adminRepository;
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
 
     public JwtTokenProvider(@Value("${jwt.secret-access}") String accessSecretKey,
                             @Value("${jwt.secret-refresh}") String refreshSecretKey,
-                            TokenProperty tokenProperty, UserRepository userRepository, JwtRedisUtil jwtRedisUtil, LoginListRedisUtil loginListRedisUtil) {
+                            TokenProperty tokenProperty, UserRepository userRepository, JwtRedisUtil jwtRedisUtil, LoginListRedisUtil loginListRedisUtil, AdminRepository adminRepository) {
         this.tokenProperty = tokenProperty;
         this.jwtRedisUtil = jwtRedisUtil;
         this.loginListRedisUtil = loginListRedisUtil;
         this.userRepository = userRepository;
+        this.adminRepository = adminRepository;
         byte[] accessKeyBytes = Decoders.BASE64.decode(accessSecretKey);
         byte[] refreshKeyBytes = Decoders.BASE64.decode(refreshSecretKey);
 
@@ -167,11 +171,18 @@ public class JwtTokenProvider {
 
         String subject = claims.getSubject();
 
+        String authority;
         Optional<User> optionalUser = userRepository.findByUserUUID(subject);
         if (optionalUser.isEmpty()) {
-            throw new CustomException(ErrorCode.USER_NOT_FOUND);
+            Optional<Admin> optionalAdmin = adminRepository.findByAdminUUID(subject);
+            if (optionalAdmin.isEmpty()) {
+                throw new CustomException(ErrorCode.USER_NOT_FOUND);
+            } else {
+                authority = optionalAdmin.get().getRole().toString();
+            }
+        } else {
+            authority = optionalUser.get().getUserType().toString();
         }
-        String authority = optionalUser.get().getUserType().toString();
 
         List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(authority);
 
@@ -333,5 +344,12 @@ public class JwtTokenProvider {
         String accessToken = TokenUtil.getTokenFromHeader(request);
         Authentication authentication = getAuthenticationFromAccessToken(accessToken);
         return authentication.getName();
+    }
+
+    public String getUserType(HttpServletRequest request) {
+        String accessToken = TokenUtil.getTokenFromHeader(request);
+        Authentication authentication = getAuthenticationFromAccessToken(accessToken);
+        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+        return authorities.isEmpty() ? "" : authorities.iterator().next().getAuthority();
     }
 }

@@ -82,4 +82,14 @@ public class Auction extends BaseTimeEntity {
     public void changeAuctionType(AuctionType auctionType) {
         this.auctionType = auctionType;
     }
+
+    // 경매의 주최자가 맞는지 확인하는 메서드
+    public boolean isOwner(String userUUID) {
+        return this.user.getUserUUID().equals(userUUID);
+    }
+
+    // 경매가 진행 중인지 확인하는 메서드
+    public boolean isProgress() {
+        return AuctionType.PROGRESS.equals(this.auctionType);
+    }
 }

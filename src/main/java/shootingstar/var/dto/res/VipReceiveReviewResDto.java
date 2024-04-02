@@ -6,12 +6,12 @@ import lombok.Data;
 @Data
 public class VipReceiveReviewResDto {
     private String userNickname;
-    private double reviewRating;
+    private Integer reviewRating;
     private String reviewContent;
 
     @QueryProjection
 
-    public VipReceiveReviewResDto(String userNickname, double reviewRating, String reviewContent) {
+    public VipReceiveReviewResDto(String userNickname, Integer reviewRating, String reviewContent) {
         this.userNickname = userNickname;
         this.reviewRating = reviewRating;
         this.reviewContent = reviewContent;

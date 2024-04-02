@@ -73,6 +73,10 @@ public class User extends BaseTimeEntity {
     @OneToMany(mappedBy = "winner", fetch = FetchType.LAZY)
     private final List<Ticket> winningTicket = new ArrayList<>();
 
+    @OneToMany(mappedBy = "receiver")
+    private final List<Review> reviewsReceived = new ArrayList<>();
+
+
     @Builder
     public User(String kakaoId, String name, String nickname, String phone, String email, String profileImgUrl, UserType userType) {
         this.userUUID = UUID.randomUUID().toString();
@@ -103,6 +107,10 @@ public class User extends BaseTimeEntity {
     public void withdrawn() {
         this.isWithdrawn = true;
         this.withdrawnTime = LocalDateTime.now();
+    }
+
+    public void updateRating(double rating) {
+        this.rating = rating;
     }
 
     public void subscribeActivate() {

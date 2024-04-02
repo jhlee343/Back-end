@@ -8,6 +8,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HttpBasicConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -55,7 +57,9 @@ public class SecurityConfig {
                                         "/api/all/**",
                                         "/api/auth/**",
                                         "/v3/api-docs/**", // swagger 설정
-                                        "/swagger-ui/**" // swagger 설정
+                                        "/swagger-ui/**", // swagger 설정
+                                        "/api/admin/signup",
+                                        "/api/admin/login"
                                 ).permitAll()
 
                                 .requestMatchers(
@@ -70,6 +74,11 @@ public class SecurityConfig {
                                         "/api/vip/**"
                                 ).hasRole("VIP")
 
+                                .requestMatchers(
+                                        "/api/admin/test"
+                                ).hasRole("ADMIN")
+
+
                                 .anyRequest().authenticated() // 정의한 엔드 포인트를 제외한 모든 요청은 인증이 필요함
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
@@ -83,6 +92,11 @@ public class SecurityConfig {
 //                                .userService(oAuth2UserService)))
 
         return http.build();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
     @Bean

@@ -1,14 +1,21 @@
 package shootingstar.var.Service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import shootingstar.var.dto.req.UserSignupReqDto;
-import shootingstar.var.dto.res.GetBannerResDto;
-import shootingstar.var.dto.res.VipDetailResDto;
+import shootingstar.var.dto.res.*;
+import shootingstar.var.entity.Auction;
 import shootingstar.var.entity.User;
+import shootingstar.var.enums.type.AuctionSortType;
+import shootingstar.var.enums.type.AuctionType;
 import shootingstar.var.enums.type.UserType;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
+import shootingstar.var.jwt.JwtTokenProvider;
+import shootingstar.var.repository.AuctionRepository;
 import shootingstar.var.repository.user.UserRepository;
 import shootingstar.var.repository.banner.BannerRepository;
 import shootingstar.var.util.MailRedisUtil;
@@ -20,9 +27,11 @@ import java.util.List;
 public class AllUserService {
     private final UserRepository userRepository;
     private final BannerRepository bannerRepository;
+    private final AuctionRepository auctionRepository;
 
     private final MailRedisUtil mailRedisUtil;
     private final CheckDuplicateService duplicateService;
+    private final JwtTokenProvider tokenProvider;
 
     public void signup(UserSignupReqDto reqDto) {
         if (duplicateService.checkEmailDuplicate(reqDto.getEmail())) {
@@ -55,7 +64,77 @@ public class AllUserService {
         return bannerRepository.findAllBanner();
     }
 
-    public VipDetailResDto getVipDetail(String vipUUID) {
+    public Page<VipListResDto> getVipList(Pageable pageable, String search, String accessToken) {
+        String userUUID = null;
+
+        if (accessToken != null) {
+            Authentication authentication = tokenProvider.getAuthenticationFromAccessToken(accessToken);
+            String tokenUserUUID = authentication.getName();
+            User user = userRepository.findByUserUUID(tokenUserUUID)
+                    .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+            userUUID = tokenUserUUID;
+        }
+        return userRepository.findVipList(pageable, search, userUUID);
+    }
+
+    public VipDetailResDto getVipDetail(String vipUUID, String accessToken) {
+        User vip = checkUserAndVipRole(vipUUID);
+
+        String userUUID = null;
+
+        if (accessToken != null) {
+            Authentication authentication = tokenProvider.getAuthenticationFromAccessToken(accessToken);
+            String tokenUserUUID = authentication.getName();
+            User user = userRepository.findByUserUUID(tokenUserUUID)
+                    .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+            userUUID = tokenUserUUID;
+        }
+        return userRepository.findVipDetailByVipUUID(vipUUID, userUUID);
+    }
+
+    public Page<ProgressAuctionResDto> getVipProgressAuction(String vipUUID, Pageable pageable) {
+        User vip = checkUserAndVipRole(vipUUID);
+
+        return userRepository.findVipProgressAuction(vipUUID, pageable);
+    }
+
+    public Page<VipReceiveReviewResDto> getVipReceivedReview(String vipUUID, Pageable pageable) {
+        User vip = checkUserAndVipRole(vipUUID);
+        return userRepository.findVipReceivedReview(vipUUID, pageable);
+    }
+
+    public Page<ProgressAuctionResDto> getProgressGeneralAuction(Pageable pageable, AuctionSortType sortType, String search) {
+        return auctionRepository.findProgressGeneralAuction(pageable, sortType, search);
+    }
+
+    public AuctionDetailResDto getAuctionDetail(String auctionUUID) {
+        Auction auction = auctionRepository.findByAuctionUUID(auctionUUID).orElseThrow(
+                () -> new CustomException(ErrorCode.AUCTION_NOT_FOUND));
+
+        User vip = auction.getUser();
+
+        String location = auction.getMeetingLocation();
+        String[] parts = location.split(" ");
+        String trimmedLocation = parts[0] + " " + parts[1];
+
+        return AuctionDetailResDto.builder()
+                .vipUUID(vip.getUserUUID())
+                .vipNickname(vip.getNickname())
+                .vipProfileImgUrl(vip.getProfileImgUrl())
+                .vipRating(vip.getRating())
+                .auctionUUID(auction.getAuctionUUID())
+                .auctionCreatedTime(auction.getCreatedTime())
+                .meetingDate(auction.getMeetingDate())
+                .meetingLocation(trimmedLocation)
+                .currentHighestBidAmount(auction.getCurrentHighestBidAmount())
+                .meetingInfoText(auction.getMeetingInfoText())
+                .meetingPromiseText(auction.getMeetingPromiseText())
+                .build();
+    }
+
+    private User checkUserAndVipRole(String vipUUID) {
         User vip = userRepository.findByUserUUID(vipUUID)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
@@ -63,6 +142,6 @@ public class AllUserService {
             throw new CustomException(ErrorCode.VIP_INFO_NOT_FOUND);
         }
 
-        return userRepository.findVipDetailByVipUUID(vipUUID);
+        return vip;
     }
 }

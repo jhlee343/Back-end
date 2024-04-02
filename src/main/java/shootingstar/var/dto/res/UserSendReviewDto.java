@@ -9,12 +9,12 @@ public class UserSendReviewDto {
     private String reviewUUID;
     private String ticketUUID;
     private String reviewContent;
-    private Double reviewRating;
+    private Integer reviewRating;
     private String receiverId;
     //내가 보낸 사람 uuid
     @QueryProjection
     public UserSendReviewDto(String reviewUUID, String ticketUUID, String reviewContent,
-                             Double reviewRating, String receiverId ){
+                             Integer reviewRating, String receiverId ){
         this.reviewUUID = reviewUUID;
         this.ticketUUID = ticketUUID;
         this.reviewContent = reviewContent;
