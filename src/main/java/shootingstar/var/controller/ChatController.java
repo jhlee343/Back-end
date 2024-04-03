@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import shootingstar.var.Service.ChatService;
 import shootingstar.var.dto.res.DetailTicketResDto;
 import shootingstar.var.dto.res.SaveChatMessageResDto;
+import shootingstar.var.enums.type.UserType;
 import shootingstar.var.exception.ErrorResponse;
 import shootingstar.var.jwt.JwtTokenProvider;
 @Tag(name = "채팅 컨트롤러", description = "basic, vip 권한 둘 다 사용 가능")
@@ -39,14 +40,14 @@ public class ChatController {
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
             @ApiResponse(responseCode = "403",
                     description =
-                                    "- 로그인한 사용자가 경매의 낙찰자도 주최자도 아닐 때 : 0101\n" +
+                                    "- 로그인한 사용자가 경매의 낙찰자도 주최자도 권한이 어드민도 아닐 때 : 8101\n" +
                                     "- 채팅방이 닫혀 있는 경우 : 8100",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
     })
     @GetMapping("/messageList/{chatRoomUUID}")
     public ResponseEntity<List<SaveChatMessageResDto>> findMessageListByChatRoomUUID(@PathVariable("chatRoomUUID") String chatRoomUUID, HttpServletRequest request) {
         String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
-        List<SaveChatMessageResDto> messages = chatService.findMessageListByChatRoomUUID(chatRoomUUID, userUUID);
+        List<SaveChatMessageResDto> messages = chatService.findMessageListByChatRoomUUID(chatRoomUUID, userUUID, null);
         return ResponseEntity.ok().body(messages);
     }
 }
