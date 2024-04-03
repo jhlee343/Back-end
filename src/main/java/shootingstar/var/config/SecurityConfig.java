@@ -59,7 +59,8 @@ public class SecurityConfig {
                                         "/v3/api-docs/**", // swagger 설정
                                         "/swagger-ui/**", // swagger 설정
                                         "/api/admin/signup",
-                                        "/api/admin/login"
+                                        "/api/admin/login",
+                                        "/ws/chat"
                                 ).permitAll()
 
                                 .requestMatchers(

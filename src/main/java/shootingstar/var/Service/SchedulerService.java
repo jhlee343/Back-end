@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shootingstar.var.entity.Auction;
 import shootingstar.var.entity.PointLog;
+import shootingstar.var.entity.chat.ChatRoom;
 import shootingstar.var.entity.ticket.TicketMeetingTime;
 import shootingstar.var.enums.type.AuctionType;
 import shootingstar.var.entity.ScheduledTask;
@@ -22,6 +23,7 @@ import shootingstar.var.exception.ErrorCode;
 import shootingstar.var.repository.AuctionRepository;
 import shootingstar.var.repository.PointLogRepository;
 import shootingstar.var.repository.ScheduledTaskRepository;
+import shootingstar.var.repository.chat.ChatRoomRepository;
 import shootingstar.var.repository.ticket.TicketMeetingTimeRepository;
 import shootingstar.var.repository.ticket.TicketRepository;
 import shootingstar.var.repository.user.UserRepository;
@@ -35,6 +37,7 @@ public class SchedulerService {
     private final PointLogRepository pointLogRepository;
     private final ScheduledTaskRepository scheduledTaskRepository;
     private final UserRepository userRepository;
+    private final ChatRoomRepository chatRoomRepository;
 
     @Transactional
     public void createTicketAndAuctionTypeSuccess(Long auctionId, Long userId, Long scheduledTaskId) {
@@ -75,6 +78,12 @@ public class SchedulerService {
         // 식사권 생성
         Ticket ticket = new Ticket(auction, winner, auction.getUser());
         ticketRepository.save(ticket);
+
+        // 채팅방 생성
+        ChatRoom chatRoom = ChatRoom.builder()
+                .ticket(ticket)
+                .build();
+        chatRoomRepository.save(chatRoom);
 
         // 경매 타입 낙찰로 변경
         auction.changeAuctionType(AuctionType.SUCCESS);
