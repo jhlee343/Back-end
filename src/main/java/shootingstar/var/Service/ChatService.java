@@ -1,5 +1,7 @@
 package shootingstar.var.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,15 +31,10 @@ public class ChatService {
         log.info("채팅방 존재함");
 
         // 로그인 한 사용자가 식사권의 낙찰자도 주최자도 아닐 경우
-        if (!chatRoom.getTicket().getOrganizer().getUserUUID().equals(userUUID)
-                && !chatRoom.getTicket().getWinner().getUserUUID().equals(userUUID)) {
-            throw new CustomException(ErrorCode.ACCESS_DENIED);
-        }
+        checkUserAccessToTicket(userUUID, chatRoom);
 
         // 채팅방이 닫혀 있는지 확인
-        if (!chatRoom.isChatRoomIsOpened()) {
-            throw new CustomException(ErrorCode.CHAT_ROOM_ACCESS_DENIED);
-        }
+        isChatRoomOpen(chatRoom);
 
         String nickname = getNickname(userUUID, chatRoom);
         ChatMessage chatMessage = ChatMessage.builder()
@@ -51,6 +48,7 @@ public class ChatService {
         return SaveChatMessageResDto.builder()
                 .nickname(findChatMessage.getSenderNickname())
                 .content(findChatMessage.getChatContent())
+                .sendTime(findChatMessage.getCreatedTime())
                 .build();
     }
 
@@ -62,5 +60,41 @@ public class ChatService {
             nickname = chatRoom.getTicket().getWinner().getNickname();
         }
         return nickname;
+    }
+
+    @Transactional
+    public List<SaveChatMessageResDto> findMessageListByChatRoomUUID(String chatRoomUUID, String userUUID) {
+        // 채팅방 존재 여부
+        ChatRoom chatRoom = chatRoomRepository.findByChatRoomUUID(chatRoomUUID)
+                .orElseThrow(() -> new CustomException(ErrorCode.CHAT_ROOM_NOT_FOUND));
+        log.info("채팅방 존재함");
+
+        // 로그인 한 사용자가 식사권의 낙찰자도 주최자도 아닐 경우
+        checkUserAccessToTicket(userUUID, chatRoom);
+
+        // 채팅방이 닫혀 있는지 확인
+        isChatRoomOpen(chatRoom);
+
+        List<ChatMessage> chatMessages = chatMessageRepository.findByChatRoomId(chatRoom.getChatRoomId());
+        return chatMessages.stream()
+                .map(message -> SaveChatMessageResDto.builder()
+                        .nickname(message.getSenderNickname())
+                        .content(message.getChatContent())
+                        .sendTime(message.getCreatedTime())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    private void checkUserAccessToTicket(String userUUID, ChatRoom chatRoom) {
+        if (!chatRoom.getTicket().getOrganizer().getUserUUID().equals(userUUID)
+                && !chatRoom.getTicket().getWinner().getUserUUID().equals(userUUID)) {
+            throw new CustomException(ErrorCode.ACCESS_DENIED);
+        }
+    }
+
+    private static void isChatRoomOpen(ChatRoom chatRoom) {
+        if (!chatRoom.isChatRoomIsOpened()) {
+            throw new CustomException(ErrorCode.CHAT_ROOM_ACCESS_DENIED);
+        }
     }
 }
