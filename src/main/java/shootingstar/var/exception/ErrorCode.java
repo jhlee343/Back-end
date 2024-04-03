@@ -93,7 +93,11 @@ public enum ErrorCode {
     ALREADY_TICKET_CANCEL_CONFLICT(CONFLICT, "6303", "이미 취소된 식사권입니다."),
     REVIEW_CONFLICT(CONFLICT, "6304", "해당 식사권에 대한 리뷰를 작성한 적이 있습니다."),
 
-    VIP_INFO_NOT_FOUND(NOT_FOUND,"7200", "존재하지 않는 VIP 정보입니다.")
+    VIP_INFO_NOT_FOUND(NOT_FOUND,"7200", "존재하지 않는 VIP 정보입니다."),
+
+    CHAT_ROOM_ACCESS_DENIED(FORBIDDEN, "8100", "접근 권한이 없습니다."),
+
+    CHAT_ROOM_NOT_FOUND(NOT_FOUND, "8200", "존재하지 않는 채팅방입니다."),
     ;
 
     private final HttpStatus httpStatus;
