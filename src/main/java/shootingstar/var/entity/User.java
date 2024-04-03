@@ -116,4 +116,8 @@ public class User extends BaseTimeEntity {
     public void subscribeActivate() {
         this.subscribeExpiration = LocalDateTime.now().plusDays(30L);
     }
+
+    public void setWarningCount(int warningCount) {
+        this.warningCount = warningCount;
+    }
 }
