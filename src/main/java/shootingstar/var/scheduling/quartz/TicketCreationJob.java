@@ -1,4 +1,4 @@
-package shootingstar.var.quartz;
+package shootingstar.var.scheduling.quartz;
 
 import lombok.RequiredArgsConstructor;
 import org.quartz.Job;
