@@ -44,6 +44,7 @@ public class VipUserController {
     public ResponseEntity<?> getVipAuctionList(@NotBlank @PathVariable("auctionType") AuctionType auctionType,
                                                HttpServletRequest request, @PageableDefault(size = 10) Pageable pageable) {
         String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
+
         if (auctionType.equals(AuctionType.PROGRESS)) {
             //진행중
             Page<UserAuctionParticipateResDto> userAuctionParticipateLists = vipService.getVipUserAuctionProgress(userUUID, pageable);
