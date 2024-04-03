@@ -14,6 +14,6 @@ public class UserProfileDto {
     private String profileImgUrl;
     private Long donation_price;
     private BigDecimal point;
-    private LocalDateTime subscribe;
+    private LocalDateTime subscribeExpiration;
     private UserType user_type;
 }

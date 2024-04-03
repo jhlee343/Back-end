@@ -48,7 +48,7 @@ public class UserService {
 
     public UserProfileDto getProfile(String nickname) {
         User user = findByNickname(nickname);
-        UserProfileDto userProfileDto = new UserProfileDto(user.getNickname(), user.getProfileImgUrl(), user.getDonationPrice(), user.getPoint(), user.getSubscribe(), user.getUserType());
+        UserProfileDto userProfileDto = new UserProfileDto(user.getNickname(), user.getProfileImgUrl(), user.getDonationPrice(), user.getPoint(), user.getSubscribeExpiration(), user.getUserType());
         return userProfileDto;
     }
 

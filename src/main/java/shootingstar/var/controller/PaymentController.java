@@ -49,24 +49,43 @@ public class PaymentController {
         return iamportClient.paymentByImpUid(impUid);
     }
 
-    @Operation(summary = "결제 검증 API", description = "결제 데이터를 PortOne서버의 데이터와 비교, 검증하는 API")
+    @Operation(summary = "포인트 결제 API", description = "포인트 결제 데이터를 PortOne서버의 데이터와 비교, 검증하는 API")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successful operation", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = Payment.class)) }),
+            @ApiResponse(responseCode = "200", description = "포인트 결제 성공", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = Payment.class)) }),
             //@ApiResponse(responseCode = "405", description = "Invalid input")
     })
-    @PostMapping("/payment")
-    public IamportResponse<Payment> paymentComplete(HttpServletRequest request, @RequestBody PaymentReqDto paymentReqDto) throws IamportResponseException, IOException {
+    @PostMapping("/payment/point")
+    public IamportResponse<Payment> pointPayment(HttpServletRequest request, @RequestBody PaymentReqDto paymentReqDto) throws IamportResponseException, IOException {
         String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
-
-        Long amount = paymentReqDto.getPaymentAmount();
 
         IamportResponse<Payment> ires = paymentLookup(paymentReqDto.getImp_uid());
 
-        paymentService.verifyIamportService(ires, amount, userUUID);
+        paymentService.verifyPointPayment(ires, paymentReqDto, userUUID);
 
         return ires;
     }
 
+    @Operation(summary = "구독 결제 API", description = "구독 결제 데이터를 PortOne서버의 데이터와 비교, 검증하는 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "구독 결제 성공", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = Payment.class)) }),
+            //@ApiResponse(responseCode = "405", description = "Invalid input")
+    })
+    @PostMapping("/payment/subscribe")
+    public IamportResponse<Payment> subscribePayment(HttpServletRequest request, @RequestBody PaymentReqDto paymentReqDto) throws IamportResponseException, IOException {
+        String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
+
+        IamportResponse<Payment> ires = paymentLookup(paymentReqDto.getImp_uid());
+
+        paymentService.verifySubscribePayment(ires, paymentReqDto, userUUID);
+
+        return ires;
+    }
+
+    @Operation(summary = "포인트 환전 신청 API", description = "보유 포인트 내에서 현금으로 환전 신청하는 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "포인트 환전 신청 성공", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = String.class)) }),
+            //@ApiResponse(responseCode = "405", description = "Invalid input")
+    })
     @PostMapping("/payment/exchange")
     public ResponseEntity<?> applyExchange(HttpServletRequest request, @RequestBody ExchangeReqDto exchangeReqDto) {
         String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
