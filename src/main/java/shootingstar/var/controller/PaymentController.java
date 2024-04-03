@@ -58,11 +58,9 @@ public class PaymentController {
     public IamportResponse<Payment> pointPayment(HttpServletRequest request, @RequestBody PaymentReqDto paymentReqDto) throws IamportResponseException, IOException {
         String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
 
-        Long amount = paymentReqDto.getPaymentAmount();
-
         IamportResponse<Payment> ires = paymentLookup(paymentReqDto.getImp_uid());
 
-        paymentService.verifyPointPayment(ires, amount, userUUID);
+        paymentService.verifyPointPayment(ires, paymentReqDto, userUUID);
 
         return ires;
     }
@@ -71,11 +69,9 @@ public class PaymentController {
     public IamportResponse<Payment> subscribePayment(HttpServletRequest request, @RequestBody PaymentReqDto paymentReqDto) throws IamportResponseException, IOException {
         String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
 
-        Long amount = paymentReqDto.getPaymentAmount();
-
         IamportResponse<Payment> ires = paymentLookup(paymentReqDto.getImp_uid());
 
-        paymentService.verifySubscribePayment(ires, amount, userUUID);
+        paymentService.verifySubscribePayment(ires, paymentReqDto, userUUID);
 
         return ires;
     }

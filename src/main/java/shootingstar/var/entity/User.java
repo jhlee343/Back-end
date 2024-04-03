@@ -57,7 +57,7 @@ public class User extends BaseTimeEntity {
 
     private Double rating;
 
-    private LocalDateTime subscribe;
+    private LocalDateTime subscribeExpiration;
 
     private Integer warningCount;
 
@@ -90,7 +90,7 @@ public class User extends BaseTimeEntity {
         this.point = new BigDecimal(0);
         this.donationPrice = 0L;
         this.rating = null;
-        this.subscribe = null;
+        this.subscribeExpiration = null;
         this.warningCount = 0;
         this.isWithdrawn = false;
         this.withdrawnTime = null;
@@ -114,6 +114,6 @@ public class User extends BaseTimeEntity {
     }
 
     public void subscribeActivate() {
-        this.subscribe = LocalDateTime.now().plusDays(30L);
+        this.subscribeExpiration = LocalDateTime.now().plusDays(30L);
     }
 }
