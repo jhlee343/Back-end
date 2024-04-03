@@ -100,7 +100,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
                         auction.currentHighestBidderUUID
                 ))
                 .from(auction)
-                .where(auction.auctionType.eq(AuctionType.SUCCESS))
+                .where(vipUserUUIDEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS))
                 .orderBy(auction.meetingDate.asc())
                 .fetch();
 
