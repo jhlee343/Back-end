@@ -9,12 +9,12 @@ import lombok.Data;
 @Data
 public class ReviewSaveReqDto {
     @NotNull
-    private Long ticketId;
+    private String ticketUUID;
 
     @NotBlank
     private String reviewContent;
 
     @Min(value = 1)
     @Max(value = 5)
-    private double reviewRating;
+    private int reviewRating;
 }

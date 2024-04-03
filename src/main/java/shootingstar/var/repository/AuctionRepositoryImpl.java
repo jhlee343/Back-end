@@ -1,27 +1,32 @@
 package shootingstar.var.repository;
 
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.DateTimePath;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
-import shootingstar.var.dto.res.*;
+import shootingstar.var.dto.res.QUserAuctionParticipateList;
+import shootingstar.var.dto.res.UserAuctionParticipateList;
+import shootingstar.var.dto.res.UserAuctionSuccessList;
+import shootingstar.var.dto.res.QUserAuctionSuccessList;
 import shootingstar.var.enums.type.AuctionType;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import static shootingstar.var.entity.QAuction.auction;
 import static shootingstar.var.entity.QUser.user;
+import static shootingstar.var.entity.ticket.QTicket.ticket;
 
 public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
     private final JPAQueryFactory queryFactory;
     public AuctionRepositoryImpl(EntityManager em){
         this.queryFactory = new JPAQueryFactory(em);
     }
-
-
-    //basicUser auction
     @Override
     public Page<UserAuctionSuccessResDto> findAllSuccessBeforeByUserUUID(String userUUID, Pageable pageable) {
         List<UserAuctionSuccessResDto> content = queryFactory
@@ -41,9 +46,8 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
                 .from(auction)
                 .where(currentHighestBidderIdEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS));
 
-        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
-    }
 
+    //만남 전 만남후 api 두개 만들어야함
     @Override
     public Page<UserAuctionSuccessResDto> findAllSuccessAfterByUserUUID(String userUUID, Pageable pageable) {
         List<UserAuctionSuccessResDto> content = queryFactory

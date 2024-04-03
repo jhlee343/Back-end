@@ -6,6 +6,6 @@ import org.springframework.data.jpa.repository.Query;
 import shootingstar.var.entity.ticket.TicketMeetingTime;
 
 public interface TicketMeetingTimeRepository extends JpaRepository<TicketMeetingTime, Long> {
-    @Query("select tmt from TicketMeetingTime tmt where tmt.ticket.ticketId = :ticketId and tmt.userNickname = :userNickname")
-    Optional<TicketMeetingTime> findByTicketIdAndUserNickname(Long ticketId, String userNickname);
+    @Query("select tmt from TicketMeetingTime tmt where tmt.ticket.ticketUUID = :ticketUUID and tmt.userNickname = :userNickname")
+    Optional<TicketMeetingTime> findByTicketUUIDAndUserNickname(String ticketUUID, String userNickname);
 }

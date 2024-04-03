@@ -1,20 +1,28 @@
 package shootingstar.var.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shootingstar.var.entity.Auction;
+import shootingstar.var.entity.PointLog;
+import shootingstar.var.entity.ticket.TicketMeetingTime;
 import shootingstar.var.enums.type.AuctionType;
 import shootingstar.var.entity.ScheduledTask;
+import shootingstar.var.enums.type.PointOriginType;
 import shootingstar.var.enums.type.TaskType;
 import shootingstar.var.entity.ticket.Ticket;
 import shootingstar.var.entity.User;
+import shootingstar.var.enums.type.TransactionType;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
 import shootingstar.var.repository.AuctionRepository;
+import shootingstar.var.repository.PointLogRepository;
 import shootingstar.var.repository.ScheduledTaskRepository;
+import shootingstar.var.repository.ticket.TicketMeetingTimeRepository;
 import shootingstar.var.repository.ticket.TicketRepository;
 import shootingstar.var.repository.user.UserRepository;
 
@@ -24,6 +32,7 @@ import shootingstar.var.repository.user.UserRepository;
 public class SchedulerService {
     private final TicketRepository ticketRepository;
     private final AuctionRepository auctionRepository;
+    private final PointLogRepository pointLogRepository;
     private final ScheduledTaskRepository scheduledTaskRepository;
     private final UserRepository userRepository;
 
@@ -43,11 +52,14 @@ public class SchedulerService {
             log.info("변경 후 경매 타입 : {}", auction.getAuctionType());
 
             // 경매 생성자에게 최소 입찰 금액만큼의 포인트 돌려주기
-            User user = userRepository.findById(userId)
+            User user = userRepository.findByUserIdWithPessimisticLock(userId)
                     .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
             log.info("사용자 증가 전 포인트 : {}", user.getPoint());
             user.increasePoint(BigDecimal.valueOf(auction.getMinBidAmount()));
             log.info("사용자 증가 후 포인트 : {}", user.getPoint());
+
+            PointLog pointLog = PointLog.createPointLogWithDeposit(user, PointOriginType.AUCTION_REGISTRATION_DEPOSIT, BigDecimal.valueOf(auction.getMinBidAmount()));
+            pointLogRepository.save(pointLog);
 
             ScheduledTask task = scheduledTaskRepository.findById(scheduledTaskId)
                     .orElseThrow(() -> new CustomException(ErrorCode.TASK_NOT_FOUND));
@@ -65,13 +77,61 @@ public class SchedulerService {
         ticketRepository.save(ticket);
 
         // 경매 타입 낙찰로 변경
-        Auction findAuction = auctionRepository.findById(auction.getAuctionId())
-                .orElseThrow(() -> new CustomException(ErrorCode.AUCTION_NOT_FOUND));
-        findAuction.changeAuctionType(AuctionType.SUCCESS);
+        auction.changeAuctionType(AuctionType.SUCCESS);
 
         // scheduledTask 타입 완료로 변경
         ScheduledTask task = scheduledTaskRepository.findById(scheduledTaskId)
                 .orElseThrow(() -> new CustomException(ErrorCode.TASK_NOT_FOUND));
         task.changeTaskType(TaskType.COMPLETE);
+    }
+
+    @Transactional
+    public void completeTicket() {
+        log.info("식사권 완료 로직 실행, 현재 시간 : {}", LocalDateTime.now());
+
+        List<Ticket> tickets = ticketRepository.findByTicketIsOpenedTrueAndWinnerIsPushedTrueAndOrganizerIsPushedTrue();
+        for (Ticket ticket : tickets) {
+            LocalDateTime meetingTime = calculateMeetingTime(ticket);
+
+            // 만남 시작 시간 이후 3일이 지나지 않았을 경우
+            if (meetingTime.plusDays(3).isAfter(LocalDateTime.now())) {
+                log.info("3일이 지나지 않음");
+                continue;
+            }
+
+            // 식사권이 신고된 경우
+            if (ticket.getReports().size() > 0) {
+                log.info("신고당한 식사권");
+                continue;
+            }
+
+            // 식사권 닫기
+            ticket.changeTicketIsOpened(false);
+
+            // 채팅방 닫기 => 추후 추가할 예정
+
+            // 포인트 정산
+            // 경매 주최자에게 70% 지급
+            User organizer = userRepository.findByUserUUIDWithPessimisticLock(ticket.getOrganizer().getUserUUID())
+                    .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+            BigDecimal point = BigDecimal.valueOf(ticket.getAuction().getCurrentHighestBidAmount()).multiply(new BigDecimal(0.7));
+            organizer.increasePoint(point);
+
+            PointLog pointLog = PointLog.createPointLogWithDeposit(organizer, PointOriginType.TICKET_COMPLETE, point);
+            pointLogRepository.save(pointLog);
+
+            // 기부금액에 5% 추가 => 추후 추가할 예정
+        }
+    }
+
+    public LocalDateTime calculateMeetingTime(Ticket ticket) {
+        LocalDateTime meetingTime;
+        List<TicketMeetingTime> ticketMeetingTimes = ticket.getTicketMeetingTimes();
+        if (ticketMeetingTimes.get(0).getStartMeetingTime().isAfter(ticketMeetingTimes.get(1).getStartMeetingTime())) {
+            meetingTime = ticketMeetingTimes.get(0).getStartMeetingTime();
+        } else {
+            meetingTime = ticketMeetingTimes.get(1).getStartMeetingTime();
+        }
+        return meetingTime;
     }
 }

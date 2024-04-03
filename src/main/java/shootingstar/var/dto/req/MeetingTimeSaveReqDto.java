@@ -6,8 +6,8 @@ import lombok.Data;
 
 @Data
 public class MeetingTimeSaveReqDto {
-    @NotNull
-    private Long ticketId;
+    @NotBlank
+    private String ticketUUID;
 
     @NotBlank
     private String startMeetingTime;

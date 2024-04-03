@@ -14,7 +14,7 @@ public class VipDetailResDto {
     private String vipJop;
     private String vipCareer;
     private String vipIntroduce;
-    private List<VipProgressAuctionResDto> progressAuctionList;
+    private List<ProgressAuctionResDto> progressAuctionList;
     private List<VipReceiveReviewResDto> receiveReviewList;
     private boolean isFollow;
 

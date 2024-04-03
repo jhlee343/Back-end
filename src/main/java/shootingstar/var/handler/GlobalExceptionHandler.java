@@ -64,8 +64,8 @@ public class GlobalExceptionHandler {
                 } case "meetingPromiseText" -> {
                     errorCode = INCORRECT_FORMAT_MEETING_PROMISE_TEXT;
                     break;
-                } case "ticketId" -> {
-                    errorCode = INCORRECT_FORMAT_TICKET_ID;
+                } case "ticketUUID" -> {
+                    errorCode = INCORRECT_FORMAT_TICKET_UUID;
                     break;
                 } case "startMeetingTime" -> {
                     errorCode = INCORRECT_FORMAT_START_MEETING_TIME;
@@ -109,6 +109,8 @@ public class GlobalExceptionHandler {
                 errorCode = INCORRECT_FORMAT_EMAIL;
             } else if (fieldName.contains("vipUUID")) {
                 errorCode = INCORRECT_FORMAT_USER_UUID;
+            } else if (fieldName.contains("auctionUUID")) {
+                errorCode = INCORRECT_FORMAT_AUCTION_UUID;
             }
 
             if (!errorCode.equals(INCORRECT_FORMAT)) {
