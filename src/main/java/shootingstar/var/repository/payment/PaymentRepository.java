@@ -1,4 +1,4 @@
-package shootingstar.var.repository;
+package shootingstar.var.repository.payment;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import shootingstar.var.entity.PaymentsInfo;

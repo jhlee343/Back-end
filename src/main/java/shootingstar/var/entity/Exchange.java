@@ -6,13 +6,14 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import shootingstar.var.enums.status.ExchangeStatus;
 
 import java.util.UUID;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ExchangeForm {
+public class Exchange {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long exchangeId;
@@ -35,7 +36,7 @@ public class ExchangeForm {
     private ExchangeStatus exchangeStatus;
 
     @Builder
-    public ExchangeForm(User user, Long exchangePoint, String exchangeAccount, String exchangeBank, String exchangeAccountHolder) {
+    public Exchange(User user, Long exchangePoint, String exchangeAccount, String exchangeBank, String exchangeAccountHolder) {
         this.exchangeUUID = UUID.randomUUID().toString();
         this.user = user;
         this.exchangePoint = exchangePoint;
