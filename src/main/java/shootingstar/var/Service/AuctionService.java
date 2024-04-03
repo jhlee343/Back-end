@@ -1,7 +1,5 @@
 package shootingstar.var.Service;
 
-import jakarta.persistence.OptimisticLockException;
-import java.awt.Point;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -25,11 +23,10 @@ import shootingstar.var.entity.ScheduledTask;
 import shootingstar.var.enums.type.PointOriginType;
 import shootingstar.var.enums.type.TaskType;
 import shootingstar.var.entity.User;
-import shootingstar.var.enums.type.TransactionType;
 import shootingstar.var.enums.type.UserType;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
-import shootingstar.var.quartz.TicketCreationJob;
+import shootingstar.var.scheduling.quartz.TicketCreationJob;
 import shootingstar.var.repository.AuctionRepository;
 import shootingstar.var.repository.PointLogRepository;
 import shootingstar.var.repository.ScheduledTaskRepository;

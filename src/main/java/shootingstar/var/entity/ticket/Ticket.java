@@ -52,6 +52,9 @@ public class Ticket extends BaseTimeEntity {
     @OneToMany(mappedBy = "ticket")
     private List<Review> reviews = new ArrayList<>();
 
+    @OneToMany(mappedBy = "ticket")
+    private List<TicketReport> reports = new ArrayList<>();
+
     @Builder
     public Ticket(Auction auction, User winner, User organizer) {
         this.ticketUUID = UUID.randomUUID().toString();
