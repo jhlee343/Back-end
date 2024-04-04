@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 public class AdminLoginReqDto {
     @NotBlank
-    private String loginId;
+    private String adminLoginId;
     @NotBlank
-    private String password;
+    private String adminPassword;
 }

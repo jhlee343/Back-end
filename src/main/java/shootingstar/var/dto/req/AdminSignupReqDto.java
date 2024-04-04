@@ -6,11 +6,11 @@ import lombok.Data;
 @Data
 public class AdminSignupReqDto {
     @NotBlank
-    private String loginId;
+    private String adminLoginId;
     @NotBlank
-    private String password;
+    private String adminPassword;
     @NotBlank
-    private String nickname;
+    private String adminNickname;
     @NotBlank
-    private String secretKey;
+    private String adminSecretKey;
 }

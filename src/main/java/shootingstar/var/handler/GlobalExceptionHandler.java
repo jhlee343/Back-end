@@ -76,6 +76,18 @@ public class GlobalExceptionHandler {
                 } case "ticketReportEvidenceUrl" -> {
                     errorCode = INCORRECT_FORMAT_TICKET_REPORT_EVIDENCE_URL;
                     break;
+                }  case "adminLoginId" -> {
+                    errorCode = INCORRECT_FORMAT_ADMIN_ID;
+                    break;
+                } case "adminPassword" -> {
+                    errorCode = INCORRECT_FORMAT_ADMIN_PASSWORD;
+                    break;
+                } case "adminNickname" -> {
+                    errorCode = INCORRECT_FORMAT_ADMIN_NICKNAME;
+                    break;
+                } case "adminSecretKey" -> {
+                    errorCode = INCORRECT_FORMAT_ADMIN_SECRET_KEY;
+                    break;
                 }
             }
 

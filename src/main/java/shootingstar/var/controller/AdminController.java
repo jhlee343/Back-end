@@ -29,13 +29,13 @@ public class AdminController {
 
     @PostMapping("/signup")
     public ResponseEntity<String> signup(@Valid @RequestBody AdminSignupReqDto reqDto) {
-        adminService.signup(reqDto.getLoginId(), reqDto.getPassword(), reqDto.getNickname(), reqDto.getSecretKey());
+        adminService.signup(reqDto.getAdminLoginId(), reqDto.getAdminPassword(), reqDto.getAdminNickname(), reqDto.getAdminSecretKey());
         return ResponseEntity.ok().body("회원가입에 성공하였습니다.");
     }
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@Valid @RequestBody AdminLoginReqDto reqDto, HttpServletResponse response) {
-        TokenInfo tokenInfo = adminService.login(reqDto.getLoginId(), reqDto.getPassword());
+        TokenInfo tokenInfo = adminService.login(reqDto.getAdminLoginId(), reqDto.getAdminPassword());
         TokenUtil.addHeader(response, tokenInfo.getAccessToken());
         TokenUtil.updateCookie(response, tokenInfo.getRefreshToken(), tokenProperty.getREFRESH_EXPIRE());
         return ResponseEntity.ok().body("로그인에 성공하였습니다.");
