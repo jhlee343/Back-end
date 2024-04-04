@@ -76,6 +76,12 @@ public class GlobalExceptionHandler {
                 } case "ticketReportEvidenceUrl" -> {
                     errorCode = INCORRECT_FORMAT_TICKET_REPORT_EVIDENCE_URL;
                     break;
+                } case "chatRoomUUID" -> {
+                    errorCode = INCORRECT_FORMAT_CHAT_ROOM_UUID;
+                    break;
+                } case "chatReportContent" -> {
+                    errorCode = INCORRECT_FORMAT_CHAT_REPORT_CONTENT;
+                    break;
                 }  case "adminLoginId" -> {
                     errorCode = INCORRECT_FORMAT_ADMIN_ID;
                     break;

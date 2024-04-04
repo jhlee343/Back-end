@@ -117,7 +117,8 @@ public class SchedulerService {
             // 식사권 닫기
             ticket.changeTicketIsOpened(false);
 
-            // 채팅방 닫기 => 추후 추가할 예정
+            // 채팅방 닫기
+            ticket.getChatRoom().changeChatRoomIsOpened(false);
 
             // 포인트 정산
             // 경매 주최자에게 70% 지급
