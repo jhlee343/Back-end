@@ -18,6 +18,8 @@ build/
 
 **/src/main/resources/ssl/
 
+**/src/test/java/shootingstar/var/Service/DummyDataTest.java
+
 ### STS ###
 .apt_generated
 .classpath
