@@ -1,11 +1,18 @@
 package shootingstar.var.Service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import shootingstar.var.dto.res.UserAuctionInvalidityResDto;
+import shootingstar.var.dto.res.UserAuctionParticipateResDto;
+import shootingstar.var.dto.res.UserAuctionSuccessResDto;
 import shootingstar.var.dto.res.VipInfoDto;
+import shootingstar.var.entity.Auction;
 import shootingstar.var.entity.User;
 import shootingstar.var.entity.VipInfo;
 import shootingstar.var.exception.CustomException;
+import shootingstar.var.repository.AuctionRepository;
 import shootingstar.var.repository.user.UserRepository;
 import shootingstar.var.repository.vip.VipInfoRepository;
 
@@ -17,9 +24,10 @@ import static shootingstar.var.exception.ErrorCode.VIP_INFO_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
-public class VipService {
+public class VipUserService {
     private final VipInfoRepository vipInfoRepository;
     private final UserRepository userRepository;
+    private final AuctionRepository auctionRepository;
 
     public VipInfoDto getVipInfo(String userUUID){
         User user = findByUserUUID(userUUID);
@@ -44,6 +52,16 @@ public class VipService {
             throw new CustomException(VIP_INFO_NOT_FOUND);
         }
         return optionalVipInfo.get();
+    }
+
+    public Page<UserAuctionSuccessResDto> getVipUserAuctionSuccess(String userUUID, Pageable pageable){
+        return auctionRepository.findAllVipSuccessByUserUUID(userUUID,pageable);
+    }
+    public Page<UserAuctionParticipateResDto> getVipUserAuctionProgress(String userUUID, Pageable pageable){
+        return auctionRepository.findAllVipProgressByUserUUID(userUUID,pageable);
+    }
+    public Page<UserAuctionInvalidityResDto> getVipUserAuctionInvalidity(String userUUID, Pageable pageable){
+        return auctionRepository.findAllVipInvalidityByUserUUID(userUUID,pageable);
     }
 
 }

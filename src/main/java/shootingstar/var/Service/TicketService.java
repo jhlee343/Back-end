@@ -17,6 +17,7 @@ import shootingstar.var.dto.res.DetailTicketResDto;
 import shootingstar.var.entity.Auction;
 import shootingstar.var.entity.PointLog;
 import shootingstar.var.entity.Review;
+import shootingstar.var.entity.chat.ChatRoom;
 import shootingstar.var.entity.ticket.Ticket;
 import shootingstar.var.entity.ticket.TicketMeetingTime;
 import shootingstar.var.entity.ticket.TicketReport;
@@ -55,6 +56,8 @@ public class TicketService {
         User winner = userRepository.findByUserUUID(auction.getCurrentHighestBidderUUID())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
+        String chatRoomUUID = ticket.getChatRoom().getChatRoomUUID();
+
         BigDecimal donationCommission = new BigDecimal(0.05);
         return DetailTicketResDto.builder()
                 .meetingDate(auction.getMeetingDate())
@@ -67,6 +70,7 @@ public class TicketService {
                 .meetingPromiseText(auction.getMeetingPromiseText())
                 .winnerIsPushed(ticket.isWinnerIsPushed())
                 .organizerIsPushed(ticket.isOrganizerIsPushed())
+                .chatRoomUUID(chatRoomUUID)
                 .build();
     }
 
@@ -193,6 +197,7 @@ public class TicketService {
         }
 
         // 채팅방 닫는 로직
+        ticket.getChatRoom().changeChatRoomIsOpened(false);
 
         // 식사권 상태 false로 변경
         ticket.changeTicketIsOpened(false);

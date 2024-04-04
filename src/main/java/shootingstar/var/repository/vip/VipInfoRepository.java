@@ -5,7 +5,7 @@ import shootingstar.var.entity.User;
 import shootingstar.var.entity.VipInfo;
 import java.util.Optional;
 
-public interface VipInfoRepository extends JpaRepository<VipInfo,Long> {
+public interface VipInfoRepository extends JpaRepository<VipInfo,Long>, VipInfoRepositoryCustom {
     Optional<VipInfo> findVipInfoByUser(User user);
-
+    Optional<VipInfo> findByVipInfoUUID(String vipInfoUUID);
 }

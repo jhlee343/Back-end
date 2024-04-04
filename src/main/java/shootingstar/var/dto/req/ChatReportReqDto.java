@@ -1,12 +1,14 @@
 package shootingstar.var.dto.req;
 
 import jakarta.validation.constraints.NotBlank;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
-public class AdminLoginReqDto {
+public class ChatReportReqDto {
     @NotBlank
-    private String adminLoginId;
+    private String chatRoomUUID;
+
     @NotBlank
-    private String adminPassword;
+    private String chatReportContent;
 }

@@ -7,12 +7,11 @@ import jakarta.persistence.EntityManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
-import shootingstar.var.dto.res.QUserReceiveReviewDto;
-import shootingstar.var.dto.res.QUserSendReviewDto;
-import shootingstar.var.dto.res.UserReceiveReviewDto;
-import shootingstar.var.dto.res.UserSendReviewDto;
+import shootingstar.var.dto.res.*;
 
 import java.util.List;
+
+import static org.springframework.util.StringUtils.hasText;
 import static shootingstar.var.entity.QReview.review;
 
 public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
@@ -100,12 +99,44 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
         return PageableExecutionUtils.getPage(content,pageable,countQuery::fetchOne);
     }
 
+    @Override
+    public Page<AllReviewsDto> findAllReviews(String search, Pageable pageable) {
+        List<AllReviewsDto> content = queryFactory
+                .select(new QAllReviewsDto(
+                        review.reviewUUID,
+                        review.writer.nickname,
+                        review.reviewContent,
+                        review.isShowed
+                ))
+                .from(review)
+                .where(checkSearch(search))
+                .orderBy(review.reviewId.asc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        JPAQuery<Long> countQuery = queryFactory
+                .select(review.count())
+                .from(review)
+                .where(checkSearch(search));
+
+        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
+    }
+
     private BooleanExpression userEqReceiver(String userUUID){
         return userUUID !=null ? review.receiver.userUUID.eq(userUUID) : null;
     }
 
     private BooleanExpression userEqWriter(String userUUID){
         return userUUID != null ? review.writer.userUUID.eq(userUUID) : null;
+    }
+
+    private BooleanExpression checkSearch (String search) {
+        if (!hasText(search)) {
+            return null;
+        }
+
+        return review.writer.name.eq(search);
     }
 
 }
