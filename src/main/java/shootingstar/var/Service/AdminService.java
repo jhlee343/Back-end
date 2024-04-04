@@ -12,6 +12,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import shootingstar.var.dto.res.*;
 import shootingstar.var.entity.*;
+import shootingstar.var.exception.CustomException;
+import shootingstar.var.exception.ErrorCode;
 import shootingstar.var.jwt.JwtTokenProvider;
 import shootingstar.var.jwt.TokenInfo;
 import shootingstar.var.repository.BanRepository;
@@ -39,21 +41,29 @@ public class AdminService {
     @Value("${admin-secret-signup-key}")
     private String adminSignupSecretKey;
 
-    public void signup(String id, String password, String secretKey) {
+    public void signup(String id, String password, String nickname, String secretKey) {
         if (!secretKey.equals(adminSignupSecretKey)) {
-            throw new RuntimeException("회원가입 실패 잘못된 인증 키");
+            throw new CustomException(ErrorCode.INCORRECT_VALUE_ADMIN_SECRET_KEY);
         }
         if (adminRepository.existsByAdminLoginId(id)) {
-            throw new RuntimeException("해당 id로 가입 불가능");
+            throw new CustomException(ErrorCode.DUPLICATE_ADMIN_ID);
+        }
+        if (adminRepository.existsByNickname(nickname)) {
+            throw new CustomException(ErrorCode.DUPLICATE_ADMIN_NICKNAME);
         }
         String encodePassword = passwordEncoder.encode(password); // 패스워드 암호화
-        Admin admin = new Admin(id, encodePassword);
+        Admin admin = new Admin(id, encodePassword, nickname);
         adminRepository.save(admin);
     }
 
     public TokenInfo login(String id, String password) {
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(id, password);
-        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+        Authentication authentication;
+        try {
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(id, password);
+            authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+        } catch (Exception e) {
+            throw new CustomException(ErrorCode.ADMIN_LOGIN_FAILED);
+        }
         return tokenProvider.generateToken(authentication);
     }
 

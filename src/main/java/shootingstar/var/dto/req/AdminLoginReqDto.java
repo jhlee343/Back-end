@@ -1,9 +1,12 @@
 package shootingstar.var.dto.req;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
 public class AdminLoginReqDto {
-    private String loginId;
-    private String password;
+    @NotBlank
+    private String adminLoginId;
+    @NotBlank
+    private String adminPassword;
 }

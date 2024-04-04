@@ -93,6 +93,7 @@ public enum ErrorCode {
     ALREADY_TICKET_CANCEL_CONFLICT(CONFLICT, "6303", "이미 취소된 식사권입니다."),
     REVIEW_CONFLICT(CONFLICT, "6304", "해당 식사권에 대한 리뷰를 작성한 적이 있습니다."),
 
+    INCORRECT_FORMAT_VIP_INFO_UUID(BAD_REQUEST, "7001", "잘못된 형식의 VIP 정보 고유번호입니다."),
     VIP_INFO_NOT_FOUND(NOT_FOUND,"7200", "존재하지 않는 VIP 정보입니다."),
 
     INCORRECT_FORMAT_CHAT_ROOM_UUID(BAD_REQUEST, "8001", "잘못된 형식의 채팅방 UUID입니다."),
@@ -102,6 +103,17 @@ public enum ErrorCode {
     CHAT_MESSAGE_ACCESS_DENIED(FORBIDDEN, "8101", "접근 권한이 없습니다."),
 
     CHAT_ROOM_NOT_FOUND(NOT_FOUND, "8200", "존재하지 않는 채팅방입니다."),
+
+    INCORRECT_FORMAT_ADMIN_ID(BAD_REQUEST, "9001", "잘못된 형식의 관리자 ID입니다."),
+    INCORRECT_FORMAT_ADMIN_PASSWORD(BAD_REQUEST, "9002", "잘못된 형식의 관리자 비밀번호 입니다."),
+    INCORRECT_FORMAT_ADMIN_NICKNAME(BAD_REQUEST, "9003", "잘못된 형식의 관리자 닉네임입니다."),
+    INCORRECT_FORMAT_ADMIN_SECRET_KEY(BAD_REQUEST, "9004", "잘못된 형식의 관리자 비밀 키 입니다."),
+
+    ADMIN_LOGIN_FAILED(FORBIDDEN, "9101", "잘못된 관라자 아이디 혹은 패스워드입니다."),
+
+    DUPLICATE_ADMIN_ID(CONFLICT, "9301", "해당 관리자 아이디는 사용할 수 없습니다."),
+    DUPLICATE_ADMIN_NICKNAME(CONFLICT, "9302", "해당 관리자 닉네임은 사용할 수 없습니다."),
+    INCORRECT_VALUE_ADMIN_SECRET_KEY(CONFLICT, "9303", "잘못된 관리자 비밀 키 입니다."),
     ;
 
     private final HttpStatus httpStatus;

@@ -82,6 +82,18 @@ public class GlobalExceptionHandler {
                 } case "chatReportContent" -> {
                     errorCode = INCORRECT_FORMAT_CHAT_REPORT_CONTENT;
                     break;
+                }  case "adminLoginId" -> {
+                    errorCode = INCORRECT_FORMAT_ADMIN_ID;
+                    break;
+                } case "adminPassword" -> {
+                    errorCode = INCORRECT_FORMAT_ADMIN_PASSWORD;
+                    break;
+                } case "adminNickname" -> {
+                    errorCode = INCORRECT_FORMAT_ADMIN_NICKNAME;
+                    break;
+                } case "adminSecretKey" -> {
+                    errorCode = INCORRECT_FORMAT_ADMIN_SECRET_KEY;
+                    break;
                 }
             }
 
@@ -113,10 +125,12 @@ public class GlobalExceptionHandler {
                 errorCode = INCORRECT_FORMAT_NICKNAME;
             } else if (fieldName.contains("email")) {
                 errorCode = INCORRECT_FORMAT_EMAIL;
-            } else if (fieldName.contains("vipUUID")) {
+            } else if (fieldName.contains("vipUUID") || fieldName.contains("userUUID")) {
                 errorCode = INCORRECT_FORMAT_USER_UUID;
             } else if (fieldName.contains("auctionUUID")) {
                 errorCode = INCORRECT_FORMAT_AUCTION_UUID;
+            } else if (fieldName.contains("vipInfoUUID")) {
+                errorCode = INCORRECT_FORMAT_VIP_INFO_UUID;
             }
 
             if (!errorCode.equals(INCORRECT_FORMAT)) {

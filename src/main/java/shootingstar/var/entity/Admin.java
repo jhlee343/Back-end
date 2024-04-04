@@ -26,13 +26,16 @@ public class Admin extends BaseTimeEntity implements UserDetails {
     private String adminLoginId;
     @NotBlank
     private String password;
+    @NotBlank
+    private String nickname;
     @Enumerated(EnumType.STRING)
     private UserType role;
 
-    public Admin(String adminLoginId, String password) {
+    public Admin(String adminLoginId, String password, String nickname) {
         this.adminUUID = UUID.randomUUID().toString();
         this.adminLoginId = adminLoginId;
         this.password = password;
+        this.nickname = nickname;
         this.role = UserType.ROLE_ADMIN;
     }
 
