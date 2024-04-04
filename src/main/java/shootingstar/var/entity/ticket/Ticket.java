@@ -56,7 +56,7 @@ public class Ticket extends BaseTimeEntity {
     @OneToMany(mappedBy = "ticket")
     private List<TicketReport> reports = new ArrayList<>();
 
-    @OneToOne(mappedBy = "ticket")
+    @OneToOne(mappedBy = "ticket", fetch = FetchType.LAZY)
     private ChatRoom chatRoom;
 
 

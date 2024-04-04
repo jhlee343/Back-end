@@ -36,4 +36,8 @@ public class ChatRoom extends BaseTimeEntity {
         this.ticket = ticket;
         this.chatRoomIsOpened = true;
     }
+
+    public void changeChatRoomIsOpened(boolean chatRoomIsOpened) {
+        this.chatRoomIsOpened = chatRoomIsOpened;
+    }
 }
