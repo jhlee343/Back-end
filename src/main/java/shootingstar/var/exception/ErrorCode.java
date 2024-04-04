@@ -95,6 +95,9 @@ public enum ErrorCode {
 
     VIP_INFO_NOT_FOUND(NOT_FOUND,"7200", "존재하지 않는 VIP 정보입니다."),
 
+    INCORRECT_FORMAT_CHAT_ROOM_UUID(BAD_REQUEST, "8001", "잘못된 형식의 채팅방 UUID입니다."),
+    INCORRECT_FORMAT_CHAT_REPORT_CONTENT(BAD_REQUEST, "8002", "잘못된 형식의 채팅방 신고 내용입니다."),
+
     CHAT_ROOM_ACCESS_DENIED(FORBIDDEN, "8100", "접근 권한이 없습니다."),
     CHAT_MESSAGE_ACCESS_DENIED(FORBIDDEN, "8101", "접근 권한이 없습니다."),
 

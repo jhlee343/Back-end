@@ -197,6 +197,7 @@ public class TicketService {
         }
 
         // 채팅방 닫는 로직
+        ticket.getChatRoom().changeChatRoomIsOpened(false);
 
         // 식사권 상태 false로 변경
         ticket.changeTicketIsOpened(false);
