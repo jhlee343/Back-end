@@ -9,8 +9,8 @@ import jakarta.persistence.EntityManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
-import shootingstar.var.dto.res.QAllTicketsDto;
 import shootingstar.var.dto.res.AllTicketsDto;
+import shootingstar.var.dto.res.QAllTicketsDto;
 import shootingstar.var.dto.res.QTicketListResDto;
 import shootingstar.var.dto.res.TicketListResDto;
 import shootingstar.var.enums.type.AuctionType;
@@ -27,7 +27,7 @@ public class TicketRepositoryImpl implements TicketRepositoryCustom{
 
     @Override
     public List<TicketListResDto> findTicketByuserUUID(String userUUID) {
-      //  return null;
+//        return null;
         return queryFactory
                 .select(new QTicketListResDto(
                         ticket.organizer.nickname,

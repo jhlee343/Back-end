@@ -49,8 +49,8 @@ public class AdminController {
         return ResponseEntity.ok().body(userList);
     }
 
-    @PatchMapping("/warning")
-    public ResponseEntity<String> warning(@Valid @RequestBody String userUUID) {
+    @PatchMapping("/warning/{userUUID}")
+    public ResponseEntity<String> warning(@PathVariable String userUUID) {
         adminService.warning(userUUID);
         return ResponseEntity.ok().body("해당 회원이 경고되었습니다.");
     }
