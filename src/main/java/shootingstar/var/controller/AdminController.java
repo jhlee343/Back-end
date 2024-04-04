@@ -1,5 +1,11 @@
 package shootingstar.var.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -15,10 +21,12 @@ import shootingstar.var.Service.AdminService;
 import shootingstar.var.dto.req.AdminLoginReqDto;
 import shootingstar.var.dto.req.AdminSignupReqDto;
 import shootingstar.var.dto.res.*;
+import shootingstar.var.exception.ErrorResponse;
 import shootingstar.var.jwt.TokenInfo;
 import shootingstar.var.jwt.TokenProperty;
 import shootingstar.var.util.TokenUtil;
 
+@Tag(name = "AdminController", description = "관리자 컨트롤러")
 @Validated
 @RestController
 @RequiredArgsConstructor
@@ -27,12 +35,43 @@ public class AdminController {
     private final AdminService adminService;
     private final TokenProperty tokenProperty;
 
+    @Operation(summary = "관리자 회원가입 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "관리자 회원가입 성공", content = {
+                    @Content(mediaType = "text/plain", schema = @Schema(implementation = String.class))}),
+            @ApiResponse(responseCode = "400",
+                    description =
+                                    "- 잘못된 형식의 관리자 ID : 9001\n" +
+                                    "- 잘못된 형식의 관리자 비밀번호 : 9002\n" +
+                                    "- 잘못된 형식의 관리자 닉네임 : 9003\n" +
+                                    "- 잘못된 형식의 관리자 비밀 키 : 9004",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+            @ApiResponse(responseCode = "409",
+                    description =
+                                    "- 사용할 수 없는 관리자 ID : 9301\n" +
+                                    "- 사용할 수 없는 관리자 닉네임 : 9302\n" +
+                                    "- 잘못된 값의 관리자 비밀 키 : 9303",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+    })
     @PostMapping("/signup")
     public ResponseEntity<String> signup(@Valid @RequestBody AdminSignupReqDto reqDto) {
         adminService.signup(reqDto.getAdminLoginId(), reqDto.getAdminPassword(), reqDto.getAdminNickname(), reqDto.getAdminSecretKey());
         return ResponseEntity.ok().body("회원가입에 성공하였습니다.");
     }
 
+    @Operation(summary = "관리자 로그인 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "관리자 로그인 성공", content = {
+                    @Content(mediaType = "text/plain", schema = @Schema(implementation = String.class))}),
+            @ApiResponse(responseCode = "400",
+                    description =
+                                    "- 잘못된 형식의 관리자 ID : 9001\n" +
+                                    "- 잘못된 형식의 관리자 비밀번호 : 9002",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+            @ApiResponse(responseCode = "403",
+                    description = "로그인 실패 : 잘못된 관리자 아이디 혹은 패스워드",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+    })
     @PostMapping("/login")
     public ResponseEntity<String> login(@Valid @RequestBody AdminLoginReqDto reqDto, HttpServletResponse response) {
         TokenInfo tokenInfo = adminService.login(reqDto.getAdminLoginId(), reqDto.getAdminPassword());
