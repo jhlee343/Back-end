@@ -3,11 +3,13 @@ package shootingstar.var.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import shootingstar.var.Service.AdminService;
 import shootingstar.var.dto.req.AdminLoginReqDto;
@@ -17,23 +19,26 @@ import shootingstar.var.jwt.TokenInfo;
 import shootingstar.var.jwt.TokenProperty;
 import shootingstar.var.util.TokenUtil;
 
+@Validated
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/admin")
+@RequestMapping("/api/lookAtMe")
 public class AdminController {
     private final AdminService adminService;
     private final TokenProperty tokenProperty;
 
     @PostMapping("/signup")
-    public void signup(@RequestBody AdminSignupReqDto reqDto) {
-        adminService.signup(reqDto.getLoginId(), reqDto.getPassword(), reqDto.getSecretKey());
+    public ResponseEntity<String> signup(@Valid @RequestBody AdminSignupReqDto reqDto) {
+        adminService.signup(reqDto.getLoginId(), reqDto.getPassword(), reqDto.getNickname(), reqDto.getSecretKey());
+        return ResponseEntity.ok().body("회원가입에 성공하였습니다.");
     }
 
     @PostMapping("/login")
-    public void login(@RequestBody AdminLoginReqDto reqDto, HttpServletResponse response) {
+    public ResponseEntity<String> login(@Valid @RequestBody AdminLoginReqDto reqDto, HttpServletResponse response) {
         TokenInfo tokenInfo = adminService.login(reqDto.getLoginId(), reqDto.getPassword());
         TokenUtil.addHeader(response, tokenInfo.getAccessToken());
         TokenUtil.updateCookie(response, tokenInfo.getRefreshToken(), tokenProperty.getREFRESH_EXPIRE());
+        return ResponseEntity.ok().body("로그인에 성공하였습니다.");
     }
 
     @GetMapping("/test")
@@ -50,7 +55,7 @@ public class AdminController {
     }
 
     @PatchMapping("/warning/{userUUID}")
-    public ResponseEntity<String> warning(@PathVariable String userUUID) {
+    public ResponseEntity<String> warning(@NotBlank @PathVariable String userUUID) {
         adminService.warning(userUUID);
         return ResponseEntity.ok().body("해당 회원이 경고되었습니다.");
     }
@@ -64,14 +69,14 @@ public class AdminController {
     }
 
     @GetMapping("/vip/requestDetail/{vipInfoUUID}")
-    public ResponseEntity<AllVipInfosDto> getVipInfoDetail(@PathVariable("vipInfoUUID") String vipInfoUUID, HttpServletRequest request) {
+    public ResponseEntity<AllVipInfosDto> getVipInfoDetail(@NotBlank @PathVariable("vipInfoUUID") String vipInfoUUID, HttpServletRequest request) {
         AllVipInfosDto vipInfoDetail = adminService.getVipInfoDetail(vipInfoUUID);
         return ResponseEntity.ok().body(vipInfoDetail);
     }
 
     @PatchMapping("/vip/changeState/{vipInfoUUID}")
     public ResponseEntity<String> vipInfoChange(
-            @PathVariable("vipInfoUUID") String vipInfoUUID,
+            @NotBlank @PathVariable("vipInfoUUID") String vipInfoUUID,
             @RequestParam String vipInfoState
     ) {
         adminService.vipInfoChange(vipInfoUUID, vipInfoState);

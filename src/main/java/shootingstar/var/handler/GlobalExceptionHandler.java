@@ -107,10 +107,12 @@ public class GlobalExceptionHandler {
                 errorCode = INCORRECT_FORMAT_NICKNAME;
             } else if (fieldName.contains("email")) {
                 errorCode = INCORRECT_FORMAT_EMAIL;
-            } else if (fieldName.contains("vipUUID")) {
+            } else if (fieldName.contains("vipUUID") || fieldName.contains("userUUID")) {
                 errorCode = INCORRECT_FORMAT_USER_UUID;
             } else if (fieldName.contains("auctionUUID")) {
                 errorCode = INCORRECT_FORMAT_AUCTION_UUID;
+            } else if (fieldName.contains("vipInfoUUID")) {
+                errorCode = INCORRECT_FORMAT_VIP_INFO_UUID;
             }
 
             if (!errorCode.equals(INCORRECT_FORMAT)) {

@@ -39,15 +39,18 @@ public class AdminService {
     @Value("${admin-secret-signup-key}")
     private String adminSignupSecretKey;
 
-    public void signup(String id, String password, String secretKey) {
+    public void signup(String id, String password, String nickname, String secretKey) {
         if (!secretKey.equals(adminSignupSecretKey)) {
             throw new RuntimeException("회원가입 실패 잘못된 인증 키");
         }
         if (adminRepository.existsByAdminLoginId(id)) {
             throw new RuntimeException("해당 id로 가입 불가능");
         }
+        if (adminRepository.existsByNickname(nickname)) {
+            throw new RuntimeException("해당 닉네임으로 가입 불가능");
+        }
         String encodePassword = passwordEncoder.encode(password); // 패스워드 암호화
-        Admin admin = new Admin(id, encodePassword);
+        Admin admin = new Admin(id, encodePassword, nickname);
         adminRepository.save(admin);
     }
 

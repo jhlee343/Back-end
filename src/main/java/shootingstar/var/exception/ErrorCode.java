@@ -93,6 +93,7 @@ public enum ErrorCode {
     ALREADY_TICKET_CANCEL_CONFLICT(CONFLICT, "6303", "이미 취소된 식사권입니다."),
     REVIEW_CONFLICT(CONFLICT, "6304", "해당 식사권에 대한 리뷰를 작성한 적이 있습니다."),
 
+    INCORRECT_FORMAT_VIP_INFO_UUID(BAD_REQUEST, "7001", "잘못된 형식의 VIP 정보 고유번호입니다."),
     VIP_INFO_NOT_FOUND(NOT_FOUND,"7200", "존재하지 않는 VIP 정보입니다."),
 
     CHAT_ROOM_ACCESS_DENIED(FORBIDDEN, "8100", "접근 권한이 없습니다."),
