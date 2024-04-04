@@ -32,7 +32,7 @@ public class VipInfo {
     private String vipIntroduce;
 
     @NotNull
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     private VipApprovalType vipApproval;
 
     @NotNull
@@ -49,5 +49,9 @@ public class VipInfo {
         this.vipJob = vipJob;
         this.vipApproval = vipApprovalType;
         this.vipEvidenceUrl = vipEvidenceUrl;
+    }
+
+    public void changeVipApproval(VipApprovalType vipApprovalType) {
+        this.vipApproval = vipApprovalType;
     }
 }

@@ -15,6 +15,7 @@ import shootingstar.var.enums.type.UserType;
 
 import java.util.List;
 
+import static org.springframework.util.StringUtils.hasText;
 import static shootingstar.var.entity.QAuction.auction;
 import static shootingstar.var.entity.QFollow.follow;
 import static shootingstar.var.entity.QReview.review;
@@ -150,6 +151,33 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom{
                 .fetch();
     }
 
+    @Override
+    public Page<AllUsersDto> findAllUsers(String search, Pageable pageable) {
+        List<AllUsersDto> content = queryFactory
+                .select(new QAllUsersDto(
+                        user.userUUID,
+                        user.name,
+                        user.nickname,
+                        user.email,
+                        user.phone,
+                        user.userType,
+                        user.warningCount
+                ))
+                .from(user)
+                .where(user.isWithdrawn.eq(false), checkSearch(search))
+                .orderBy(user.userId.asc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        JPAQuery<Long> countQuery = queryFactory
+                .select(user.count())
+                .from(user)
+                .where(user.isWithdrawn.eq(false), checkSearch(search));
+
+        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
+    }
+
     private BooleanExpression getIsFollow(String userUUID) {
         return userUUID != null ?
                 JPAExpressions
@@ -158,5 +186,14 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom{
                         .where(follow.follower.userUUID.eq(userUUID)
                                 .and(follow.following.userUUID.eq(user.userUUID)))
                         .gt(0L) : Expressions.asBoolean(false).isTrue();
+    }
+
+    private BooleanExpression checkSearch (String search) {
+        if (!hasText(search)) {
+            return null;
+        }
+
+        return user.name.eq(search)
+                .or(user.nickname.eq(search));
     }
 }
