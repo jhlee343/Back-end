@@ -5,10 +5,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import shootingstar.var.dto.req.UserSignupReqDto;
 import shootingstar.var.dto.res.*;
 import shootingstar.var.entity.Auction;
 import shootingstar.var.entity.User;
+import shootingstar.var.entity.Wallet;
 import shootingstar.var.enums.type.AuctionSortType;
 import shootingstar.var.enums.type.AuctionType;
 import shootingstar.var.enums.type.UserType;
@@ -18,9 +20,12 @@ import shootingstar.var.jwt.JwtTokenProvider;
 import shootingstar.var.repository.AuctionRepository;
 import shootingstar.var.repository.user.UserRepository;
 import shootingstar.var.repository.banner.BannerRepository;
+import shootingstar.var.repository.wallet.WalletRepository;
 import shootingstar.var.util.MailRedisUtil;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +33,7 @@ public class AllUserService {
     private final UserRepository userRepository;
     private final BannerRepository bannerRepository;
     private final AuctionRepository auctionRepository;
+    private final WalletRepository walletRepository;
 
     private final MailRedisUtil mailRedisUtil;
     private final CheckDuplicateService duplicateService;
@@ -62,6 +68,13 @@ public class AllUserService {
 
     public List<GetBannerResDto> getBanner() {
         return bannerRepository.findAllBanner();
+    }
+
+    @Transactional
+    public BigDecimal getTotalDonation() {
+        Wallet wallet = walletRepository.findWithPessimisticLock()
+                .orElseThrow(() -> new CustomException(ErrorCode.WALLET_NOT_FOUND));
+        return wallet.getTotalDonationPrice();
     }
 
     public Page<VipListResDto> getVipList(Pageable pageable, String search, String accessToken) {

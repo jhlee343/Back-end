@@ -114,6 +114,8 @@ public enum ErrorCode {
     DUPLICATE_ADMIN_ID(CONFLICT, "9301", "해당 관리자 아이디는 사용할 수 없습니다."),
     DUPLICATE_ADMIN_NICKNAME(CONFLICT, "9302", "해당 관리자 닉네임은 사용할 수 없습니다."),
     INCORRECT_VALUE_ADMIN_SECRET_KEY(CONFLICT, "9303", "잘못된 관리자 비밀 키 입니다."),
+
+    WALLET_NOT_FOUND(NOT_FOUND, "10200", "지갑을 찾을 수 없습니다."),
     ;
 
     private final HttpStatus httpStatus;
