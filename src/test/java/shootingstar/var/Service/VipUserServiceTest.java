@@ -16,7 +16,7 @@ import shootingstar.var.repository.user.UserRepository;
 import shootingstar.var.repository.vip.VipInfoRepository;
 
 @SpringBootTest
-class UserServiceTest {
+class VipUserServiceTest {
     @Autowired
     UserRepository userRepository;
     @Autowired
