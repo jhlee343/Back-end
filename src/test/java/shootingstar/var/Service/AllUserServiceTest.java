@@ -268,4 +268,5 @@ class AllUserServiceTest {
         System.out.println(auctionDetail2);
         Assertions.assertThat(auctionDetail2.getAuctionUUID()).isEqualTo(progressAuction2.getAuctionUUID());
     }
+
 }
