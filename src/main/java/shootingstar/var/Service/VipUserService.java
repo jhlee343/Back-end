@@ -45,15 +45,19 @@ public class VipUserService {
     public void editVipInfo(String userUUID, VipInfoEditResDto vipInfoEdit){
         User user =findByUserUUID(userUUID);
         VipInfo vipInfo = findVipInfoByUser(user);
+        if(vipInfoEdit.getVipJob()!=null){
+            vipInfo.changeVipJob(vipInfoEdit.getVipJob());
+        }
         if(vipInfoEdit.getVipCareer()!=null){
             vipInfo.changeVipCareer(vipInfoEdit.getVipCareer());
         }
-        else if(vipInfoEdit.getVipIntroduce()!=null){
+        if(vipInfoEdit.getVipIntroduce()!=null){
             vipInfo.changeVipIntroduce(vipInfoEdit.getVipIntroduce());
         }
-        else if(vipInfoEdit.getVipEvidenceUrl()!=null){
+        if(vipInfoEdit.getVipEvidenceUrl()!=null){
             vipInfo.changeVipEvidenceUrl(vipInfoEdit.getVipEvidenceUrl());
         }
+
         vipInfoRepository.save(vipInfo);
     }
     public User findByUserUUID(String userUUID) {

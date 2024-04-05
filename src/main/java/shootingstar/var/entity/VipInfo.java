@@ -62,4 +62,7 @@ public class VipInfo {
     public void changeVipEvidenceUrl(String vipEvidenceUrl){
         this.vipEvidenceUrl=vipEvidenceUrl;
     }
+    public void changeVipJob(String vipJob){
+        this.vipJob=vipJob;
+    }
 }

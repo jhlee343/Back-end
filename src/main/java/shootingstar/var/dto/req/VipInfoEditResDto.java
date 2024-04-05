@@ -16,7 +16,7 @@ public class VipInfoEditResDto {
     private String vipEvidenceUrl;
 
     @Builder
-    public VipInfoEditResDto(String vipJob,String vipCareer,String vipIntroduce,
+    public VipInfoEditResDto(String vipJob, String vipCareer, String vipIntroduce,
                              String vipEvidenceUrl){
         this.vipJob = vipJob;
         this.vipCareer = vipCareer;
