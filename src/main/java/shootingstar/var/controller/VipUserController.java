@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import shootingstar.var.Service.VipUserService;
+import shootingstar.var.dto.req.VipInfoEditResDto;
 import shootingstar.var.dto.res.UserAuctionInvalidityResDto;
 import shootingstar.var.dto.res.UserAuctionParticipateResDto;
 import shootingstar.var.dto.res.UserAuctionSuccessResDto;
@@ -38,7 +39,13 @@ public class VipUserController {
         return ResponseEntity.ok(vipInfo);
 
     }
-
+    @Operation(summary = "vip info 수정하기")
+    @PatchMapping("/editInfo")
+    public ResponseEntity<String> editVipInfo(HttpServletRequest request, @RequestBody VipInfoEditResDto vipInfoEdit){
+        String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
+        vipService.editVipInfo(userUUID, vipInfoEdit);
+        return ResponseEntity.ok("vip Info Edit Success");
+    }
     @Operation(summary = "경매 불러오기")
     @GetMapping("/auction/{auctionType}")
     public ResponseEntity<?> getVipAuctionList(@NotBlank @PathVariable("auctionType") AuctionType auctionType,

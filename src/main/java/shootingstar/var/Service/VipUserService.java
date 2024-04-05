@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import shootingstar.var.dto.req.VipInfoEditResDto;
 import shootingstar.var.dto.res.UserAuctionInvalidityResDto;
 import shootingstar.var.dto.res.UserAuctionParticipateResDto;
 import shootingstar.var.dto.res.UserAuctionSuccessResDto;
@@ -39,6 +41,25 @@ public class VipUserService {
         );
     }
 
+    @Transactional
+    public void editVipInfo(String userUUID, VipInfoEditResDto vipInfoEdit){
+        User user =findByUserUUID(userUUID);
+        VipInfo vipInfo = findVipInfoByUser(user);
+        if(vipInfoEdit.getVipJob()!=null){
+            vipInfo.changeVipJob(vipInfoEdit.getVipJob());
+        }
+        if(vipInfoEdit.getVipCareer()!=null){
+            vipInfo.changeVipCareer(vipInfoEdit.getVipCareer());
+        }
+        if(vipInfoEdit.getVipIntroduce()!=null){
+            vipInfo.changeVipIntroduce(vipInfoEdit.getVipIntroduce());
+        }
+        if(vipInfoEdit.getVipEvidenceUrl()!=null){
+            vipInfo.changeVipEvidenceUrl(vipInfoEdit.getVipEvidenceUrl());
+        }
+
+        vipInfoRepository.save(vipInfo);
+    }
     public User findByUserUUID(String userUUID) {
         Optional<User> optionalUser = userRepository.findByUserUUID(userUUID);
         if (optionalUser.isEmpty()) {

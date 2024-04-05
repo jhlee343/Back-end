@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import shootingstar.var.dto.req.UserApplyVipDto;
 import shootingstar.var.dto.res.TicketListResDto;
 import shootingstar.var.dto.res.UserAuctionParticipateResDto;
@@ -29,6 +30,8 @@ public class BasicUserService {
     private final TicketRepository ticketRepository;
     private final UserRepository userRepository;
     private final AuctionRepository auctionRepository;
+
+    @Transactional
     public void applyVip(String userUUID , UserApplyVipDto userApplyVipDto){
         User user = findByUserUUID(userUUID);
         VipInfo vipInfo = VipInfo.builder()
