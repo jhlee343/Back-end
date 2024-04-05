@@ -268,4 +268,21 @@ class AllUserServiceTest {
         System.out.println(auctionDetail2);
         Assertions.assertThat(auctionDetail2.getAuctionUUID()).isEqualTo(progressAuction2.getAuctionUUID());
     }
+    @Test
+    @DisplayName("vip 수정하기")
+    @Transactional
+    public void editVipInfo() throws Exception {
+        User vip = new User("22", "실명", "유명인", "000-0000-0000", "test@ttt.com", "helloUrl", UserType.ROLE_VIP);
+        User basic = new User("33", "실명", "일반인", "000-0000-0000", "test@ttt.com", "helloUrl", UserType.ROLE_BASIC);
+
+        userRepository.save(vip);
+        userRepository.save(basic);
+
+        userRepository.flush();
+
+        VipInfo vipInfo = new VipInfo(vip, vip.getName(), "개발자", "경력", "소개", VipApprovalType.APPROVE, "url");
+        vipInfoRepository.save(vipInfo);
+
+        vipInfoRepository.flush();
+    }
 }
