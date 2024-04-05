@@ -58,12 +58,14 @@ public class SecurityConfig {
                                         "/api/auth/**",
                                         "/v3/api-docs/**", // swagger 설정
                                         "/swagger-ui/**", // swagger 설정
-                                        "/api/admin/signup",
-                                        "/api/admin/login"
+                                        "/api/lookAtMe/signup",
+                                        "/api/lookAtMe/login",
+                                        "/ws/chat"
                                 ).permitAll()
 
                                 .requestMatchers(
-                                        "/api/ticket/**"
+                                        "/api/ticket/**",
+                                        "/api/chat/**"
                                 ).hasAnyRole("BASIC", "VIP")
 
                                 .requestMatchers( // 권한 확인
@@ -75,7 +77,7 @@ public class SecurityConfig {
                                 ).hasRole("VIP")
 
                                 .requestMatchers(
-                                        "/api/admin/test"
+                                        "/api/lookAtMe/test"
                                 ).hasRole("ADMIN")
 
 

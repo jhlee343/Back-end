@@ -19,6 +19,7 @@ import shootingstar.var.entity.Auction;
 import shootingstar.var.entity.BaseTimeEntity;
 import shootingstar.var.entity.Review;
 import shootingstar.var.entity.User;
+import shootingstar.var.entity.chat.ChatRoom;
 
 @Entity
 @Getter
@@ -54,6 +55,10 @@ public class Ticket extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "ticket")
     private List<TicketReport> reports = new ArrayList<>();
+
+    @OneToOne(mappedBy = "ticket", fetch = FetchType.LAZY)
+    private ChatRoom chatRoom;
+
 
     @Builder
     public Ticket(Auction auction, User winner, User organizer) {

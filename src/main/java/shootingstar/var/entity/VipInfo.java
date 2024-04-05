@@ -32,7 +32,7 @@ public class VipInfo {
     private String vipIntroduce;
 
     @NotNull
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     private VipApprovalType vipApproval;
 
     @NotNull
@@ -48,15 +48,6 @@ public class VipInfo {
         this.vipIntroduce = vipIntroduce;
         this.vipJob = vipJob;
         this.vipApproval = vipApprovalType;
-        this.vipEvidenceUrl = vipEvidenceUrl;
-    }
-    public void changeVipCareer(String vipCareer){
-        this.vipCareer = vipCareer;
-    }
-    public void changeVipIntroduce(String vipIntroduce){
-        this.vipIntroduce=vipIntroduce;
-    }
-    public void changeVipEvidenceUrl(String vipEvidenceUrl){
         this.vipEvidenceUrl = vipEvidenceUrl;
     }
 }
