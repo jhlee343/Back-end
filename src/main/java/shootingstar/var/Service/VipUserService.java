@@ -49,7 +49,7 @@ public class VipUserService {
             vipInfo.changeVipCareer(vipInfoEdit.getVipCareer());
         }
         else if(vipInfoEdit.getVipIntroduce()!=null){
-            vipInfo.changeVipEvidenceUrl(vipInfoEdit.getVipEvidenceUrl());
+            vipInfo.changeVipIntroduce(vipInfoEdit.getVipIntroduce());
         }
         else if(vipInfoEdit.getVipEvidenceUrl()!=null){
             vipInfo.changeVipEvidenceUrl(vipInfoEdit.getVipEvidenceUrl());

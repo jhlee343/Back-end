@@ -50,4 +50,16 @@ public class VipInfo {
         this.vipApproval = vipApprovalType;
         this.vipEvidenceUrl = vipEvidenceUrl;
     }
+    public void changeVipApproval(VipApprovalType vipApprovalType) {
+        this.vipApproval = vipApprovalType;
+    }
+    public void changeVipCareer(String vipCareer){
+        this.vipCareer=vipCareer;
+    }
+    public void changeVipIntroduce(String vipIntroduce){
+        this.vipIntroduce=vipIntroduce;
+    }
+    public void changeVipEvidenceUrl(String vipEvidenceUrl){
+        this.vipEvidenceUrl=vipEvidenceUrl;
+    }
 }
