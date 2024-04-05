@@ -28,6 +28,7 @@ import shootingstar.var.enums.type.AuctionSortType;
 import shootingstar.var.exception.ErrorResponse;
 import shootingstar.var.util.TokenUtil;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Tag(name = "AllUserController", description = "로그인하지 않아도 접속 가능한 컨트롤러")
@@ -129,6 +130,19 @@ public class AllUserController {
     public ResponseEntity<List<GetBannerResDto>> getBanner() {
         List<GetBannerResDto> banners = allUserService.getBanner();
         return ResponseEntity.ok().body(banners);
+    }
+
+    @Operation(summary = "현재 전체 기부금액 조회 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "현재 전체 기부금액 조회", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = TotalDonationPriceResDto.class))}),
+            @ApiResponse(responseCode = "404", description = "지갑을 찾을 수 없음 : 10200", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+    })
+    @GetMapping("/totalDonation")
+    public ResponseEntity<TotalDonationPriceResDto> getTotalDonation() {
+        BigDecimal totalDonation = allUserService.getTotalDonation();
+        return ResponseEntity.ok().body(new TotalDonationPriceResDto(totalDonation));
     }
 
     @Operation(summary = "모든 사용자가 접근 가능한 VIP 리스트 조회 API")
