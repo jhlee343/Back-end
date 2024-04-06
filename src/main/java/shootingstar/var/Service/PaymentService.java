@@ -9,10 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shootingstar.var.dto.req.ExchangeReqDto;
 import shootingstar.var.dto.req.PaymentReqDto;
-import shootingstar.var.entity.Exchange;
-import shootingstar.var.entity.PaymentsInfo;
-import shootingstar.var.entity.PointLog;
-import shootingstar.var.entity.User;
+import shootingstar.var.entity.*;
 import shootingstar.var.enums.type.PointOriginType;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
@@ -20,6 +17,7 @@ import shootingstar.var.repository.PointLogRepository;
 import shootingstar.var.repository.exchange.ExchangeRepository;
 import shootingstar.var.repository.payment.PaymentRepository;
 import shootingstar.var.repository.user.UserRepository;
+import shootingstar.var.repository.wallet.WalletRepository;
 
 import static shootingstar.var.exception.ErrorCode.*;
 
@@ -31,6 +29,7 @@ public class PaymentService {
     private final UserRepository userRepository;
     private final ExchangeRepository exchangeRepository;
     private final PointLogRepository pointLogRepository;
+    private final WalletRepository walletRepository;
 
 
 
@@ -38,6 +37,9 @@ public class PaymentService {
     public void verifyPointPayment(IamportResponse<Payment> ires, PaymentReqDto paymentReqDto, String userUUID) {
         User user = userRepository.findByUserUUIDWithPessimisticLock(userUUID)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        Wallet wallet = walletRepository.findWithPessimisticLock()
+                .orElseThrow(() -> new CustomException(ErrorCode.WALLET_NOT_FOUND));
 
         if (ires.getResponse().getAmount().longValue() != paymentReqDto.getPaymentAmount()) {
             throw new CustomException(PAYMENT_ACCESS_DENIED);
@@ -49,6 +51,10 @@ public class PaymentService {
         log.info("사용자 포인트 충전 전 포인트: {}", user.getPoint());
         user.increasePoint(BigDecimal.valueOf(paymentReqDto.getPaymentAmount()));
         log.info("사용자 포인트 충전 후 포인트: {}", user.getPoint());
+
+        log.info("사용자 포인트 충전 전 Wallet: {}", wallet.getCurrentCash());
+        wallet.increaseCash(BigDecimal.valueOf(paymentReqDto.getPaymentAmount()));
+        log.info("사용자 포인트 충전 후 Wallet: {}", wallet.getCurrentCash());
 
         PointLog pointLog = PointLog.createPointLogWithDeposit(user, PointOriginType.CHARGE, BigDecimal.valueOf(paymentReqDto.getPaymentAmount()));
         pointLogRepository.save(pointLog);
