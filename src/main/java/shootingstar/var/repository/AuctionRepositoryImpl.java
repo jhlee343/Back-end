@@ -38,14 +38,14 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
                         user.nickname
                 ))
                 .from(auction)
-                .where(currentHighestBidderIdEq(userUUID), auction.auctionType.eq(AuctionType.SUCCESS))
-                .orderBy(auction.meetingDate.desc())
+                .where(currentHighestBidderIdEq(userUUID), auction.auctionType.eq(AuctionType.SUCCESS),meetingDateBefore())
+                .orderBy(auction.meetingDate.asc())
                 .fetch();
 
         JPAQuery<Long> countQuery = queryFactory
                 .select(auction.count())
                 .from(auction)
-                .where(currentHighestBidderIdEq(userUUID), auction.auctionType.eq(AuctionType.SUCCESS));
+                .where(currentHighestBidderIdEq(userUUID), auction.auctionType.eq(AuctionType.SUCCESS),meetingDateBefore());
 
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
@@ -61,14 +61,14 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
                         user.nickname
                 ))
                 .from(auction)
-                .where(currentHighestBidderIdEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS))
-                .orderBy(auction.meetingDate.asc())
+                .where(currentHighestBidderIdEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS),meetingDateAfter())
+                .orderBy(auction.meetingDate.desc())
                 .fetch();
 
         JPAQuery<Long> countQuery = queryFactory
                 .select(auction.count())
                 .from(auction)
-                .where(currentHighestBidderIdEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS));
+                .where(currentHighestBidderIdEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS),meetingDateAfter());
 
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
