@@ -57,4 +57,25 @@ class VipUserServiceTest {
         System.out.println(vipInfo.getVipJob()+" "+ vipInfo.getVipCareer()+" "+vipInfo.getVipIntroduce());
 
     }
+
+    @Test
+    @DisplayName("vip Auction Success load")
+    public void vipAuctionSuccess() throws Exception{
+        //vip auction 현재날짜 전 날짜 후로 구분해서 가져오기
+
+        //user 생성
+        User vip = new User("22",
+                "실명",
+                "유명인",
+                "000-0000-0000",
+                "test@ttt.com",
+                "helloUrl",
+                UserType.ROLE_VIP);
+
+        userRepository.save(vip);
+
+        userRepository.flush();
+
+        //auction 생성
+    }
 }

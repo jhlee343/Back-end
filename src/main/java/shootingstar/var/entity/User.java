@@ -76,6 +76,8 @@ public class User extends BaseTimeEntity {
     @OneToMany(mappedBy = "receiver")
     private final List<Review> reviewsReceived = new ArrayList<>();
 
+    @OneToOne
+    private VipInfo vipInfo;
 
     @Builder
     public User(String kakaoId, String name, String nickname, String phone, String email, String profileImgUrl, UserType userType) {
