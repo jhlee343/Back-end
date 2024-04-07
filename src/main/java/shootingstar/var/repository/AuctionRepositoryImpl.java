@@ -14,7 +14,12 @@ import org.springframework.data.support.PageableExecutionUtils;
 import shootingstar.var.dto.res.*;
 import shootingstar.var.enums.type.AuctionSortType;
 import shootingstar.var.enums.type.AuctionType;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+
+import static com.querydsl.core.types.dsl.DateTimePath.*;
 import static shootingstar.var.entity.QAuction.auction;
 import static shootingstar.var.entity.QUser.user;
 
@@ -28,7 +33,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
         List<UserAuctionSuccessResDto> content = queryFactory
                 .select(new QUserAuctionSuccessResDto(
                         auction.user.profileImgUrl,
-                        auction.user.name,
+                        auction.user.nickname,
                         auction.meetingDate,
                         user.nickname
                 ))
@@ -51,7 +56,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
         List<UserAuctionSuccessResDto> content = queryFactory
                 .select(new QUserAuctionSuccessResDto(
                         auction.user.profileImgUrl,
-                        auction.user.name,
+                        auction.user.nickname,
                         auction.meetingDate,
                         user.nickname
                 ))
@@ -91,7 +96,9 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
 
     //vipUser auction
     @Override
-    public Page<UserAuctionSuccessResDto> findAllVipSuccessByUserUUID(String userUUID, Pageable pageable) {
+    public Page<UserAuctionSuccessResDto> findAllVipSuccessBeforeByUserUUID(String userUUID, Pageable pageable) {
+        //만남 전 - 가까운 날짜 순
+
         List<UserAuctionSuccessResDto> content = queryFactory
                 .select(new QUserAuctionSuccessResDto(
                         auction.user.profileImgUrl,
@@ -100,14 +107,37 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
                         auction.currentHighestBidderUUID
                 ))
                 .from(auction)
-                .where(vipUserUUIDEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS))
+                .where(vipUserUUIDEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS),meetingDateBefore())
                 .orderBy(auction.meetingDate.asc())
                 .fetch();
 
         JPAQuery<Long> countQuery = queryFactory
                 .select(auction.count())
                 .from(auction)
-                .where(vipUserUUIDEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS));
+                .where(vipUserUUIDEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS),meetingDateBefore());
+
+        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
+    }
+
+    @Override
+    public Page<UserAuctionSuccessResDto> findAllVipSuccessAfterByUserUUID(String userUUID, Pageable pageable) {
+        //만남 후 - 최근 날짜 순
+        List<UserAuctionSuccessResDto> content = queryFactory
+                .select(new QUserAuctionSuccessResDto(
+                        auction.user.profileImgUrl,
+                        auction.user.nickname,
+                        auction.createdTime,
+                        auction.currentHighestBidderUUID
+                ))
+                .from(auction)
+                .where(vipUserUUIDEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS),meetingDateAfter())
+                .orderBy(auction.meetingDate.desc())
+                .fetch();
+
+        JPAQuery<Long> countQuery = queryFactory
+                .select(auction.count())
+                .from(auction)
+                .where(vipUserUUIDEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS),meetingDateAfter());
 
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
@@ -202,4 +232,13 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
         return userUUID != null ? auction.user.userUUID.eq(userUUID) : null;
     }
 
+    private BooleanExpression meetingDateBefore(){
+        //x>=y 만남시간이 현재보다 뒤인경우 - 아직 안만난경우
+        return auction.meetingDate.goe(LocalDateTime.now());
+    }
+
+    private BooleanExpression meetingDateAfter(){
+        //x<y 만남후
+        return auction.meetingDate.lt(LocalDateTime.now());
+    }
 }
