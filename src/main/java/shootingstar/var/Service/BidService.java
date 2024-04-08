@@ -12,14 +12,14 @@ import shootingstar.var.dto.req.BidReqDto;
 import shootingstar.var.dto.res.BidResDto;
 import shootingstar.var.entity.Auction;
 import shootingstar.var.entity.Bid;
-import shootingstar.var.entity.PointLog;
+import shootingstar.var.entity.log.PointLog;
 import shootingstar.var.entity.User;
 import shootingstar.var.enums.type.PointOriginType;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
 import shootingstar.var.repository.AuctionRepository;
 import shootingstar.var.repository.BidRepository;
-import shootingstar.var.repository.PointLogRepository;
+import shootingstar.var.repository.log.PointLogRepository;
 import shootingstar.var.repository.user.UserRepository;
 
 @Slf4j
