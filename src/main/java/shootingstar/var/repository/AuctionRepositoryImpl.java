@@ -38,14 +38,14 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
                         user.nickname
                 ))
                 .from(auction)
-                .where(currentHighestBidderIdEq(userUUID), auction.auctionType.eq(AuctionType.SUCCESS),meetingDateBefore())
+                .where(currentHighestBidderIdEq(userUUID), auction.auctionType.eq(AuctionType.SUCCESS), auction.meetingDate.before(LocalDateTime.now()))
                 .orderBy(auction.meetingDate.asc())
                 .fetch();
 
         JPAQuery<Long> countQuery = queryFactory
                 .select(auction.count())
                 .from(auction)
-                .where(currentHighestBidderIdEq(userUUID), auction.auctionType.eq(AuctionType.SUCCESS),meetingDateBefore());
+                .where(currentHighestBidderIdEq(userUUID), auction.auctionType.eq(AuctionType.SUCCESS),auction.meetingDate.before(LocalDateTime.now()));
 
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
@@ -61,14 +61,14 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
                         user.nickname
                 ))
                 .from(auction)
-                .where(currentHighestBidderIdEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS),meetingDateAfter())
+                .where(currentHighestBidderIdEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS),auction.meetingDate.after(LocalDateTime.now()))
                 .orderBy(auction.meetingDate.desc())
                 .fetch();
 
         JPAQuery<Long> countQuery = queryFactory
                 .select(auction.count())
                 .from(auction)
-                .where(currentHighestBidderIdEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS),meetingDateAfter());
+                .where(currentHighestBidderIdEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS),auction.meetingDate.after(LocalDateTime.now()));
 
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
@@ -232,13 +232,5 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
         return userUUID != null ? auction.user.userUUID.eq(userUUID) : null;
     }
 
-    private BooleanExpression meetingDateBefore(){
-        //x>=y 만남시간이 현재보다 뒤인경우 - 아직 안만난경우
-        return auction.meetingDate.goe(LocalDateTime.now());
-    }
 
-    private BooleanExpression meetingDateAfter(){
-        //x<y 만남후
-        return auction.meetingDate.lt(LocalDateTime.now());
-    }
 }
