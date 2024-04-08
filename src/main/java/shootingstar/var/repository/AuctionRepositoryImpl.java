@@ -14,7 +14,12 @@ import org.springframework.data.support.PageableExecutionUtils;
 import shootingstar.var.dto.res.*;
 import shootingstar.var.enums.type.AuctionSortType;
 import shootingstar.var.enums.type.AuctionType;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+
+import static com.querydsl.core.types.dsl.DateTimePath.*;
 import static shootingstar.var.entity.QAuction.auction;
 import static shootingstar.var.entity.QUser.user;
 
@@ -28,19 +33,19 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
         List<UserAuctionSuccessResDto> content = queryFactory
                 .select(new QUserAuctionSuccessResDto(
                         auction.user.profileImgUrl,
-                        auction.user.name,
+                        auction.user.nickname,
                         auction.meetingDate,
                         user.nickname
                 ))
                 .from(auction)
-                .where(currentHighestBidderIdEq(userUUID), auction.auctionType.eq(AuctionType.SUCCESS))
-                .orderBy(auction.meetingDate.desc())
+                .where(currentHighestBidderIdEq(userUUID), auction.auctionType.eq(AuctionType.SUCCESS), auction.meetingDate.before(LocalDateTime.now()))
+                .orderBy(auction.meetingDate.asc())
                 .fetch();
 
         JPAQuery<Long> countQuery = queryFactory
                 .select(auction.count())
                 .from(auction)
-                .where(currentHighestBidderIdEq(userUUID), auction.auctionType.eq(AuctionType.SUCCESS));
+                .where(currentHighestBidderIdEq(userUUID), auction.auctionType.eq(AuctionType.SUCCESS),auction.meetingDate.before(LocalDateTime.now()));
 
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
@@ -51,19 +56,19 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
         List<UserAuctionSuccessResDto> content = queryFactory
                 .select(new QUserAuctionSuccessResDto(
                         auction.user.profileImgUrl,
-                        auction.user.name,
+                        auction.user.nickname,
                         auction.meetingDate,
                         user.nickname
                 ))
                 .from(auction)
-                .where(currentHighestBidderIdEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS))
-                .orderBy(auction.meetingDate.asc())
+                .where(currentHighestBidderIdEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS),auction.meetingDate.after(LocalDateTime.now()))
+                .orderBy(auction.meetingDate.desc())
                 .fetch();
 
         JPAQuery<Long> countQuery = queryFactory
                 .select(auction.count())
                 .from(auction)
-                .where(currentHighestBidderIdEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS));
+                .where(currentHighestBidderIdEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS),auction.meetingDate.after(LocalDateTime.now()));
 
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
@@ -91,23 +96,48 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
 
     //vipUser auction
     @Override
-    public Page<UserAuctionSuccessResDto> findAllVipSuccessByUserUUID(String userUUID, Pageable pageable) {
+    public Page<UserAuctionSuccessResDto> findAllVipSuccessBeforeByUserUUID(String userUUID, Pageable pageable) {
+        //만남 전 - 가까운 날짜 순
+
         List<UserAuctionSuccessResDto> content = queryFactory
                 .select(new QUserAuctionSuccessResDto(
                         auction.user.profileImgUrl,
                         auction.user.nickname,
-                        auction.createdTime,
+                        auction.meetingDate,
                         auction.currentHighestBidderUUID
                 ))
                 .from(auction)
-                .where(vipUserUUIDEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS))
+                .where(vipUserUUIDEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS),auction.meetingDate.before(LocalDateTime.now()))
                 .orderBy(auction.meetingDate.asc())
                 .fetch();
 
         JPAQuery<Long> countQuery = queryFactory
                 .select(auction.count())
                 .from(auction)
-                .where(vipUserUUIDEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS));
+                .where(vipUserUUIDEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS),auction.meetingDate.before(LocalDateTime.now()));
+
+        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
+    }
+
+    @Override
+    public Page<UserAuctionSuccessResDto> findAllVipSuccessAfterByUserUUID(String userUUID, Pageable pageable) {
+        //만남 후 - 최근 날짜 순
+        List<UserAuctionSuccessResDto> content = queryFactory
+                .select(new QUserAuctionSuccessResDto(
+                        auction.user.profileImgUrl,
+                        auction.user.nickname,
+                        auction.meetingDate,
+                        auction.currentHighestBidderUUID
+                ))
+                .from(auction)
+                .where(vipUserUUIDEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS),auction.meetingDate.after(LocalDateTime.now()))
+                .orderBy(auction.meetingDate.desc())
+                .fetch();
+
+        JPAQuery<Long> countQuery = queryFactory
+                .select(auction.count())
+                .from(auction)
+                .where(vipUserUUIDEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS),auction.meetingDate.after(LocalDateTime.now()));
 
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
@@ -201,5 +231,6 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
     private BooleanExpression vipUserUUIDEq(String userUUID){
         return userUUID != null ? auction.user.userUUID.eq(userUUID) : null;
     }
+
 
 }
