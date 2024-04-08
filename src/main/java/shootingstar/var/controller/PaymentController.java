@@ -55,14 +55,14 @@ public class PaymentController {
             //@ApiResponse(responseCode = "405", description = "Invalid input")
     })
     @PostMapping("/payment/point")
-    public IamportResponse<Payment> pointPayment(HttpServletRequest request, @RequestBody PaymentReqDto paymentReqDto) throws IamportResponseException, IOException {
+    public ResponseEntity<?> pointPayment(HttpServletRequest request, @RequestBody PaymentReqDto paymentReqDto) throws IamportResponseException, IOException {
         String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
 
         IamportResponse<Payment> ires = paymentLookup(paymentReqDto.getImp_uid());
 
         paymentService.verifyPointPayment(ires, paymentReqDto, userUUID);
 
-        return ires;
+        return ResponseEntity.ok("포인트 충전이 완료되었습니다.");
     }
 
     @Operation(summary = "구독 결제 API", description = "구독 결제 데이터를 PortOne서버의 데이터와 비교, 검증하는 API")
@@ -71,14 +71,14 @@ public class PaymentController {
             //@ApiResponse(responseCode = "405", description = "Invalid input")
     })
     @PostMapping("/payment/subscribe")
-    public IamportResponse<Payment> subscribePayment(HttpServletRequest request, @RequestBody PaymentReqDto paymentReqDto) throws IamportResponseException, IOException {
+    public ResponseEntity<?> subscribePayment(HttpServletRequest request, @RequestBody PaymentReqDto paymentReqDto) throws IamportResponseException, IOException {
         String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
 
         IamportResponse<Payment> ires = paymentLookup(paymentReqDto.getImp_uid());
 
         paymentService.verifySubscribePayment(ires, paymentReqDto, userUUID);
 
-        return ires;
+        return ResponseEntity.ok("구독이 완료되었습니다.");
     }
 
     @Operation(summary = "포인트 환전 신청 API", description = "보유 포인트 내에서 현금으로 환전 신청하는 API")
