@@ -40,9 +40,10 @@ public class BidService {
         validateAuctionType(auction);
 
         // 입찰하는 사용자가 경매 주최자인지 확인
-        if (auction.getUser().getUserUUID().equals(userUUID)) {
-            throw new CustomException(ErrorCode.AUCTION_ACCESS_DENIED);
-        }
+        validateUserIsOrganizer(userUUID, auction);
+
+        // 이전 최고 입찰자가 현재 입찰하는 사용자일 때
+        validateUserIsCurrentHighestBidder(userUUID, auction);
 
         // 입력된 입찰 금액이 이전 최고 입찰 금액보다 크면서 경매호가표 기준의 응찰가가 맞는지 확인
         validateCurrentHighestBidAmount(bidDto, auction);
@@ -100,6 +101,18 @@ public class BidService {
     private void validateAuctionType(Auction findAuction) {
         if (!findAuction.isProgress()) {
             throw new CustomException(ErrorCode.AUCTION_CONFLICT);
+        }
+    }
+
+    private void validateUserIsOrganizer(String userUUID, Auction auction) {
+        if (auction.getUser().getUserUUID().equals(userUUID)) {
+            throw new CustomException(ErrorCode.AUCTION_ACCESS_DENIED);
+        }
+    }
+
+    private void validateUserIsCurrentHighestBidder(String userUUID, Auction auction) {
+        if (auction.getCurrentHighestBidderUUID() != null && auction.getCurrentHighestBidderUUID().equals(userUUID)) {
+            throw new CustomException(ErrorCode.AUCTION_ACCESS_DENIED);
         }
     }
 
