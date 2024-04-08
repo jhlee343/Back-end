@@ -76,7 +76,7 @@ public class User extends BaseTimeEntity {
     @OneToMany(mappedBy = "receiver")
     private final List<Review> reviewsReceived = new ArrayList<>();
 
-    @OneToOne
+    @OneToOne(mappedBy = "vipInfo")
     private VipInfo vipInfo;
 
     @Builder
