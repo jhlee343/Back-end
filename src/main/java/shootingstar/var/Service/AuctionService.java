@@ -17,7 +17,7 @@ import org.quartz.TriggerBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shootingstar.var.entity.Auction;
-import shootingstar.var.entity.PointLog;
+import shootingstar.var.entity.log.PointLog;
 import shootingstar.var.enums.type.AuctionType;
 import shootingstar.var.entity.ScheduledTask;
 import shootingstar.var.enums.type.PointOriginType;
@@ -28,7 +28,7 @@ import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
 import shootingstar.var.scheduling.quartz.TicketCreationJob;
 import shootingstar.var.repository.AuctionRepository;
-import shootingstar.var.repository.PointLogRepository;
+import shootingstar.var.repository.log.PointLogRepository;
 import shootingstar.var.repository.ScheduledTaskRepository;
 import shootingstar.var.repository.user.UserRepository;
 import shootingstar.var.dto.req.AuctionCreateReqDto;
@@ -92,7 +92,7 @@ public class AuctionService {
     }
 
     public void schedulingCreateTicket(Auction auction, User findUser) {
-        LocalDateTime scheduleTime = LocalDateTime.now().plusMinutes(1);
+        LocalDateTime scheduleTime = LocalDateTime.now().plusMinutes(2);
         ScheduledTask task = ScheduledTask.builder()
                 .auctionId(auction.getAuctionId())
                 .userId(auction.getUser().getUserId())
