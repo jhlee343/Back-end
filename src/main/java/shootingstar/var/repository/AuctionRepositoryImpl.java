@@ -103,18 +103,18 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
                 .select(new QUserAuctionSuccessResDto(
                         auction.user.profileImgUrl,
                         auction.user.nickname,
-                        auction.createdTime,
+                        auction.meetingDate,
                         auction.currentHighestBidderUUID
                 ))
                 .from(auction)
-                .where(vipUserUUIDEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS),meetingDateBefore())
+                .where(vipUserUUIDEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS),auction.meetingDate.before(LocalDateTime.now()))
                 .orderBy(auction.meetingDate.asc())
                 .fetch();
 
         JPAQuery<Long> countQuery = queryFactory
                 .select(auction.count())
                 .from(auction)
-                .where(vipUserUUIDEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS),meetingDateBefore());
+                .where(vipUserUUIDEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS),auction.meetingDate.before(LocalDateTime.now()));
 
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
@@ -126,18 +126,18 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
                 .select(new QUserAuctionSuccessResDto(
                         auction.user.profileImgUrl,
                         auction.user.nickname,
-                        auction.createdTime,
+                        auction.meetingDate,
                         auction.currentHighestBidderUUID
                 ))
                 .from(auction)
-                .where(vipUserUUIDEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS),meetingDateAfter())
+                .where(vipUserUUIDEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS),auction.meetingDate.after(LocalDateTime.now()))
                 .orderBy(auction.meetingDate.desc())
                 .fetch();
 
         JPAQuery<Long> countQuery = queryFactory
                 .select(auction.count())
                 .from(auction)
-                .where(vipUserUUIDEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS),meetingDateAfter());
+                .where(vipUserUUIDEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS),auction.meetingDate.after(LocalDateTime.now()));
 
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
