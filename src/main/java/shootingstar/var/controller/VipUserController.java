@@ -59,7 +59,6 @@ public class VipUserController {
             Page<UserAuctionParticipateResDto> userAuctionParticipateLists = vipService.getVipUserAuctionProgress(userUUID, pageable);
             return ResponseEntity.ok(userAuctionParticipateLists);
         } else if (auctionType.equals(AuctionType.SUCCESS)) {
-            //성공 예외처리해줘야함
             throw new CustomException(ErrorCode.VIP_AUCTION_SUCCESS_ACCESS_DENIED);
         }
         else {
@@ -73,12 +72,11 @@ public class VipUserController {
     @GetMapping("/auction/{auctionType}/successBefore")
     public ResponseEntity<?> getVipAuctionSuccessBefore(@NotBlank @PathVariable("auctionType") AuctionType auctionType, HttpServletRequest request, @PageableDefault(size =10)Pageable pageable){
         if(!auctionType.equals(AuctionType.SUCCESS)){
-            //auctionType이 success가 아닌경우
             throw new CustomException(ErrorCode.VIP_AUCTION_SUCCESS_ACCESS_DENIED);
         }
         String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
         Page <UserAuctionSuccessResDto> userAuctionSuccessResDtos = vipService.getVipUserAuctionSuccessBefore(userUUID,pageable);
-        return null;
+        return ResponseEntity.ok(userAuctionSuccessResDtos);
     }
 
     @Operation(summary = "경매 성공 만남 후 불러오기")
@@ -89,7 +87,9 @@ public class VipUserController {
             //auctionType이 success가 아닌경우
             throw new CustomException(ErrorCode.VIP_AUCTION_SUCCESS_ACCESS_DENIED);
         }
-        return null;
+        String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
+        Page<UserAuctionSuccessResDto> userAuctionSuccessResDtos =vipService.getVipUserAuctionSuccessAfter(userUUID,pageable);
+        return ResponseEntity.ok(userAuctionSuccessResDtos);
     }
 
 }
