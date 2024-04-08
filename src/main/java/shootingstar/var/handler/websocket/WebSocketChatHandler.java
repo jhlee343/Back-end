@@ -1,5 +1,6 @@
 package shootingstar.var.handler.websocket;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.HashMap;
@@ -15,9 +16,11 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import shootingstar.var.Service.ChatService;
+import shootingstar.var.dto.req.BidReqDto;
 import shootingstar.var.dto.req.ChatMessageReqDto;
 import shootingstar.var.dto.res.SaveChatMessageResDto;
 import shootingstar.var.exception.CustomException;
+import shootingstar.var.exception.ErrorCode;
 import shootingstar.var.jwt.JwtTokenProvider;
 
 @Slf4j
@@ -34,16 +37,17 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
-        log.info("{} 연결됨", session.getId());
+        log.info("chat 세션 {} 연결됨", session.getId());
         sessions.add(session);
     }
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         String payload = message.getPayload();
-        ChatMessageReqDto chatMessageDto = objectMapper.readValue(payload, ChatMessageReqDto.class);
 
         try {
+            ChatMessageReqDto chatMessageDto = getChatMessageReqDto(payload);
+
             // 엑세스 토큰 검증
             validateAccessToken(chatMessageDto);
 
@@ -59,11 +63,26 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
             broadcastMessage(chatRoomUUID, messageJson);
 
         } catch (CustomException e) {
-            String errorRes = objectMapper.writeValueAsString(e.getErrorCode());
-            sendMessage(session, errorRes);
+            sendErrorMessage(session, e);
 
             session.close();
         }
+    }
+
+    private ChatMessageReqDto getChatMessageReqDto(String payload) {
+        ChatMessageReqDto chatMessageReqDto;
+        try {
+            chatMessageReqDto = objectMapper.readValue(payload, ChatMessageReqDto.class);
+        } catch (JsonProcessingException e) {
+            throw new CustomException(ErrorCode.INCORRECT_FORMAT_JSON);
+        }
+
+        if (chatMessageReqDto.getChatRoomUUID() == null || chatMessageReqDto.getChatRoomUUID().equals("")) {
+            throw new CustomException(ErrorCode.INCORRECT_FORMAT_CHAT_ROOM_UUID);
+        } else if (chatMessageReqDto.getMessage() == null || chatMessageReqDto.getMessage().equals("")) {
+            throw new CustomException(ErrorCode.INCORRECT_FORMAT_CHAT_MESSAGE);
+        }
+        return chatMessageReqDto;
     }
 
     private void validateAccessToken(ChatMessageReqDto chatMessageDto) {
@@ -97,6 +116,14 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
 
     private void sendMessage(WebSocketSession session, String messageJson) throws IOException {
         session.sendMessage(new TextMessage(messageJson));
+    }
+
+    private void sendErrorMessage(WebSocketSession session, CustomException e) throws IOException {
+        Map<String, String> errors = new HashMap<>();
+        errors.put("code", e.getErrorCode().getCode());
+        errors.put("description", e.getErrorCode().getDescription());
+        String errorRes = objectMapper.writeValueAsString(errors);
+        sendMessage(session, errorRes);
     }
 
     @Override

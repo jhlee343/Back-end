@@ -99,6 +99,7 @@ public enum ErrorCode {
 
     INCORRECT_FORMAT_CHAT_ROOM_UUID(BAD_REQUEST, "8001", "잘못된 형식의 채팅방 UUID입니다."),
     INCORRECT_FORMAT_CHAT_REPORT_CONTENT(BAD_REQUEST, "8002", "잘못된 형식의 채팅방 신고 내용입니다."),
+    INCORRECT_FORMAT_CHAT_MESSAGE(BAD_REQUEST, "8003", "잘못된 형식의 채팅 메세지입니다."),
 
     CHAT_ROOM_ACCESS_DENIED(FORBIDDEN, "8100", "접근 권한이 없습니다."),
     CHAT_MESSAGE_ACCESS_DENIED(FORBIDDEN, "8101", "접근 권한이 없습니다."),
