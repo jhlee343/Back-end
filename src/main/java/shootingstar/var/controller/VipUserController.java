@@ -60,7 +60,7 @@ public class VipUserController {
             return ResponseEntity.ok(userAuctionParticipateLists);
         } else if (auctionType.equals(AuctionType.SUCCESS)) {
             //성공 예외처리해줘야함
-            return null;
+            throw new CustomException(ErrorCode.VIP_AUCTION_SUCCESS_ACCESS_DENIED);
         }
         else {
             //유찰
