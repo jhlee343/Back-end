@@ -1,4 +1,4 @@
-package shootingstar.var.handler;
+package shootingstar.var.handler.websocket;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;

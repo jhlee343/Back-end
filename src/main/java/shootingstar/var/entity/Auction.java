@@ -92,4 +92,16 @@ public class Auction extends BaseTimeEntity {
     public boolean isProgress() {
         return AuctionType.PROGRESS.equals(this.auctionType);
     }
+
+    public void increaseBidCount() {
+        this.bidCount++;
+    }
+
+    public void changeCurrentHighestBidderUUID(String userUUID) {
+        this.currentHighestBidderUUID = userUUID;
+    }
+
+    public void changeCurrentHighestBidAmount(long price) {
+        this.currentHighestBidAmount = price;
+    }
 }
