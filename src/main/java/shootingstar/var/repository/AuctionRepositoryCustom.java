@@ -17,7 +17,8 @@ public interface AuctionRepositoryCustom {
     List<UserAuctionParticipateResDto> findParticipateList(String userUUID, Pageable pageable);
     Page<UserAuctionParticipateResDto> findAllParticipateByUserUUID(String userUUID, Pageable pageable);
 
-    Page<UserAuctionSuccessResDto> findAllVipSuccessByUserUUID(String userUUID, Pageable pageable);
+    Page<UserAuctionSuccessResDto> findAllVipSuccessBeforeByUserUUID(String userUUID, Pageable pageable);
+    Page<UserAuctionSuccessResDto> findAllVipSuccessAfterByUserUUID(String userUUID, Pageable pageable);
     Page<UserAuctionParticipateResDto> findAllVipProgressByUserUUID(String userUUID, Pageable pageable);
     Page<UserAuctionInvalidityResDto> findAllVipInvalidityByUserUUID(String userUUID,Pageable pageable);
 

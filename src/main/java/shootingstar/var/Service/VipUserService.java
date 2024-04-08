@@ -75,8 +75,11 @@ public class VipUserService {
         return optionalVipInfo.get();
     }
 
-    public Page<UserAuctionSuccessResDto> getVipUserAuctionSuccess(String userUUID, Pageable pageable){
-        return auctionRepository.findAllVipSuccessByUserUUID(userUUID,pageable);
+    public Page<UserAuctionSuccessResDto> getVipUserAuctionSuccessBefore(String userUUID, Pageable pageable){
+        return auctionRepository.findAllVipSuccessBeforeByUserUUID(userUUID,pageable);
+    }
+    public Page<UserAuctionSuccessResDto> getVipUserAuctionSuccessAfter(String userUUID, Pageable pageable){
+        return auctionRepository.findAllVipSuccessAfterByUserUUID(userUUID, pageable);
     }
     public Page<UserAuctionParticipateResDto> getVipUserAuctionProgress(String userUUID, Pageable pageable){
         return auctionRepository.findAllVipProgressByUserUUID(userUUID,pageable);

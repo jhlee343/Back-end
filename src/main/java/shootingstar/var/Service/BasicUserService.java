@@ -22,6 +22,7 @@ import shootingstar.var.repository.ticket.TicketRepository;
 import java.util.Optional;
 
 import static shootingstar.var.exception.ErrorCode.USER_NOT_FOUND;
+import static shootingstar.var.exception.ErrorCode.VIP_INFO_DUPLICATE;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +35,10 @@ public class BasicUserService {
     @Transactional
     public void applyVip(String userUUID , UserApplyVipDto userApplyVipDto){
         User user = findByUserUUID(userUUID);
+        //vipinfo가 존재하는경우 예외처리
+       if(user.getVipInfo()!=null){
+           throw new CustomException(VIP_INFO_DUPLICATE);
+       }
         VipInfo vipInfo = VipInfo.builder()
                 .user(user)
                 .vipName(userApplyVipDto.getVipName())
