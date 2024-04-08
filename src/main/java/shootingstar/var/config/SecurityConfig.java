@@ -60,7 +60,8 @@ public class SecurityConfig {
                                         "/swagger-ui/**", // swagger 설정
                                         "/api/lookAtMe/signup",
                                         "/api/lookAtMe/login",
-                                        "/ws/chat"
+                                        "/ws/chat",
+                                        "/ws/bid"
                                 ).permitAll()
 
                                 .requestMatchers(
