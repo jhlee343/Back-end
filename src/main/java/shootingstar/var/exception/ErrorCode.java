@@ -59,6 +59,7 @@ public enum ErrorCode {
     INCORRECT_FORMAT_MEETING_INFO_TEXT(BAD_REQUEST, "2004", "잘못된 형식의 만남에 대한 정보입니다."),
     INCORRECT_FORMAT_MEETING_PROMISE_TEXT(BAD_REQUEST, "2005", "잘못된 형식의 만남에 대한 약속입니다."),
     INCORRECT_FORMAT_AUCTION_UUID(BAD_REQUEST, "2006", "잘못된 형식의 경매 고유번호입니다."),
+    INCORRECT_FORMAT_PRICE(BAD_REQUEST, "2007", "잘못된 형식의 입찰 금액입니다."),
 
     AUCTION_ACCESS_DENIED(FORBIDDEN, "2100", "접근 권한이 없습니다."),
     AUCTION_NOT_FOUND(NOT_FOUND, "2200", "존재하지 않는 경매입니다."),
@@ -101,6 +102,7 @@ public enum ErrorCode {
 
     INCORRECT_FORMAT_CHAT_ROOM_UUID(BAD_REQUEST, "8001", "잘못된 형식의 채팅방 UUID입니다."),
     INCORRECT_FORMAT_CHAT_REPORT_CONTENT(BAD_REQUEST, "8002", "잘못된 형식의 채팅방 신고 내용입니다."),
+    INCORRECT_FORMAT_CHAT_MESSAGE(BAD_REQUEST, "8003", "잘못된 형식의 채팅 메세지입니다."),
 
     CHAT_ROOM_ACCESS_DENIED(FORBIDDEN, "8100", "접근 권한이 없습니다."),
     CHAT_MESSAGE_ACCESS_DENIED(FORBIDDEN, "8101", "접근 권한이 없습니다."),
@@ -119,6 +121,8 @@ public enum ErrorCode {
     INCORRECT_VALUE_ADMIN_SECRET_KEY(CONFLICT, "9303", "잘못된 관리자 비밀 키 입니다."),
 
     WALLET_NOT_FOUND(NOT_FOUND, "10200", "지갑을 찾을 수 없습니다."),
+
+    INCORRECT_FORMAT_JSON(BAD_REQUEST, "11000", "잘못된 형식의 JSON 데이터 입니다.")
     ;
 
     private final HttpStatus httpStatus;
