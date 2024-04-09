@@ -1,14 +1,18 @@
 package shootingstar.var.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.NavigableMap;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shootingstar.var.dto.req.BidReqDto;
+import shootingstar.var.dto.res.BidInfoResDto;
+import shootingstar.var.dto.res.BidLog;
 import shootingstar.var.dto.res.BidResDto;
 import shootingstar.var.entity.Auction;
 import shootingstar.var.entity.Bid;
@@ -98,12 +102,6 @@ public class BidService {
                 .build();
     }
 
-    private void validateAuctionType(Auction findAuction) {
-        if (!findAuction.isProgress()) {
-            throw new CustomException(ErrorCode.AUCTION_CONFLICT);
-        }
-    }
-
     private void validateUserIsOrganizer(String userUUID, Auction auction) {
         if (auction.getUser().getUserUUID().equals(userUUID)) {
             throw new CustomException(ErrorCode.AUCTION_ACCESS_DENIED);
@@ -157,6 +155,36 @@ public class BidService {
     private void validateSufficientPointForBid(BidReqDto bidDto, User currentUser) {
         if (currentUser.getPoint().subtract(BigDecimal.valueOf(bidDto.getPrice())).compareTo(BigDecimal.ZERO) == -1) {
             throw new CustomException(ErrorCode.INCORRECT_FORMAT_PRICE);
+        }
+    }
+
+    public BidInfoResDto findBidInfo(String auctionUUID) {
+        Auction auction = auctionRepository.findByAuctionUUID(auctionUUID)
+                .orElseThrow(() -> new CustomException(ErrorCode.AUCTION_NOT_FOUND));
+
+        // 진행중인 경매인지 확인
+        validateAuctionType(auction);
+
+        List<Bid> bids = bidRepository.findTop10ByAuction_AuctionIdOrderByCreatedTimeDesc(
+                auction.getAuctionId());
+
+        List<BidLog> bidLogs = bids.stream()
+                .map(bid -> BidLog.builder()
+                        .bidderNickname(bid.getBidderNickname())
+                        .bidAmount(bid.getBidAmount())
+                        .participatedBidTime(bid.getCreatedTime())
+                        .build())
+                .collect(Collectors.toList());
+
+        return BidInfoResDto.builder()
+                .currentHighestBidAmount(auction.getCurrentHighestBidAmount())
+                .bidLogs(bidLogs)
+                .build();
+    }
+
+    private void validateAuctionType(Auction findAuction) {
+        if (!findAuction.isProgress()) {
+            throw new CustomException(ErrorCode.AUCTION_CONFLICT);
         }
     }
 }
