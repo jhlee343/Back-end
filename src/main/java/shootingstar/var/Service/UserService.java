@@ -46,8 +46,8 @@ public class UserService {
         }
     }
 
-    public UserProfileDto getProfile(String nickname) {
-        User user = findByNickname(nickname);
+    public UserProfileDto getProfile(String userUUID) {
+        User user = findByUserUUID(userUUID);
         UserProfileDto userProfileDto = new UserProfileDto(user.getNickname(), user.getProfileImgUrl(), user.getDonationPrice(), user.getPoint(), user.getSubscribeExpiration(), user.getUserType());
         return userProfileDto;
     }
@@ -60,7 +60,6 @@ public class UserService {
     public void follow(String followingId, String userUUID) {
         User follower = findByUserUUID(userUUID);
         User following = findByUserUUID(followingId);
-        UUID followUUID = UUID.randomUUID();
         Follow follow = new Follow(follower,following);
         followRepository.save(follow);
     }
@@ -101,13 +100,6 @@ public class UserService {
         return followOptional.get();
     }
 
-    public User findByNickname(String nickname) {
-        Optional<User> optionalUser = userRepository.findByNickname(nickname);
-        if (optionalUser.isEmpty()) {
-            throw new CustomException(USER_NOT_FOUND);
-        }
-        return optionalUser.get();
-    }
 
     public User findByUserUUID(String userUUID) {
         Optional<User> optionalUser = userRepository.findByUserUUID(userUUID);
