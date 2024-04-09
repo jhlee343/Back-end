@@ -21,6 +21,8 @@ public class RedisConfig {
     private int redisPort2; // mail 레디스 포트
     @Value("${spring.data.redis.port3}")
     private int redisPort3; // loginList 레디스 포트
+    @Value("${spring.data.redis.port4}")
+    private int redisPort4;
     @Value("${spring.data.redis.password}")
     private String redisPassword;
 
@@ -55,6 +57,15 @@ public class RedisConfig {
         return new LettuceConnectionFactory(redisConfiguration);
     }
 
+    @Bean
+    public RedisConnectionFactory participatingAuctionRedisConnectionFactory() {
+        RedisStandaloneConfiguration redisConfiguration = new RedisStandaloneConfiguration();
+        redisConfiguration.setHostName(redisHost);
+        redisConfiguration.setPort(redisPort4);
+        redisConfiguration.setPassword(redisPassword);
+        return new LettuceConnectionFactory(redisConfiguration);
+    }
+
     // JWT 레디스 템플릿 등록
     @Bean
     public RedisTemplate<?, ?> jwtRedisTemplate() {
@@ -85,6 +96,14 @@ public class RedisConfig {
         return redisTemplate;
     }
 
+    @Bean
+    public RedisTemplate<?, ?> participatingAuctionRedisTemplate() {
+        RedisTemplate<?, ?> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(participatingAuctionRedisConnectionFactory());   //connection
+        redisTemplate.setKeySerializer(new StringRedisSerializer());    // key
+        redisTemplate.setValueSerializer(new StringRedisSerializer());  // value
+        return redisTemplate;
+    }
 
     // 레디스에 저장되는 데이터 JSON 타입으로 직렬화
     @Bean
