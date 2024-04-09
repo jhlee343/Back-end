@@ -36,9 +36,10 @@ public class UserController {
     private final JwtTokenProvider jwtTokenProvider;
 
     @Operation(summary = "프로필 불러오기")
-    @GetMapping("/profile/{nickname}")
-    public ResponseEntity<UserProfileDto> getProfile(@NotEmpty @PathVariable String nickname) {
-        UserProfileDto profile = userService.getProfile(nickname);
+    @GetMapping("/profile")
+    public ResponseEntity<UserProfileDto> getProfile(HttpServletRequest request) {
+        String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
+        UserProfileDto profile = userService.getProfile(userUUID);
         return ResponseEntity.ok(profile);
     }
 
