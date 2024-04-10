@@ -52,6 +52,12 @@ public class BasicUserService {
         vipInfoRepository.save(vipInfo);
     }
 
+    public String applyCheck(String userUUID){
+        User user = findByUserUUID(userUUID);
+        String userApplyType = String.valueOf(user.getVipInfo().getVipApproval());
+        return userApplyType;
+    }
+
     public Page<TicketListResDto> getAllTicketList(String userUUID, TicketSortType ticketSortType, String search, Pageable pageable){
         return ticketRepository.findAllTicketByuserUUID(userUUID, ticketSortType, search, pageable);
     }
