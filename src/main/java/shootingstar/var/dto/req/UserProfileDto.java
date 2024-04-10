@@ -3,6 +3,7 @@ package shootingstar.var.dto.req;
 import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import shootingstar.var.entity.VipApprovalType;
 import shootingstar.var.enums.type.UserType;
 
 import java.time.LocalDateTime;
@@ -15,5 +16,5 @@ public class UserProfileDto {
     private Long donation_price;
     private BigDecimal point;
     private LocalDateTime subscribeExpiration;
-    private UserType user_type;
+    private Double rating;
 }
