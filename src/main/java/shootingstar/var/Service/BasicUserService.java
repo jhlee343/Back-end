@@ -21,8 +21,7 @@ import shootingstar.var.repository.ticket.TicketRepository;
 
 import java.util.Optional;
 
-import static shootingstar.var.exception.ErrorCode.USER_NOT_FOUND;
-import static shootingstar.var.exception.ErrorCode.VIP_INFO_DUPLICATE;
+import static shootingstar.var.exception.ErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -54,8 +53,10 @@ public class BasicUserService {
 
     public String applyCheck(String userUUID){
         User user = findByUserUUID(userUUID);
-        String userApplyType = String.valueOf(user.getVipInfo().getVipApproval());
-        return userApplyType;
+        VipInfo vipInfo = findVipInfoByUser(user);
+        VipApprovalType vipApproval = vipInfo.getVipApproval();
+        return String.valueOf(vipApproval);
+
     }
 
     public Page<TicketListResDto> getAllTicketList(String userUUID, TicketSortType ticketSortType, String search, Pageable pageable){
@@ -80,5 +81,13 @@ public class BasicUserService {
             throw new CustomException(USER_NOT_FOUND);
         }
         return optionalUser.get();
+    }
+
+    public VipInfo findVipInfoByUser(User user) {
+        Optional<VipInfo> optionalVipInfo = vipInfoRepository.findVipInfoByUser(user);
+        if (optionalVipInfo.isEmpty()) {
+            throw new CustomException(VIP_INFO_NOT_FOUND);
+        }
+        return optionalVipInfo.get();
     }
 }

@@ -7,8 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import shootingstar.var.dto.req.UserProfileDto;
 import shootingstar.var.entity.User;
+import shootingstar.var.entity.VipApprovalType;
+import shootingstar.var.entity.VipInfo;
 import shootingstar.var.enums.type.UserType;
 import shootingstar.var.repository.user.UserRepository;
+import shootingstar.var.repository.vip.VipInfoRepository;
 
 @SpringBootTest
 public class UserServiceTest {
@@ -17,6 +20,12 @@ public class UserServiceTest {
     private UserService userService;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private VipInfoRepository vipInfoRepository;
+    @Autowired
+    private BasicUserService basicUserService;
+    @Autowired
+    private AdminService adminService;
 
     @Test
     @DisplayName("프로필 불러오기")
@@ -31,8 +40,27 @@ public class UserServiceTest {
         userRepository.flush();
 
         UserProfileDto userProfileDto = userService.getProfile(vip.getUserUUID());
-        System.out.println(userProfileDto.getNickname()+" "+ userProfileDto.getPoint()+" "+userProfileDto.getSubscribeExpiration());
+        System.out.println(userProfileDto.getNickname()+" "+ userProfileDto.getPoint()+" "+userProfileDto.getRating());
         UserProfileDto userProfileDto1 = userService.getProfile(basic.getUserUUID());
-        System.out.println(userProfileDto1.getNickname()+" "+ userProfileDto1.getPoint()+" "+userProfileDto1.getSubscribeExpiration());
+        System.out.println(userProfileDto1.getNickname()+" "+ userProfileDto1.getPoint()+" "+userProfileDto1.getRating());
+    }
+
+    @Test
+    @DisplayName("vip 신청 상태 조회")
+    @Transactional
+    public void applyCheck() throws Exception {
+        User basic = new User("33", "실명", "일반인", "000-0000-0000", "test@ttt.com", "helloUrl", UserType.ROLE_BASIC);
+        userRepository.save(basic);
+        userRepository.flush();
+
+        VipInfo vipInfo = new VipInfo(basic,"일반인","직업","경력","소개", VipApprovalType.STANDBY,"url");
+        vipInfoRepository.save(vipInfo);
+        vipInfoRepository.flush();
+
+        basicUserService.applyCheck(basic.getUserUUID());
+        System.out.println(basicUserService.applyCheck(basic.getUserUUID()));
+
+        adminService.vipInfoChange(vipInfo.getVipInfoUUID(), "APPROVE");
+        System.out.println(basicUserService.applyCheck(basic.getUserUUID()));
     }
 }
