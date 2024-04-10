@@ -37,6 +37,13 @@ public class BasicUserController {
             return ResponseEntity.ok().body("vip apply success");
     }
 
+    @Operation(summary = "vip 신청 상태 조회")
+    @GetMapping("/applyCheck")
+    public ResponseEntity<String> applyCheck(HttpServletRequest request){
+        String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
+        String userApplyType = basicUserService.applyCheck(userUUID);
+        return ResponseEntity.ok(userApplyType);
+    }
     @Operation(summary = "사용자 식사권 리스트 불러오기")
     @GetMapping("/ticketList")
     public ResponseEntity<?> getTicketList(HttpServletRequest request,
