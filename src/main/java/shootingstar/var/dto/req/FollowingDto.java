@@ -7,12 +7,11 @@ import lombok.Data;
 public class FollowingDto {
     private String nickname;
     private String profileImgUrl;
-    private Long id;
-
+    private String userUUID;
     @QueryProjection
-    public FollowingDto(String nickname, String profileImgUrl, Long id){
+    public FollowingDto(String nickname, String profileImgUrl, String userUUID){
         this.nickname = nickname;
         this.profileImgUrl = profileImgUrl;
-        this.id = id;
+        this.userUUID = userUUID;
     }
 }
