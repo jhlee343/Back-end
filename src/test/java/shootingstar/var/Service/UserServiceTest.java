@@ -7,10 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import shootingstar.var.dto.req.FollowingDto;
 import shootingstar.var.dto.req.UserProfileDto;
+import shootingstar.var.entity.Follow;
 import shootingstar.var.entity.User;
 import shootingstar.var.entity.VipApprovalType;
 import shootingstar.var.entity.VipInfo;
 import shootingstar.var.enums.type.UserType;
+import shootingstar.var.repository.follow.FollowRepository;
 import shootingstar.var.repository.user.UserRepository;
 import shootingstar.var.repository.vip.VipInfoRepository;
 
@@ -29,6 +31,8 @@ public class UserServiceTest {
     private BasicUserService basicUserService;
     @Autowired
     private AdminService adminService;
+    @Autowired
+    private FollowRepository followRepository;
 
     @Test
     @DisplayName("팔로우리스트 가져오기")
@@ -52,10 +56,45 @@ public class UserServiceTest {
         List<FollowingDto> followingDto =userService.findAllFollowing(basic.getUserUUID());
         System.out.println(followingDto);
 
-        userService.unFollow();
+
+
+    }
+
+    @Test
+    @DisplayName("unfollow")
+    @Transactional
+    public void unfollow() throws Exception{
+        User vip1 = new User("11", "실명1", "유명인1", "000-0000-0000", "test@ttt.com", "helloUrl", UserType.ROLE_VIP);
+        User vip2 = new User("22", "실명2", "유명인2", "000-0000-0000", "test@ttt.com", "helloUrl", UserType.ROLE_VIP);
+        User vip3 = new User("33", "실명3", "유명인3", "000-0000-0000", "test@ttt.com", "helloUrl", UserType.ROLE_VIP);
+        User basic = new User("44", "실명", "일반인", "000-0000-0000", "test@ttt.com", "helloUrl", UserType.ROLE_BASIC);
+
+        userRepository.save(vip1);
+        userRepository.save(vip2);
+        userRepository.save(vip3);
+        userRepository.save(basic);
+
+        userRepository.flush();
+
+        //userService.unFollow();
+        Follow follow1 = new Follow(basic, vip1);
+        Follow follow2 = new Follow(basic, vip2);
+        Follow follow3 = new Follow(basic, vip3);
+
+        followRepository.save(follow1);
+        followRepository.save(follow2);
+        followRepository.save(follow3);
+
+        followRepository.flush();
+        List<FollowingDto> followingDto =userService.findAllFollowing(basic.getUserUUID());
+        System.out.println(followingDto);
+        System.out.println(followingDto.size());
+
+
+        userService.unFollow(follow1.getFollowUUID());
         List<FollowingDto> followingDto1 =userService.findAllFollowing(basic.getUserUUID());
         System.out.println(followingDto1);
-
+        System.out.println(followingDto1.size());
     }
     @Test
     @DisplayName("프로필 불러오기")
