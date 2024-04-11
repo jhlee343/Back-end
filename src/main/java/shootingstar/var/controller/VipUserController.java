@@ -1,6 +1,10 @@
 package shootingstar.var.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.NotBlank;
@@ -10,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
 import shootingstar.var.Service.VipUserService;
 import shootingstar.var.dto.req.VipInfoEditResDto;
@@ -34,6 +39,14 @@ public class VipUserController {
     private final VipUserService vipService;
 
     @Operation(summary = "vip 소개 불러오기")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "사용자 아이디에 해당하는 vipInfo 반환", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Boolean.class))}),
+            @ApiResponse(responseCode = "403",
+                    description = "잘못된 유저 정보 : 1201\n"+"잘못된 vipInfo 정보 : 7200",
+                    content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+    })
     @GetMapping("/info")
     public ResponseEntity<VipInfoDto> getVipInfo(HttpServletRequest request) {
         String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
@@ -41,14 +54,32 @@ public class VipUserController {
         return ResponseEntity.ok(vipInfo);
 
     }
+
     @Operation(summary = "vip info 수정하기")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "사용자 아이디에 해당하는 vipInfo 반환", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Boolean.class))}),
+            @ApiResponse(responseCode = "403",
+                    description = "잘못된 유저 정보 : 1201\n"+"잘못된 vipInfo 정보 : 7200",
+                    content = {
+                            @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+    })
     @PatchMapping("/editInfo")
     public ResponseEntity<String> editVipInfo(HttpServletRequest request, @RequestBody VipInfoEditResDto vipInfoEdit){
         String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
         vipService.editVipInfo(userUUID, vipInfoEdit);
         return ResponseEntity.ok("vip Info Edit Success");
     }
+
     @Operation(summary = "경매 불러오기")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "경매 타입에 맞는 경매 불러오기", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Boolean.class))}),
+            @ApiResponse(responseCode = "401",
+                    description = "SUCCESS 타입의 입력 경우, : 7100",
+                    content = {
+                            @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+    })
     @GetMapping("/auction/{auctionType}")
     public ResponseEntity<?> getVipAuctionList(@NotBlank @PathVariable("auctionType") AuctionType auctionType,
                                                HttpServletRequest request, @PageableDefault(size = 10) Pageable pageable) {
@@ -69,6 +100,14 @@ public class VipUserController {
     }
 
     @Operation(summary = "경매 성공 만남 전 불러오기")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공한 경매 만남전 불러오기 성공", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Boolean.class))}),
+            @ApiResponse(responseCode = "401",
+                    description = "SUCCESS 타입의 입력이 아닌경우, : 7100",
+                    content = {
+                            @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+    })
     @GetMapping("/auction/{auctionType}/successBefore")
     public ResponseEntity<?> getVipAuctionSuccessBefore(@NotBlank @PathVariable("auctionType") AuctionType auctionType, HttpServletRequest request, @PageableDefault(size =10)Pageable pageable){
         if(!auctionType.equals(AuctionType.SUCCESS)){
@@ -80,6 +119,14 @@ public class VipUserController {
     }
 
     @Operation(summary = "경매 성공 만남 후 불러오기")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공한 경매 만남후 불러오기 성공", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Boolean.class))}),
+            @ApiResponse(responseCode = "401",
+                    description = "SUCCESS 타입의 입력이 아닌경우, : 7100",
+                    content = {
+                            @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+    })
     @GetMapping("/auction/{auctionType}/successAfter")
     public ResponseEntity<?> getVipAuctionSuccessAfter(@NotBlank @PathVariable("auctionType") AuctionType auctionType,
                                                        HttpServletRequest request, @PageableDefault(size = 10) Pageable pageable){
