@@ -41,7 +41,7 @@ public class VipUserController {
     @Operation(summary = "vip 소개 불러오기")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "사용자 아이디에 해당하는 vipInfo 반환", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = Boolean.class))}),
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = VipInfoDto.class))}),
             @ApiResponse(responseCode = "403",
                     description = "잘못된 유저 정보 : 1201\n"+"잘못된 vipInfo 정보 : 7200",
                     content = {
@@ -58,7 +58,7 @@ public class VipUserController {
     @Operation(summary = "vip info 수정하기")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "사용자 아이디에 해당하는 vipInfo 반환", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = Boolean.class))}),
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))}),
             @ApiResponse(responseCode = "403",
                     description = "잘못된 유저 정보 : 1201\n"+"잘못된 vipInfo 정보 : 7200",
                     content = {
@@ -74,7 +74,7 @@ public class VipUserController {
     @Operation(summary = "경매 불러오기")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "경매 타입에 맞는 경매 불러오기", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = Boolean.class))}),
+                    @Content(mediaType = "application/json")}),
             @ApiResponse(responseCode = "401",
                     description = "SUCCESS 타입의 입력 경우, : 7100",
                     content = {
@@ -102,7 +102,7 @@ public class VipUserController {
     @Operation(summary = "경매 성공 만남 전 불러오기")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공한 경매 만남전 불러오기 성공", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = Boolean.class))}),
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = UserAuctionSuccessResDto.class))}),
             @ApiResponse(responseCode = "401",
                     description = "SUCCESS 타입의 입력이 아닌경우, : 7100",
                     content = {
@@ -121,7 +121,7 @@ public class VipUserController {
     @Operation(summary = "경매 성공 만남 후 불러오기")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공한 경매 만남후 불러오기 성공", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = Boolean.class))}),
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = UserAuctionSuccessResDto.class))}),
             @ApiResponse(responseCode = "401",
                     description = "SUCCESS 타입의 입력이 아닌경우, : 7100",
                     content = {
