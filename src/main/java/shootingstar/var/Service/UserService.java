@@ -49,7 +49,7 @@ public class UserService {
     public UserProfileDto getProfile(String userUUID) {
         User user = findByUserUUID(userUUID);
         UserProfileDto userProfileDto = new UserProfileDto(user.getNickname(),user.getUserUUID(), user.getProfileImgUrl(),
-                user.getDonationPrice(), user.getPoint(), user.getSubscribeExpiration(), user.getRating());
+                user.getDonationPrice(), user.getPoint(), user.getSubscribeExpiration(), user.getRating() , user.getUserType());
         return userProfileDto;
     }
 

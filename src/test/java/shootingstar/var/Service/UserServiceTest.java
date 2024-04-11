@@ -52,7 +52,7 @@ public class UserServiceTest {
         List<FollowingDto> followingDto =userService.findAllFollowing(basic.getUserUUID());
         System.out.println(followingDto);
 
-        userService.unFollow(vip3.getUserUUID());
+        userService.unFollow();
         List<FollowingDto> followingDto1 =userService.findAllFollowing(basic.getUserUUID());
         System.out.println(followingDto1);
 

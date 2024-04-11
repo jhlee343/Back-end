@@ -18,4 +18,5 @@ public class UserProfileDto {
     private BigDecimal point;
     private LocalDateTime subscribeExpiration;
     private Double rating;
+    private UserType userType;
 }
