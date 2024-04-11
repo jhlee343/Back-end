@@ -51,6 +51,11 @@ public class UserServiceTest {
         userService.follow(vip3.getUserUUID(), basic.getUserUUID());
         List<FollowingDto> followingDto =userService.findAllFollowing(basic.getUserUUID());
         System.out.println(followingDto);
+
+        userService.unFollow(vip3.getUserUUID());
+        List<FollowingDto> followingDto1 =userService.findAllFollowing(basic.getUserUUID());
+        System.out.println(followingDto1);
+
     }
     @Test
     @DisplayName("프로필 불러오기")

@@ -24,7 +24,8 @@ public class FollowRepositoryCustomImpl implements shootingstar.var.repository.f
                 .select(new QFollowingDto(
                         follow.following.nickname,
                         follow.following.profileImgUrl,
-                        follow.following.userUUID
+                        follow.following.userUUID,
+                        follow.followUUID
                 ))
                 .from(follow)
                 .where(IdEq(followerId))
