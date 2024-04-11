@@ -58,9 +58,9 @@ public class UserService {
     }
 
     @Transactional
-    public void follow(String followingId, String userUUID) {
+    public void follow(String followingUUID, String userUUID) {
         User follower = findByUserUUID(userUUID);
-        User following = findByUserUUID(followingId);
+        User following = findByUserUUID(followingUUID);
         Follow follow = new Follow(follower,following);
         followRepository.save(follow);
     }
