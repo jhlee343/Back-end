@@ -1,6 +1,7 @@
 package shootingstar.var.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.NavigableMap;
@@ -54,6 +55,9 @@ public class BidService {
 
         User currentUser = userRepository.findByUserUUIDWithPessimisticLock(userUUID)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        // 입찰하는 사용자가 구독하고 있는 상태인지 확인
+        currentUser.validateSubscribeExpiration();
 
         // 사용자의 포인트가 입찰 금액보다 적은지 확인
         validateSufficientPointForBid(bidDto, currentUser);
