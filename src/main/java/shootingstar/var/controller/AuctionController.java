@@ -57,10 +57,10 @@ public class AuctionController {
         return ResponseEntity.ok().body("경매 생성 성공");
     }
 
-    @Operation(summary = "경매 취소 API", description = "VIP 권한을 가진 경매 주최자와 ADMIN 권한의 관리자가 경매를 취소할 때 사용")
+    @Operation(summary = "경매 취소 API", description = "VIP 권한을 가진 경매 주최자가 경매를 취소할 때 사용")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",
-                    description = "- 사용자 타입이 VIP이거나 ADMIN일 때 : 경매 취소 성공"),
+                    description = "- 사용자 타입이 VIP일 때 : 경매 취소 성공"),
             @ApiResponse(responseCode = "404",
                     description =
                                     "- 사용자 정보 조회 실패 : 1201\n" +
@@ -69,7 +69,7 @@ public class AuctionController {
                                     "- 스케줄링된 task를 취소하는 데 실패 했을 때 : 4201",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
             @ApiResponse(responseCode = "403",
-                    description = "- 로그인 한 사용자가 경매 주최자이거나 권한이 ADMIN이 아닐 때 : 2100",
+                    description = "- 로그인 한 사용자가 경매 주최자일 때 : 2100",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
             @ApiResponse(responseCode = "409",
                     description = "- 경매 타입이 진행중(PROGRESS)이 아닐 때 : 2300",

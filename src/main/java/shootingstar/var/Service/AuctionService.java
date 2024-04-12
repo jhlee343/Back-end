@@ -80,7 +80,7 @@ public class AuctionService {
     }
 
     private void validateMinBidAmount(AuctionCreateReqDto reqDto, User findUser) {
-        // 최소 입찰 금액이 10000원 단위가 아닐 경우
+        // 최소 입찰 금액이 10000원으로 나누어 떨어지지 않을 경우
         if (reqDto.getMinBidAmount() % 10000 != 0) {
             throw new CustomException(ErrorCode.INCORRECT_FORMAT_MIN_BID_AMOUNT);
         }
@@ -137,35 +137,13 @@ public class AuctionService {
         findAuction.changeAuctionType(AuctionType.CANCEL);
         log.info("경매가 취소되었습니다. auctionUUID : {}", findAuction.getAuctionUUID());
 
-        PointLog pointLog;
         PointOriginType pointOriginType = userType.equals(UserType.ROLE_VIP.toString()) ? PointOriginType.VIP_AUCTION_CANCEL : PointOriginType.ADMIN_AUCTION_CANCEL;
 
         // 입찰에 참여한 유저가 있을 때, 현재 최고 입찰자에게 현재 최고 입찰 금액 반환
-        if (findAuction.getCurrentHighestBidderUUID() != null) {
-            User findCurrentHighestBidder = userRepository.findByUserUUIDWithPessimisticLock(findAuction.getCurrentHighestBidderUUID())
-                    .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-
-            log.info("경매 취소로 인해 최고 입찰자에게 포인트가 반환될 예정입니다.");
-            log.info("최고입찰자 uuid : {}, 추가 전 포인트 : {}", findCurrentHighestBidder.getUserUUID(), findCurrentHighestBidder.getPoint());
-
-            findCurrentHighestBidder.increasePoint(BigDecimal.valueOf(findAuction.getCurrentHighestBidAmount()));
-
-            log.info("최고입찰자 uuid : {}, 추가 후 포인트 : {}", findCurrentHighestBidder.getUserUUID(), findCurrentHighestBidder.getPoint());
-
-            pointLog = PointLog.createPointLogWithDeposit(findCurrentHighestBidder, pointOriginType, BigDecimal.valueOf(findAuction.getCurrentHighestBidAmount()));
-            pointLogRepository.save(pointLog);
-        }
+        refundHighestBidderOnAuctionCancellation(findAuction, pointOriginType);
 
         // 사용자 포인트에 += 최소입찰금액
-        User findVIP = userRepository.findByUserUUIDWithPessimisticLock(findAuction.getUser().getUserUUID())
-                        .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        log.info("경매 취소로 인해 경매 주최자에게 포인트가 반환될 예정입니다.");
-        log.info("경매 주최자 id : {}, 추가 전 포인트 : {}", findVIP.getUserId(), findVIP.getPoint());
-        findVIP.increasePoint(BigDecimal.valueOf(findAuction.getMinBidAmount()));
-        log.info("경매 주최자 id : {}, 추가 후 포인트 : {}", findVIP.getUserId(), findVIP.getPoint());
-
-        pointLog = PointLog.createPointLogWithDeposit(findVIP, pointOriginType, BigDecimal.valueOf(findAuction.getMinBidAmount()));
-        pointLogRepository.save(pointLog);
+        refundDepositToOrganizer(findAuction, pointOriginType);
 
         deleteScheduling(findAuction);
     }
@@ -186,6 +164,36 @@ public class AuctionService {
         if (!findAuction.isProgress()) {
             throw new CustomException(ErrorCode.AUCTION_CONFLICT);
         }
+    }
+
+    public void refundHighestBidderOnAuctionCancellation(Auction findAuction, PointOriginType pointOriginType) {
+        if (findAuction.getCurrentHighestBidderUUID() != null) {
+            User findCurrentHighestBidder = userRepository.findByUserUUIDWithPessimisticLock(findAuction.getCurrentHighestBidderUUID())
+                    .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+            log.info("경매 취소로 인해 최고 입찰자에게 포인트가 반환될 예정입니다.");
+            log.info("최고입찰자 uuid : {}, 추가 전 포인트 : {}", findCurrentHighestBidder.getUserUUID(), findCurrentHighestBidder.getPoint());
+
+            findCurrentHighestBidder.increasePoint(BigDecimal.valueOf(findAuction.getCurrentHighestBidAmount()));
+
+            log.info("최고입찰자 uuid : {}, 추가 후 포인트 : {}", findCurrentHighestBidder.getUserUUID(), findCurrentHighestBidder.getPoint());
+
+            PointLog pointLog = PointLog.createPointLogWithDeposit(findCurrentHighestBidder,
+                    pointOriginType, BigDecimal.valueOf(findAuction.getCurrentHighestBidAmount()));
+            pointLogRepository.save(pointLog);
+        }
+    }
+
+    public void refundDepositToOrganizer(Auction findAuction, PointOriginType pointOriginType) {
+        User organizer = userRepository.findByUserUUIDWithPessimisticLock(findAuction.getUser().getUserUUID())
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        log.info("경매 취소로 인해 경매 주최자에게 포인트가 반환될 예정입니다.");
+        log.info("경매 주최자 id : {}, 추가 전 포인트 : {}", organizer.getUserId(), organizer.getPoint());
+        organizer.increasePoint(BigDecimal.valueOf(findAuction.getMinBidAmount()));
+        log.info("경매 주최자 id : {}, 추가 후 포인트 : {}", organizer.getUserId(), organizer.getPoint());
+
+        PointLog pointLog = PointLog.createPointLogWithDeposit(organizer, pointOriginType, BigDecimal.valueOf(findAuction.getMinBidAmount()));
+        pointLogRepository.save(pointLog);
     }
 
     public void deleteScheduling(Auction findAuction) {
