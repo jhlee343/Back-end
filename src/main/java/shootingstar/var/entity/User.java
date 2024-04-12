@@ -16,6 +16,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import shootingstar.var.exception.CustomException;
+import shootingstar.var.exception.ErrorCode;
 
 @Entity
 @Getter
@@ -121,5 +123,12 @@ public class User extends BaseTimeEntity {
 
     public void setWarningCount(int warningCount) {
         this.warningCount = warningCount;
+    }
+
+    public void validateSubscribeExpiration() {
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        if (this.subscribeExpiration == null || this.subscribeExpiration.isBefore(currentDateTime)) {
+            throw new CustomException(ErrorCode.EXPIRED_SUBSCRIPTION);
+        }
     }
 }
