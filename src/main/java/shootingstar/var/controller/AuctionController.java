@@ -69,7 +69,7 @@ public class AuctionController {
                                     "- 스케줄링된 task를 취소하는 데 실패 했을 때 : 4201",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
             @ApiResponse(responseCode = "403",
-                    description = "- 로그인 한 사용자가 경매 주최자일 때 : 2100",
+                    description = "- 로그인 한 사용자가 경매 주최자가 아닐 때 : 2100",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
             @ApiResponse(responseCode = "409",
                     description = "- 경매 타입이 진행중(PROGRESS)이 아닐 때 : 2300",
