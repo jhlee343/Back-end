@@ -23,7 +23,7 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import shootingstar.var.dto.req.AuctionCreateReqDto;
-import shootingstar.var.entity.Auction;
+import shootingstar.var.entity.auction.Auction;
 import shootingstar.var.entity.ScheduledTask;
 import shootingstar.var.entity.User;
 import shootingstar.var.entity.log.PointLog;

@@ -16,15 +16,17 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import shootingstar.var.Service.AuctionService;
 import shootingstar.var.dto.req.AuctionCreateReqDto;
+import shootingstar.var.dto.req.AuctionReportReqDto;
 import shootingstar.var.enums.type.UserType;
 import shootingstar.var.exception.ErrorResponse;
 import shootingstar.var.jwt.JwtTokenProvider;
 
 @Slf4j
-@Tag(name = "경매 컨트롤러", description= "vip 권한만 사용 가능(경매 취소는 ADMIN도 사용 가능)")
+@Tag(name = "경매 컨트롤러", description= "경매 생성과 경매 취소는 vip 권한만 사용 가능, "
+                                    + "경매 신고는 basic, vip 둘 다 사용 가능")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/vip/auction")
+@RequestMapping("/api")
 public class AuctionController {
 
     private final AuctionService auctionService;
@@ -50,7 +52,7 @@ public class AuctionController {
                     description = "- 스케줄링 실패 : 4000",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
     })
-    @PostMapping("/create")
+    @PostMapping("/vip/auction/create")
     public ResponseEntity<String> create(@Valid @RequestBody AuctionCreateReqDto reqDto, HttpServletRequest request) {
         String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
         auctionService.create(reqDto, userUUID);
@@ -78,10 +80,30 @@ public class AuctionController {
                     description = "- 스케줄링 실패 : 4000",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
     })
-    @PatchMapping("/cancel/{auctionUUID}")
+    @PatchMapping("/vip/auction/cancel/{auctionUUID}")
     public ResponseEntity<String> cancel(@PathVariable("auctionUUID") String auctionUUID, HttpServletRequest request) {
         String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
         auctionService.cancel(auctionUUID, userUUID, UserType.ROLE_VIP.toString());
         return ResponseEntity.ok().body("경매 취소 성공");
+    }
+
+    @Operation(summary = "경매 신고 API", description = "경매 진행중 일 때 BASIC, VIP 사용 가능")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "- 사용자 타입이 BASIC, VIP일 때 : 경매 신고 성공"),
+            @ApiResponse(responseCode = "404",
+                    description =
+                                    "- 사용자 정보 조회 실패 : 1201\n" +
+                                    "- 경매가 존재하지 않을 때 : 2200",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+            @ApiResponse(responseCode = "409",
+                    description = "- 경매 타입이 진행중(PROGRESS)이 아닐 때 : 2300",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+    })
+    @PostMapping("/auction/report")
+    public ResponseEntity<String> reportAuction(@Valid @RequestBody AuctionReportReqDto reqDto, HttpServletRequest request) {
+        String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
+        auctionService.reportAuction(reqDto, userUUID);
+        return ResponseEntity.ok().body("경매 신고 성공");
     }
 }

@@ -12,7 +12,7 @@ import shootingstar.var.dto.req.MeetingTimeSaveReqDto;
 import shootingstar.var.dto.req.ReviewSaveReqDto;
 import shootingstar.var.dto.req.TicketReportReqDto;
 import shootingstar.var.dto.res.DetailTicketResDto;
-import shootingstar.var.entity.Auction;
+import shootingstar.var.entity.auction.Auction;
 import shootingstar.var.entity.log.PointLog;
 import shootingstar.var.entity.Review;
 import shootingstar.var.entity.ticket.Ticket;

@@ -9,6 +9,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import shootingstar.var.entity.auction.Auction;
 import shootingstar.var.entity.ticket.Ticket;
 import shootingstar.var.enums.type.UserType;
 

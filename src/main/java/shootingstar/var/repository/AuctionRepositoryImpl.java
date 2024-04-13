@@ -3,7 +3,6 @@ package shootingstar.var.repository;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.DateTimePath;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -15,13 +14,12 @@ import shootingstar.var.dto.res.*;
 import shootingstar.var.enums.type.AuctionSortType;
 import shootingstar.var.enums.type.AuctionType;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.querydsl.core.types.dsl.DateTimePath.*;
-import static shootingstar.var.entity.QAuction.auction;
 import static shootingstar.var.entity.QUser.user;
+import static shootingstar.var.entity.auction.QAuction.auction;
+import static shootingstar.var.entity.QBid.bid;
 
 public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
     private final JPAQueryFactory queryFactory;
@@ -35,7 +33,8 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
                         auction.user.profileImgUrl,
                         auction.user.nickname,
                         auction.meetingDate,
-                        user.nickname
+                        user.nickname,
+                        auction.auctionUUID
                 ))
                 .from(auction)
                 .where(currentHighestBidderIdEq(userUUID), auction.auctionType.eq(AuctionType.SUCCESS), auction.meetingDate.before(LocalDateTime.now()))
@@ -58,7 +57,8 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
                         auction.user.profileImgUrl,
                         auction.user.nickname,
                         auction.meetingDate,
-                        user.nickname
+                        user.nickname,
+                        auction.auctionUUID
                 ))
                 .from(auction)
                 .where(currentHighestBidderIdEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS),auction.meetingDate.after(LocalDateTime.now()))
@@ -73,20 +73,6 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
 
-    @Override
-    public List<UserAuctionParticipateResDto> findParticipateList(String userUUID, Pageable pageable) {
-        return queryFactory
-                .select(new QUserAuctionParticipateResDto(
-                        auction.user.profileImgUrl,
-                        auction.user.nickname,
-                        auction.createdTime,
-                        auction.bidCount,
-                        auction.currentHighestBidAmount
-                ))
-                .from(auction)
-                .where(auction.auctionType.eq(AuctionType.PROGRESS))
-                .fetch();
-    }
 
     @Override
     public Page<UserAuctionParticipateResDto> findAllParticipateByUserUUID(String userUUID, Pageable pageable) {
@@ -104,7 +90,8 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
                         auction.user.profileImgUrl,
                         auction.user.nickname,
                         auction.meetingDate,
-                        auction.currentHighestBidderUUID
+                        bid.bidderNickname,
+                        auction.auctionUUID
                 ))
                 .from(auction)
                 .where(vipUserUUIDEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS),auction.meetingDate.before(LocalDateTime.now()))
@@ -127,7 +114,8 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
                         auction.user.profileImgUrl,
                         auction.user.nickname,
                         auction.meetingDate,
-                        auction.currentHighestBidderUUID
+                        bid.bidderNickname,
+                        auction.auctionUUID
                 ))
                 .from(auction)
                 .where(vipUserUUIDEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS),auction.meetingDate.after(LocalDateTime.now()))
@@ -150,7 +138,8 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
                         auction.user.nickname,
                         auction.createdTime,
                         auction.currentHighestBidAmount,
-                        auction.bidCount
+                        auction.bidCount,
+                        auction.auctionUUID
                 ))
                 .from(auction)
                 .where(vipUserUUIDEq(userUUID) , auction.auctionType.eq(AuctionType.PROGRESS))
@@ -171,7 +160,8 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
                 .select(new QUserAuctionInvalidityResDto(
                         auction.user.profileImgUrl,
                         auction.user.nickname,
-                        auction.createdTime
+                        auction.createdTime,
+                        auction.auctionUUID
                 ))
                 .from(auction)
                 .where(vipUserUUIDEq(userUUID), auction.auctionType.eq(AuctionType.INVALIDITY))
