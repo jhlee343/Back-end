@@ -17,12 +17,16 @@ public class VipInfoDto {
     @NotNull
     private String vipIntroduce;
 
+    @NotNull
+    private String vipEvidenceUrl;
+
 
     @Builder
     public VipInfoDto(String vipJob,
-                   String vipCareer, String vipIntroduce){
+                   String vipCareer, String vipIntroduce, String vipEvidenceUrl){
         this.vipCareer = vipCareer;
         this.vipIntroduce = vipIntroduce;
         this.vipJob = vipJob;
+        this.vipEvidenceUrl = vipEvidenceUrl;
     }
 }
