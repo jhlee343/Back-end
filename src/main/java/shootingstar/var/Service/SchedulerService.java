@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import shootingstar.var.entity.Auction;
+import shootingstar.var.entity.auction.Auction;
 import shootingstar.var.entity.log.DonationLog;
 import shootingstar.var.entity.log.PointLog;
 import shootingstar.var.entity.Wallet;

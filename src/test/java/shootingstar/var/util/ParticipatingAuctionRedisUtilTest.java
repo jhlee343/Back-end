@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-import shootingstar.var.entity.Auction;
+import shootingstar.var.entity.auction.Auction;
 import shootingstar.var.entity.User;
 import shootingstar.var.enums.type.UserType;
 import shootingstar.var.repository.AuctionRepository;
@@ -14,8 +14,6 @@ import shootingstar.var.repository.user.UserRepository;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class ParticipatingAuctionRedisUtilTest {

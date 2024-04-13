@@ -16,11 +16,11 @@ import shootingstar.var.enums.type.UserType;
 import java.util.List;
 
 import static org.springframework.util.StringUtils.hasText;
-import static shootingstar.var.entity.QAuction.auction;
 import static shootingstar.var.entity.QFollow.follow;
 import static shootingstar.var.entity.QReview.review;
 import static shootingstar.var.entity.QUser.user;
 import static shootingstar.var.entity.QVipInfo.vipInfo;
+import static shootingstar.var.entity.auction.QAuction.auction;
 
 public class UserRepositoryCustomImpl implements UserRepositoryCustom{
 

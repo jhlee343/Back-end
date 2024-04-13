@@ -11,7 +11,7 @@ import org.springframework.data.domain.Pageable;
 import shootingstar.var.dto.req.VipInfoEditResDto;
 import shootingstar.var.dto.res.UserAuctionSuccessResDto;
 import shootingstar.var.dto.res.VipInfoDto;
-import shootingstar.var.entity.Auction;
+import shootingstar.var.entity.auction.Auction;
 import shootingstar.var.entity.User;
 import shootingstar.var.entity.VipApprovalType;
 import shootingstar.var.entity.VipInfo;
