@@ -17,11 +17,14 @@ public class UserAuctionInvalidityResDto {
 
     @NotNull
     private LocalDateTime auctionCreatedDate;
+    @NotNull
+    private String auctionUUID;
 
     @QueryProjection
-    public UserAuctionInvalidityResDto(String profileImgUrl, String vipUserName, LocalDateTime auctionCreatedDate){
+    public UserAuctionInvalidityResDto(String profileImgUrl, String vipUserName, LocalDateTime auctionCreatedDate, String auctionUUID){
         this.profileImgUrl = profileImgUrl;
         this.vipUserName = vipUserName;
-        this.auctionCreatedDate = auctionCreatedDate;;
+        this.auctionCreatedDate = auctionCreatedDate;
+        this.auctionUUID = auctionUUID;
     }
 }
