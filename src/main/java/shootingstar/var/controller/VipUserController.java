@@ -58,7 +58,7 @@ public class VipUserController {
     @Operation(summary = "vip info 수정하기")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "사용자 아이디에 해당하는 vipInfo 반환", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))}),
+                    @Content(mediaType = "text/plain", schema = @Schema(implementation = String.class))}),
             @ApiResponse(responseCode = "403",
                     description = "잘못된 유저 정보 : 1201\n"+"잘못된 vipInfo 정보 : 7200",
                     content = {
@@ -74,7 +74,7 @@ public class VipUserController {
     @Operation(summary = "경매 불러오기")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "경매 타입에 맞는 경매 불러오기", content = {
-                    @Content(mediaType = "application/json")}),
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = UserAuctionParticipateResDto.class))}),
             @ApiResponse(responseCode = "401",
                     description = "SUCCESS 타입의 입력 경우, : 7100",
                     content = {

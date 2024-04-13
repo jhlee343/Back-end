@@ -36,7 +36,7 @@ public class BasicUserController {
     @Operation(summary = "vip 신청")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "신청 성공 성공", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))}),
+                    @Content(mediaType = "text/plain", schema = @Schema(implementation = String.class))}),
             @ApiResponse(responseCode = "400",
                     description = "중복된 신청인경우, : 7300",
                     content = {
@@ -52,8 +52,8 @@ public class BasicUserController {
 
     @Operation(summary = "vip 신청 상태 조회")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "vip 신청 상태 조회 성공", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))}),
+            @ApiResponse(responseCode = "200", description = "vip 신청 상태 조회 성공 :  REFUSAL, STANDBY, APPROVE 3 타입", content = {
+                    @Content(mediaType = "text/plain", schema = @Schema(implementation = String.class))}),
             @ApiResponse(responseCode = "400",
                     description = "잘못된 유저 정보 : 1201\n" + "잘못된 vipInfo 정보 : 7200",
                     content = {
