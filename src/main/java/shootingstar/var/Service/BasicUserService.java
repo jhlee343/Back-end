@@ -63,7 +63,6 @@ public class BasicUserService {
         return ticketRepository.findAllTicketByuserUUID(userUUID, ticketSortType, search, pageable);
     }
 
-
     public Page<UserAuctionSuccessResDto> successBeforeAuctionList(String userUUID, Pageable pageable){
         return auctionRepository.findAllSuccessBeforeByUserUUID(userUUID, pageable);
     }

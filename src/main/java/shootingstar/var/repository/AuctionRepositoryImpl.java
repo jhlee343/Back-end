@@ -3,7 +3,6 @@ package shootingstar.var.repository;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.DateTimePath;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -22,6 +21,7 @@ import java.util.List;
 import static com.querydsl.core.types.dsl.DateTimePath.*;
 import static shootingstar.var.entity.QAuction.auction;
 import static shootingstar.var.entity.QUser.user;
+import static shootingstar.var.entity.QBid.bid;
 
 public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
     private final JPAQueryFactory queryFactory;
@@ -92,7 +92,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
                         auction.user.profileImgUrl,
                         auction.user.nickname,
                         auction.meetingDate,
-                        auction.currentHighestBidderUUID,
+                        bid.bidderNickname,
                         auction.auctionUUID
                 ))
                 .from(auction)
@@ -116,7 +116,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
                         auction.user.profileImgUrl,
                         auction.user.nickname,
                         auction.meetingDate,
-                        auction.currentHighestBidderUUID,
+                        bid.bidderNickname,
                         auction.auctionUUID
                 ))
                 .from(auction)
