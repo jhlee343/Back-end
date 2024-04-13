@@ -53,17 +53,6 @@ public class UserController {
         return ResponseEntity.ok(profile);
     }
 
-    @Operation(summary = "VIP 확인")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "vip 확인 성공", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = Boolean.class))}),
-    })
-    @GetMapping("/checkVIP")
-    public ResponseEntity<Boolean> checkVIP(HttpServletRequest request) {
-        String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
-        return ResponseEntity.ok(userService.checkVIP(userUUID));
-    }
-
     @Operation(summary = "팔로우 리스트 불러오기")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "팔로우 리스트 불러오기 성공", content = {
@@ -83,10 +72,10 @@ public class UserController {
             @ApiResponse(responseCode = "403", description = "잘못된 유저 정보 : 1201",content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
     })
-    @GetMapping("/follow/{followingId}")
-    public ResponseEntity<String> follow(@NotBlank @PathVariable("followingId") String followingId, HttpServletRequest request) {
+    @GetMapping("/follow/{followingUUID}")
+    public ResponseEntity<String> follow(@NotBlank @PathVariable("followingUUID") String followingUUID, HttpServletRequest request) {
         String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
-        userService.follow(followingId,userUUID);
+        userService.follow(followingUUID,userUUID);
         return ResponseEntity.ok("follow success");
     }
 
