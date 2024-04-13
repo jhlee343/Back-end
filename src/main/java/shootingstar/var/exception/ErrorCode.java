@@ -51,6 +51,7 @@ public enum ErrorCode {
     DUPLICATE_NICKNAME(CONFLICT, "1302", "이미 사용중인 닉네임입니다."),
     WITHDRAWAL_ERROR_BY_AUCTION_IN_PROGRESS(CONFLICT, "1303", "현재 진행중인 경매가 존재할 경우 회원탈퇴가 불가능합니다."),
     WITHDRAWAL_ERROR_BY_TICKET_IN_PROGRESS(CONFLICT, "1304", "현재 종료되지 않은 식사권이 존재할 경우 회원탈퇴가 불가능합니다."),
+    EXPIRED_SUBSCRIPTION(CONFLICT, "1305", "구독 전이거나 구독이 만료되었습니다."),
 
     MIN_BID_AMOUNT_INCORRECT_FORMAT(BAD_REQUEST, "2000", "최소입찰금액은 자신의 보유 포인트보다 적어야 합니다."),
     INCORRECT_FORMAT_MIN_BID_AMOUNT(BAD_REQUEST, "2001", "잘못된 형식의 최소 입찰 금액입니다."),
@@ -66,8 +67,13 @@ public enum ErrorCode {
     AUCTION_CONFLICT(CONFLICT, "2300", "이미 처리된 경매입니다."),
 
     EXCHANGE_AMOUNT_INCORRECT_FORMAT(BAD_REQUEST, "3000", "환전 포인트는 보유 포인트보다 적어야 합니다."),
-    PAYMENT_ACCESS_DENIED(FORBIDDEN, "3100", "결제 정보가 다릅니다."),
+    PORTONE_SERVER_RESPONSE_ERROR(INTERNAL_SERVER_ERROR, "3001", "결제 서버 응답 오류가 발생했습니다."),
+    PORTONE_SERVER_DISCONNECTED(INTERNAL_SERVER_ERROR, "3002", "결제 서버와 연결이 끊어졌습니다."),
+    PAYMENT_ACCESS_DENIED(FORBIDDEN, "3100", "잘못된 결제 요청입니다."),
     DIFFERENT_ACCOUNT_HOLDER(FORBIDDEN, "3101", "본인 명의의 계좌가 아닙니다."),
+    PORTONE_AUTHENTICATION_ERROR(UNAUTHORIZED, "3102", "포트원 ACCESS 토큰 발급에 실패했습니다."),
+    PORTONE_PAYMENT_NOT_FOUND(NOT_FOUND, "3200", "해당하는 거래내역이 존재하지 않습니다."),
+
 
     SCHEDULING_SERVER_ERROR(INTERNAL_SERVER_ERROR, "4000", "알 수 없는 오류가 발생했습니다."),
     TASK_NOT_FOUND(NOT_FOUND, "4200", "존재하지 않는 task입니다."),
