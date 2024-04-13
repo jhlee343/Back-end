@@ -48,8 +48,8 @@ public class UserService {
 
     public UserProfileDto getProfile(String userUUID) {
         User user = findByUserUUID(userUUID);
-        UserProfileDto userProfileDto = new UserProfileDto(user.getNickname(), user.getProfileImgUrl(),
-                user.getDonationPrice(), user.getPoint(), user.getSubscribeExpiration(), user.getRating());
+        UserProfileDto userProfileDto = new UserProfileDto(user.getNickname(),user.getUserUUID(), user.getProfileImgUrl(),
+                user.getDonationPrice(), user.getPoint(), user.getSubscribeExpiration(), user.getRating() , user.getUserType());
         return userProfileDto;
     }
 
@@ -58,9 +58,9 @@ public class UserService {
     }
 
     @Transactional
-    public void follow(String followingId, String userUUID) {
+    public void follow(String followingUUID, String userUUID) {
         User follower = findByUserUUID(userUUID);
-        User following = findByUserUUID(followingId);
+        User following = findByUserUUID(followingUUID);
         Follow follow = new Follow(follower,following);
         followRepository.save(follow);
     }
