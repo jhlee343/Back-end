@@ -15,7 +15,7 @@ import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import shootingstar.var.entity.Auction;
+import shootingstar.var.entity.auction.Auction;
 import shootingstar.var.entity.BaseTimeEntity;
 import shootingstar.var.entity.Review;
 import shootingstar.var.entity.User;

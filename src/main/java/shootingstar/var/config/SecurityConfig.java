@@ -67,7 +67,8 @@ public class SecurityConfig {
                                 .requestMatchers(
                                         "/api/ticket/**",
                                         "/api/chat/**",
-                                        "/api/bid/**"
+                                        "/api/bid/**",
+                                        "/api/auction/report"
                                 ).hasAnyRole("BASIC", "VIP")
 
                                 .requestMatchers( // 권한 확인

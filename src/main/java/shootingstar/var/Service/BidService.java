@@ -1,7 +1,6 @@
 package shootingstar.var.Service;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.NavigableMap;
@@ -15,7 +14,7 @@ import shootingstar.var.dto.req.BidReqDto;
 import shootingstar.var.dto.res.BidInfoResDto;
 import shootingstar.var.dto.res.BidLog;
 import shootingstar.var.dto.res.BidResDto;
-import shootingstar.var.entity.Auction;
+import shootingstar.var.entity.auction.Auction;
 import shootingstar.var.entity.Bid;
 import shootingstar.var.entity.log.PointLog;
 import shootingstar.var.entity.User;

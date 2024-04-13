@@ -1,4 +1,4 @@
-package shootingstar.var.entity;
+package shootingstar.var.entity.auction;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
@@ -12,6 +12,9 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
+import shootingstar.var.entity.BaseTimeEntity;
+import shootingstar.var.entity.Bid;
+import shootingstar.var.entity.User;
 import shootingstar.var.enums.type.AuctionType;
 
 @Entity

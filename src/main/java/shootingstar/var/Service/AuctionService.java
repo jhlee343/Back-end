@@ -16,7 +16,9 @@ import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import shootingstar.var.entity.Auction;
+import shootingstar.var.dto.req.AuctionReportReqDto;
+import shootingstar.var.entity.auction.Auction;
+import shootingstar.var.entity.auction.AuctionReport;
 import shootingstar.var.entity.log.PointLog;
 import shootingstar.var.enums.type.AuctionType;
 import shootingstar.var.entity.ScheduledTask;
@@ -26,6 +28,7 @@ import shootingstar.var.entity.User;
 import shootingstar.var.enums.type.UserType;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
+import shootingstar.var.repository.AuctionReportRepository;
 import shootingstar.var.scheduling.quartz.TicketCreationJob;
 import shootingstar.var.repository.AuctionRepository;
 import shootingstar.var.repository.log.PointLogRepository;
@@ -44,6 +47,7 @@ public class AuctionService {
     private final UserRepository userRepository;
     private final PointLogRepository pointLogRepository;
     private final ScheduledTaskRepository scheduledTaskRepository;
+    private final AuctionReportRepository auctionReportRepository;
     private final Scheduler scheduler;
 
     @Transactional
@@ -148,21 +152,9 @@ public class AuctionService {
         deleteScheduling(findAuction);
     }
 
-    private Auction findAuctionByAuctionUUID(String auctionUUID) {
-        Auction findAuction = auctionRepository.findByAuctionUUID(auctionUUID)
-                .orElseThrow(() -> new CustomException(ErrorCode.AUCTION_NOT_FOUND));
-        return findAuction;
-    }
-
     private void checkAuctionCancelAccess(String userUUID, String userType, Auction auction) {
         if (!auction.isOwner(userUUID) && !userType.equals(UserType.ROLE_ADMIN.toString())) {
             throw new CustomException(ErrorCode.AUCTION_ACCESS_DENIED);
-        }
-    }
-
-    private void validateAuctionType(Auction findAuction) {
-        if (!findAuction.isProgress()) {
-            throw new CustomException(ErrorCode.AUCTION_CONFLICT);
         }
     }
 
@@ -215,6 +207,38 @@ public class AuctionService {
 
         // 스케줄링 타입 CANCEL로 변경
         task.changeTaskType(TaskType.CANCEL);
+    }
+
+    @Transactional
+    public void reportAuction(AuctionReportReqDto reqDto, String userUUID) {
+        // 경매 존재 여부
+        Auction auction = findAuctionByAuctionUUID(reqDto.getAuctionUUID());
+
+        // 경매 타입이 PROGRESS인지 확인
+        validateAuctionType(auction);
+
+        User user = userRepository.findByUserUUID(userUUID)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        AuctionReport auctionReport = AuctionReport.builder()
+                .auction(auction)
+                .auctionReportNickname(user.getNickname())
+                .auctionReportContent(reqDto.getAuctionReportContent())
+                .build();
+
+        auctionReportRepository.save(auctionReport);
+    }
+
+    private Auction findAuctionByAuctionUUID(String auctionUUID) {
+        Auction findAuction = auctionRepository.findByAuctionUUID(auctionUUID)
+                .orElseThrow(() -> new CustomException(ErrorCode.AUCTION_NOT_FOUND));
+        return findAuction;
+    }
+
+    private void validateAuctionType(Auction findAuction) {
+        if (!findAuction.isProgress()) {
+            throw new CustomException(ErrorCode.AUCTION_CONFLICT);
+        }
     }
 }
 

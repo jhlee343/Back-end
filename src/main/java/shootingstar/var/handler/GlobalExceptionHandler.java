@@ -94,6 +94,12 @@ public class GlobalExceptionHandler {
                 } case "adminSecretKey" -> {
                     errorCode = INCORRECT_FORMAT_ADMIN_SECRET_KEY;
                     break;
+                } case "auctionUUID" -> {
+                    errorCode = INCORRECT_FORMAT_AUCTION_UUID;
+                    break;
+                } case "auctionReportContent" -> {
+                    errorCode = INCORRECT_FORMAT_AUCTION_REPORT_CONTENT;
+                    break;
                 }
             }
 
