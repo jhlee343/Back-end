@@ -4,7 +4,7 @@ import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
-import shootingstar.var.entity.Auction;
+import shootingstar.var.entity.auction.Auction;
 
 import java.util.Optional;
 
