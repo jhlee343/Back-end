@@ -20,20 +20,6 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
         this.queryFactory = new JPAQueryFactory(em);
     }
 
-    @Override
-    public List<UserReceiveReviewDto> findReceiveByUserUUID(String userUUID) {
-                return queryFactory
-                .select(new QUserReceiveReviewDto(
-                        review.reviewUUID,
-                        review.ticket.ticketUUID,
-                        review.reviewContent,
-                        review.reviewRating,
-                        review.writer.nickname
-                ))
-                .from(review)
-                .where(userEqReceiver(userUUID))
-                .fetch();
-    }
 
     @Override
     public Page<UserReceiveReviewDto> findAllReceiveByUserUUID(String userUUID, Pageable pageable) {
@@ -43,7 +29,12 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
                         review.ticket.ticketUUID,
                         review.reviewContent,
                         review.reviewRating,
-                        review.writer.nickname
+                        review.writer.nickname,
+                        review.writer.profileImgUrl,
+                        review.ticket.auction.user.nickname,
+                        review.ticket.auction.meetingDate,
+                        review.ticket.auction.meetingLocation,
+                        review.ticket.auction.currentHighestBidAmount
                 ))
                 .from(review)
                 .where(userEqReceiver(userUUID), review.receiver.isWithdrawn.eq(false))
