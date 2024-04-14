@@ -16,7 +16,8 @@ public class UserReceiveReviewDto {
     private String reviewContent;
     private Integer reviewRating;
 
-    private String writer;
+    private String writerUUID;
+    private String writerNickname;
     private String writerImgUrl;
 
     private String vipNickname;
@@ -28,12 +29,13 @@ public class UserReceiveReviewDto {
     //나에게 보낸사람 uuid
     @QueryProjection
     public UserReceiveReviewDto(String reviewUUID, String ticketUUID, String reviewContent, Integer reviewRating,
-                                String writer, String writerImgUrl, String vipNickname, LocalDateTime meetingDate, String meetingLocation, long highestBidAmount){
+                                String writerUUID,String writerNickname, String writerImgUrl, String vipNickname, LocalDateTime meetingDate, String meetingLocation, long highestBidAmount){
         this.reviewUUID = reviewUUID;
         this.ticketUUID = ticketUUID;
         this.reviewContent = reviewContent;
         this.reviewRating = reviewRating;
-        this.writer = writer;
+        this.writerUUID = writerUUID;
+        this.writerNickname = writerNickname;
         this.writerImgUrl = writerImgUrl;
         this.vipNickname = vipNickname;
         this.meetingDate = meetingDate;

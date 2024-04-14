@@ -20,7 +20,6 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
         this.queryFactory = new JPAQueryFactory(em);
     }
 
-
     @Override
     public Page<UserReceiveReviewDto> findAllReceiveByUserUUID(String userUUID, Pageable pageable) {
         List<UserReceiveReviewDto> content = queryFactory
@@ -29,6 +28,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
                         review.ticket.ticketUUID,
                         review.reviewContent,
                         review.reviewRating,
+                        review.writer.userUUID,
                         review.writer.nickname,
                         review.writer.profileImgUrl,
                         review.ticket.auction.user.nickname,
@@ -37,7 +37,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
                         review.ticket.auction.currentHighestBidAmount
                 ))
                 .from(review)
-                .where(userEqReceiver(userUUID), review.receiver.isWithdrawn.eq(false))
+                .where(userEqReceiver(userUUID), review.receiver.isWithdrawn.eq(false) )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(review.reviewId.desc())
@@ -50,20 +50,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
 
         return PageableExecutionUtils.getPage(content,pageable,countQuery::fetchOne);
     }
-    @Override
-    public List<UserSendReviewDto> findSendByUserUUID(String userUUID) {
-        return queryFactory
-                .select(new QUserSendReviewDto(
-                        review.reviewUUID,
-                        review.ticket.ticketUUID,
-                        review.reviewContent,
-                        review.reviewRating,
-                        review.receiver.nickname
-                ))
-                .from(review)
-                .where(userEqWriter(userUUID))
-                .fetch();
-    }
+
 
     @Override
     public Page<UserSendReviewDto> findAllSendByUserUUID(String userUUID, Pageable pageable) {
@@ -73,7 +60,13 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
                         review.ticket.ticketUUID,
                         review.reviewContent,
                         review.reviewRating,
-                        review.receiver.nickname
+                        review.receiver.userUUID,
+                        review.receiver.nickname,
+                        review.receiver.profileImgUrl,
+                        review.ticket.auction.user.nickname,
+                        review.ticket.auction.meetingDate,
+                        review.ticket.auction.meetingLocation,
+                        review.ticket.auction.currentHighestBidAmount
                 ))
                 .from(review)
                 .where(userEqWriter(userUUID), review.writer.isWithdrawn.eq(false))
@@ -129,5 +122,6 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
 
         return review.writer.name.eq(search);
     }
+
 
 }
