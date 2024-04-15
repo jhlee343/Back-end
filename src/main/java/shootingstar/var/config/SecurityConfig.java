@@ -60,12 +60,15 @@ public class SecurityConfig {
                                         "/swagger-ui/**", // swagger 설정
                                         "/api/lookAtMe/signup",
                                         "/api/lookAtMe/login",
-                                        "/ws/chat"
+                                        "/ws/chat",
+                                        "/ws/bid"
                                 ).permitAll()
 
                                 .requestMatchers(
                                         "/api/ticket/**",
-                                        "/api/chat/**"
+                                        "/api/chat/**",
+                                        "/api/bid/**",
+                                        "/api/auction/report"
                                 ).hasAnyRole("BASIC", "VIP")
 
                                 .requestMatchers( // 권한 확인

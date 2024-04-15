@@ -14,6 +14,7 @@ import shootingstar.var.dto.res.GetBannerResDto;
 import shootingstar.var.dto.res.ProgressAuctionResDto;
 import shootingstar.var.dto.res.VipDetailResDto;
 import shootingstar.var.entity.*;
+import shootingstar.var.entity.auction.Auction;
 import shootingstar.var.entity.ticket.Ticket;
 import shootingstar.var.enums.type.AuctionSortType;
 import shootingstar.var.enums.type.AuctionType;

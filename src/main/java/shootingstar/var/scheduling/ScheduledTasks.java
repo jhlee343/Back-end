@@ -11,7 +11,7 @@ public class ScheduledTasks {
 
     private final SchedulerService schedulerService;
 
-    @Scheduled(cron = "0 0 0 * * *")
+    @Scheduled(cron = "0 40 20 * * *")
     public void completeTicket() {
         schedulerService.completeTicket();
     }

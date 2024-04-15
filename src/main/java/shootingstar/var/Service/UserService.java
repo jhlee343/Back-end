@@ -11,6 +11,7 @@ import shootingstar.var.dto.req.WarningListDto;
 import shootingstar.var.dto.res.UserReceiveReviewDto;
 import shootingstar.var.dto.res.UserSendReviewDto;
 import shootingstar.var.entity.*;
+import shootingstar.var.entity.auction.Auction;
 import shootingstar.var.enums.type.UserType;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.repository.follow.FollowRepository;
@@ -46,9 +47,10 @@ public class UserService {
         }
     }
 
-    public UserProfileDto getProfile(String nickname) {
-        User user = findByNickname(nickname);
-        UserProfileDto userProfileDto = new UserProfileDto(user.getNickname(), user.getProfileImgUrl(), user.getDonationPrice(), user.getPoint(), user.getSubscribeExpiration(), user.getUserType());
+    public UserProfileDto getProfile(String userUUID) {
+        User user = findByUserUUID(userUUID);
+        UserProfileDto userProfileDto = new UserProfileDto(user.getNickname(),user.getUserUUID(), user.getProfileImgUrl(),
+                user.getDonationPrice(), user.getPoint(), user.getSubscribeExpiration(), user.getRating() , user.getUserType());
         return userProfileDto;
     }
 
@@ -57,10 +59,9 @@ public class UserService {
     }
 
     @Transactional
-    public void follow(String followingId, String userUUID) {
+    public void follow(String followingUUID, String userUUID) {
         User follower = findByUserUUID(userUUID);
-        User following = findByUserUUID(followingId);
-        UUID followUUID = UUID.randomUUID();
+        User following = findByUserUUID(followingUUID);
         Follow follow = new Follow(follower,following);
         followRepository.save(follow);
     }
@@ -101,13 +102,6 @@ public class UserService {
         return followOptional.get();
     }
 
-    public User findByNickname(String nickname) {
-        Optional<User> optionalUser = userRepository.findByNickname(nickname);
-        if (optionalUser.isEmpty()) {
-            throw new CustomException(USER_NOT_FOUND);
-        }
-        return optionalUser.get();
-    }
 
     public User findByUserUUID(String userUUID) {
         Optional<User> optionalUser = userRepository.findByUserUUID(userUUID);

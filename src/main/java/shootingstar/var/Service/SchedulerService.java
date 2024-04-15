@@ -7,8 +7,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import shootingstar.var.entity.Auction;
-import shootingstar.var.entity.PointLog;
+import shootingstar.var.entity.auction.Auction;
+import shootingstar.var.entity.log.DonationLog;
+import shootingstar.var.entity.log.PointLog;
+import shootingstar.var.entity.Wallet;
 import shootingstar.var.entity.chat.ChatRoom;
 import shootingstar.var.entity.ticket.TicketMeetingTime;
 import shootingstar.var.enums.type.AuctionType;
@@ -17,16 +19,16 @@ import shootingstar.var.enums.type.PointOriginType;
 import shootingstar.var.enums.type.TaskType;
 import shootingstar.var.entity.ticket.Ticket;
 import shootingstar.var.entity.User;
-import shootingstar.var.enums.type.TransactionType;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
 import shootingstar.var.repository.AuctionRepository;
-import shootingstar.var.repository.PointLogRepository;
+import shootingstar.var.repository.log.DonationLogRepository;
+import shootingstar.var.repository.log.PointLogRepository;
 import shootingstar.var.repository.ScheduledTaskRepository;
 import shootingstar.var.repository.chat.ChatRoomRepository;
-import shootingstar.var.repository.ticket.TicketMeetingTimeRepository;
 import shootingstar.var.repository.ticket.TicketRepository;
 import shootingstar.var.repository.user.UserRepository;
+import shootingstar.var.repository.wallet.WalletRepository;
 
 @Slf4j
 @Service
@@ -38,6 +40,8 @@ public class SchedulerService {
     private final ScheduledTaskRepository scheduledTaskRepository;
     private final UserRepository userRepository;
     private final ChatRoomRepository chatRoomRepository;
+    private final WalletRepository walletRepository;
+    private final DonationLogRepository donationLogRepository;
 
     @Transactional
     public void createTicketAndAuctionTypeSuccess(Long auctionId, Long userId, Long scheduledTaskId) {
@@ -131,6 +135,18 @@ public class SchedulerService {
             pointLogRepository.save(pointLog);
 
             // 기부금액에 5% 추가 => 추후 추가할 예정
+            Wallet wallet = walletRepository.findWithPessimisticLock()
+                    .orElseThrow(() -> new CustomException(ErrorCode.WALLET_NOT_FOUND));
+            BigDecimal donation = BigDecimal.valueOf(ticket.getAuction().getCurrentHighestBidAmount()).multiply(new BigDecimal(0.05));
+            wallet.increaseDonation(donation);
+
+            // 기부금액 로그 저장
+            DonationLog donationLog = DonationLog.builder()
+                    .donorNickname(ticket.getWinner().getNickname())
+                    .donationPrice(donation)
+                    .totalDonationPrice(wallet.getTotalDonationPrice())
+                    .build();
+            donationLogRepository.save(donationLog);
         }
     }
 

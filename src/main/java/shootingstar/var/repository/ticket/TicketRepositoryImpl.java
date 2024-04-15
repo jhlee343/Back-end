@@ -34,7 +34,8 @@ public class TicketRepositoryImpl implements TicketRepositoryCustom{
                         ticket.auction.meetingLocation,
                         ticket.auction.meetingDate,
                         ticket.organizer.rating,
-                        ticket.organizer.profileImgUrl
+                        ticket.organizer.profileImgUrl,
+                        ticket.ticketUUID
                 ))
                 .from(ticket)
                 .where(userIdEq(userUUID))
@@ -49,7 +50,8 @@ public class TicketRepositoryImpl implements TicketRepositoryCustom{
                         ticket.auction.meetingLocation,
                         ticket.auction.meetingDate,
                         ticket.organizer.rating,
-                        ticket.organizer.profileImgUrl
+                        ticket.organizer.profileImgUrl,
+                        ticket.ticketUUID
                 ))
                 .from(ticket)
                 .where(userIdEq(userUUID), containName(search), ticket.auction.auctionType.eq(AuctionType.SUCCESS))

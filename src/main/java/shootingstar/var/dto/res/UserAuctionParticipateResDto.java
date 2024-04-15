@@ -22,13 +22,18 @@ public class UserAuctionParticipateResDto {
 
     @NotNull
     private String profileImgUrl;
+
+    @NotNull
+    private String auctionUUID;
+
     @QueryProjection
     public UserAuctionParticipateResDto(String profileImgUrl, String vipUserName, LocalDateTime auctionCreatedDate,
-                                      long bidCount, long currentHighestBidAmount){
+                                      long bidCount, long currentHighestBidAmount, String auctionUUID){
         this.profileImgUrl = profileImgUrl;
         this.vipUserName = vipUserName;
         this.auctionCreatedDate = auctionCreatedDate;
         this.bidCount = bidCount;
         this.currentHighestBidAmount = currentHighestBidAmount;
+        this.auctionUUID = auctionUUID;
     }
 }

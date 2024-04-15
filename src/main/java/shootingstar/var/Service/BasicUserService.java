@@ -21,7 +21,7 @@ import shootingstar.var.repository.ticket.TicketRepository;
 
 import java.util.Optional;
 
-import static shootingstar.var.exception.ErrorCode.USER_NOT_FOUND;
+import static shootingstar.var.exception.ErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +34,10 @@ public class BasicUserService {
     @Transactional
     public void applyVip(String userUUID , UserApplyVipDto userApplyVipDto){
         User user = findByUserUUID(userUUID);
+        //vipinfo가 존재하는경우 예외처리
+       if(user.getVipInfo()!=null){
+           throw new CustomException(VIP_INFO_DUPLICATE);
+       }
         VipInfo vipInfo = VipInfo.builder()
                 .user(user)
                 .vipName(userApplyVipDto.getVipName())
@@ -47,10 +51,17 @@ public class BasicUserService {
         vipInfoRepository.save(vipInfo);
     }
 
+    public String applyCheck(String userUUID){
+        User user = findByUserUUID(userUUID);
+        VipInfo vipInfo = findVipInfoByUser(user);
+        VipApprovalType vipApproval = vipInfo.getVipApproval();
+        return String.valueOf(vipApproval);
+
+    }
+
     public Page<TicketListResDto> getAllTicketList(String userUUID, TicketSortType ticketSortType, String search, Pageable pageable){
         return ticketRepository.findAllTicketByuserUUID(userUUID, ticketSortType, search, pageable);
     }
-
 
     public Page<UserAuctionSuccessResDto> successBeforeAuctionList(String userUUID, Pageable pageable){
         return auctionRepository.findAllSuccessBeforeByUserUUID(userUUID, pageable);
@@ -69,5 +80,13 @@ public class BasicUserService {
             throw new CustomException(USER_NOT_FOUND);
         }
         return optionalUser.get();
+    }
+
+    public VipInfo findVipInfoByUser(User user) {
+        Optional<VipInfo> optionalVipInfo = vipInfoRepository.findVipInfoByUser(user);
+        if (optionalVipInfo.isEmpty()) {
+            throw new CustomException(VIP_INFO_NOT_FOUND);
+        }
+        return optionalVipInfo.get();
     }
 }

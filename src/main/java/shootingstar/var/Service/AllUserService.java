@@ -8,11 +8,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shootingstar.var.dto.req.UserSignupReqDto;
 import shootingstar.var.dto.res.*;
-import shootingstar.var.entity.Auction;
+import shootingstar.var.entity.auction.Auction;
 import shootingstar.var.entity.User;
 import shootingstar.var.entity.Wallet;
 import shootingstar.var.enums.type.AuctionSortType;
-import shootingstar.var.enums.type.AuctionType;
 import shootingstar.var.enums.type.UserType;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
@@ -25,7 +24,6 @@ import shootingstar.var.util.MailRedisUtil;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

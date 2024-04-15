@@ -1,6 +1,8 @@
 package shootingstar.var.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -14,11 +16,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import shootingstar.var.exception.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
 import shootingstar.var.Service.UserService;
 import shootingstar.var.dto.req.FollowingDto;
 import shootingstar.var.dto.req.UserProfileDto;
 import shootingstar.var.dto.req.WarningListDto;
+import shootingstar.var.dto.res.GetBannerResDto;
 import shootingstar.var.dto.res.UserReceiveReviewDto;
 import shootingstar.var.dto.res.UserSendReviewDto;
 import shootingstar.var.jwt.JwtTokenProvider;
@@ -36,20 +40,24 @@ public class UserController {
     private final JwtTokenProvider jwtTokenProvider;
 
     @Operation(summary = "프로필 불러오기")
-    @GetMapping("/profile/{nickname}")
-    public ResponseEntity<UserProfileDto> getProfile(@NotEmpty @PathVariable String nickname) {
-        UserProfileDto profile = userService.getProfile(nickname);
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "프로필 불러오기 성공", content = {
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserProfileDto.class))}),
+            @ApiResponse(responseCode = "403", description = "잘못된 유저 정보 : 1201",content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+    })
+    @GetMapping("/profile")
+    public ResponseEntity<UserProfileDto> getProfile(HttpServletRequest request) {
+        String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
+        UserProfileDto profile = userService.getProfile(userUUID);
         return ResponseEntity.ok(profile);
     }
 
-    @Operation(summary = "VIP 확인")
-    @GetMapping("/checkVIP")
-    public ResponseEntity<Boolean> checkVIP(HttpServletRequest request) {
-        String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
-        return ResponseEntity.ok(userService.checkVIP(userUUID));
-    }
-
     @Operation(summary = "팔로우 리스트 불러오기")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "팔로우 리스트 불러오기 성공", content = {
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = FollowingDto.class))}),
+    })
     @GetMapping("/followingList")
     public ResponseEntity<?> followingList(HttpServletRequest request) {
         String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
@@ -58,17 +66,26 @@ public class UserController {
     }
     @Operation(summary = "팔로우하기")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "follow success")
+            @ApiResponse(responseCode = "200", description = "follow success", content = {
+                    @Content(mediaType = "text/plain" , schema = @Schema(implementation = String.class))
+            }),
+            @ApiResponse(responseCode = "403", description = "잘못된 유저 정보 : 1201",content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
     })
-    @GetMapping("/follow/{followingId}")
-    public ResponseEntity<String> follow(@NotBlank @PathVariable("followingId") String followingId, HttpServletRequest request) {
+    @GetMapping("/follow/{followingUUID}")
+    public ResponseEntity<String> follow(@NotBlank @PathVariable("followingUUID") String followingUUID, HttpServletRequest request) {
         String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
-        userService.follow(followingId,userUUID);
+        userService.follow(followingUUID,userUUID);
         return ResponseEntity.ok("follow success");
     }
+
     @Operation(summary = "언팔로우")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "unfollow success")
+            @ApiResponse(responseCode = "200", description = "unfollow success" , content = {
+                    @Content(mediaType = "text/plain", schema = @Schema(implementation = String.class))
+            }),
+            @ApiResponse(responseCode = "403", description = "잘못된 유저 정보 : 1201",content = {
+                    @Content(mediaType = "text/plain", schema = @Schema(implementation = ErrorResponse.class))}),
     })
     @DeleteMapping("/unfollow/{followUUID}")
     public ResponseEntity<String> unFollow(@NotBlank @PathVariable("followUUID") String followUUID) {
@@ -77,6 +94,11 @@ public class UserController {
     }
 
     @Operation(summary = "사용자페이지 받은 리뷰 불러오기")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "받은 리뷰 불러오기 성공", content = {
+                    @Content(mediaType = "application/json" , schema = @Schema(implementation = UserReceiveReviewDto.class))
+            })
+    })
     @GetMapping("/review/receive")
     public ResponseEntity<?> getReceiveReview(HttpServletRequest request, @PageableDefault(size=10) Pageable pageable){
         String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
@@ -85,6 +107,11 @@ public class UserController {
     }
 
     @Operation(summary = "사용자페이지 쓴 리뷰 불러오기")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "쓴 리뷰 불러오기 성공", content = {
+                    @Content(mediaType = "application/json" , schema = @Schema(implementation = UserSendReviewDto.class))
+            })
+    })
     @GetMapping("/review/send")
     public ResponseEntity<?> getSendReview(HttpServletRequest request, @PageableDefault(size=10) Pageable pageable){
         String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
@@ -93,20 +120,25 @@ public class UserController {
     }
 
     @Operation(summary = "리뷰 신고") @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "review report success")
+            @ApiResponse(responseCode = "200", description = "review report success",content = {
+                    @Content(mediaType = "text/plain", schema = @Schema(implementation = String.class))
+            })
     })
     @PostMapping("/review/report/{reviewId}")
     public ResponseEntity<String> reportReview(@Valid @PathVariable("reviewId") Long reviewId){
         userService.reportReview(reviewId);
         return ResponseEntity.ok().body("review report success");
     }
+
     @Operation(summary = "경고 내역")
+    @ApiResponse(responseCode = "200", description = "경고 내역 조회 성공",content = {
+            @Content(mediaType = "application/json", schema = @Schema(implementation = WarningListDto.class))
+    })
     @GetMapping("/warningList")
     public ResponseEntity<?> warningList(HttpServletRequest request){
         String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
         List<WarningListDto> warning = userService.findAllWarning(userUUID);
         return ResponseEntity.ok().body(warning);
-                //ResponseEntity.ok().body(warning);
     }
 
 

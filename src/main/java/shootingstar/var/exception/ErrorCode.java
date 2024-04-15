@@ -51,6 +51,7 @@ public enum ErrorCode {
     DUPLICATE_NICKNAME(CONFLICT, "1302", "이미 사용중인 닉네임입니다."),
     WITHDRAWAL_ERROR_BY_AUCTION_IN_PROGRESS(CONFLICT, "1303", "현재 진행중인 경매가 존재할 경우 회원탈퇴가 불가능합니다."),
     WITHDRAWAL_ERROR_BY_TICKET_IN_PROGRESS(CONFLICT, "1304", "현재 종료되지 않은 식사권이 존재할 경우 회원탈퇴가 불가능합니다."),
+    EXPIRED_SUBSCRIPTION(CONFLICT, "1305", "구독 전이거나 구독이 만료되었습니다."),
 
     MIN_BID_AMOUNT_INCORRECT_FORMAT(BAD_REQUEST, "2000", "최소입찰금액은 자신의 보유 포인트보다 적어야 합니다."),
     INCORRECT_FORMAT_MIN_BID_AMOUNT(BAD_REQUEST, "2001", "잘못된 형식의 최소 입찰 금액입니다."),
@@ -59,14 +60,21 @@ public enum ErrorCode {
     INCORRECT_FORMAT_MEETING_INFO_TEXT(BAD_REQUEST, "2004", "잘못된 형식의 만남에 대한 정보입니다."),
     INCORRECT_FORMAT_MEETING_PROMISE_TEXT(BAD_REQUEST, "2005", "잘못된 형식의 만남에 대한 약속입니다."),
     INCORRECT_FORMAT_AUCTION_UUID(BAD_REQUEST, "2006", "잘못된 형식의 경매 고유번호입니다."),
+    INCORRECT_FORMAT_PRICE(BAD_REQUEST, "2007", "잘못된 형식의 입찰 금액입니다."),
+    INCORRECT_FORMAT_AUCTION_REPORT_CONTENT(BAD_REQUEST, "2008", "잘못된 형식의 경매 신고 내용입니다."),
 
     AUCTION_ACCESS_DENIED(FORBIDDEN, "2100", "접근 권한이 없습니다."),
     AUCTION_NOT_FOUND(NOT_FOUND, "2200", "존재하지 않는 경매입니다."),
     AUCTION_CONFLICT(CONFLICT, "2300", "이미 처리된 경매입니다."),
 
     EXCHANGE_AMOUNT_INCORRECT_FORMAT(BAD_REQUEST, "3000", "환전 포인트는 보유 포인트보다 적어야 합니다."),
-    PAYMENT_ACCESS_DENIED(FORBIDDEN, "3100", "결제 정보가 다릅니다."),
+    PORTONE_SERVER_RESPONSE_ERROR(INTERNAL_SERVER_ERROR, "3001", "결제 서버 응답 오류가 발생했습니다."),
+    PORTONE_SERVER_DISCONNECTED(INTERNAL_SERVER_ERROR, "3002", "결제 서버와 연결이 끊어졌습니다."),
+    PAYMENT_ACCESS_DENIED(FORBIDDEN, "3100", "잘못된 결제 요청입니다."),
     DIFFERENT_ACCOUNT_HOLDER(FORBIDDEN, "3101", "본인 명의의 계좌가 아닙니다."),
+    PORTONE_AUTHENTICATION_ERROR(UNAUTHORIZED, "3102", "포트원 ACCESS 토큰 발급에 실패했습니다."),
+    PORTONE_PAYMENT_NOT_FOUND(NOT_FOUND, "3200", "해당하는 거래내역이 존재하지 않습니다."),
+
 
     SCHEDULING_SERVER_ERROR(INTERNAL_SERVER_ERROR, "4000", "알 수 없는 오류가 발생했습니다."),
     TASK_NOT_FOUND(NOT_FOUND, "4200", "존재하지 않는 task입니다."),
@@ -98,12 +106,16 @@ public enum ErrorCode {
     REVIEW_CONFLICT(CONFLICT, "6304", "해당 식사권에 대한 리뷰를 작성한 적이 있습니다."),
 
     INCORRECT_FORMAT_VIP_INFO_UUID(BAD_REQUEST, "7001", "잘못된 형식의 VIP 정보 고유번호입니다."),
+    VIP_AUCTION_SUCCESS_ACCESS_DENIED(FORBIDDEN,"7100", "잘못된 VIP 옥션 조회 경로입니다."),
     VIP_INFO_NOT_FOUND(NOT_FOUND,"7200", "존재하지 않는 VIP 정보입니다."),
+    VIP_INFO_DUPLICATE(CONFLICT,"7300","중복된 VIP신청입니다."),
+
 
     VIP_INFO_ALREADY_HANDLED(CONFLICT, "7300", "이미 승인 또는 반려된 VIP 정보입니다."),
 
     INCORRECT_FORMAT_CHAT_ROOM_UUID(BAD_REQUEST, "8001", "잘못된 형식의 채팅방 UUID입니다."),
     INCORRECT_FORMAT_CHAT_REPORT_CONTENT(BAD_REQUEST, "8002", "잘못된 형식의 채팅방 신고 내용입니다."),
+    INCORRECT_FORMAT_CHAT_MESSAGE(BAD_REQUEST, "8003", "잘못된 형식의 채팅 메세지입니다."),
 
     CHAT_ROOM_ACCESS_DENIED(FORBIDDEN, "8100", "접근 권한이 없습니다."),
     CHAT_MESSAGE_ACCESS_DENIED(FORBIDDEN, "8101", "접근 권한이 없습니다."),
@@ -123,6 +135,8 @@ public enum ErrorCode {
     ALREADY_BANNED_USER(CONFLICT, "9304", "이미 정지된 사용자입니다."),
 
     WALLET_NOT_FOUND(NOT_FOUND, "10200", "지갑을 찾을 수 없습니다."),
+
+    INCORRECT_FORMAT_JSON(BAD_REQUEST, "11000", "잘못된 형식의 JSON 데이터 입니다.")
     ;
 
     private final HttpStatus httpStatus;

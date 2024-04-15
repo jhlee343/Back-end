@@ -9,6 +9,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import shootingstar.var.entity.auction.Auction;
 import shootingstar.var.entity.ticket.Ticket;
 import shootingstar.var.enums.type.UserType;
 
@@ -16,6 +17,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import shootingstar.var.exception.CustomException;
+import shootingstar.var.exception.ErrorCode;
 
 @Entity
 @Getter
@@ -76,6 +79,8 @@ public class User extends BaseTimeEntity {
     @OneToMany(mappedBy = "receiver")
     private final List<Review> reviewsReceived = new ArrayList<>();
 
+    @OneToOne(mappedBy = "user")
+    private VipInfo vipInfo;
 
     @Builder
     public User(String kakaoId, String name, String nickname, String phone, String email, String profileImgUrl, UserType userType) {
@@ -119,6 +124,13 @@ public class User extends BaseTimeEntity {
 
     public void setWarningCount(int warningCount) {
         this.warningCount = warningCount;
+    }
+
+    public void validateSubscribeExpiration() {
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        if (this.subscribeExpiration == null || this.subscribeExpiration.isBefore(currentDateTime)) {
+            throw new CustomException(ErrorCode.EXPIRED_SUBSCRIPTION);
+        }
     }
 
     public void changeUserType(UserType userType) {

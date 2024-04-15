@@ -1,4 +1,4 @@
-package shootingstar.var.entity;
+package shootingstar.var.entity.log;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,12 +10,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import java.awt.Point;
 import java.math.BigDecimal;
 import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import shootingstar.var.entity.BaseTimeEntity;
+import shootingstar.var.entity.User;
 import shootingstar.var.enums.type.PointOriginType;
 import shootingstar.var.enums.type.TransactionType;
 

@@ -1,4 +1,4 @@
-package shootingstar.var.entity;
+package shootingstar.var.entity.auction;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
@@ -12,6 +12,9 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
+import shootingstar.var.entity.BaseTimeEntity;
+import shootingstar.var.entity.Bid;
+import shootingstar.var.entity.User;
 import shootingstar.var.enums.type.AuctionType;
 
 @Entity
@@ -91,5 +94,17 @@ public class Auction extends BaseTimeEntity {
     // 경매가 진행 중인지 확인하는 메서드
     public boolean isProgress() {
         return AuctionType.PROGRESS.equals(this.auctionType);
+    }
+
+    public void increaseBidCount() {
+        this.bidCount++;
+    }
+
+    public void changeCurrentHighestBidderUUID(String userUUID) {
+        this.currentHighestBidderUUID = userUUID;
+    }
+
+    public void changeCurrentHighestBidAmount(long price) {
+        this.currentHighestBidAmount = price;
     }
 }

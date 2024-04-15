@@ -16,8 +16,10 @@ import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import shootingstar.var.entity.Auction;
-import shootingstar.var.entity.PointLog;
+import shootingstar.var.dto.req.AuctionReportReqDto;
+import shootingstar.var.entity.auction.Auction;
+import shootingstar.var.entity.auction.AuctionReport;
+import shootingstar.var.entity.log.PointLog;
 import shootingstar.var.enums.type.AuctionType;
 import shootingstar.var.entity.ScheduledTask;
 import shootingstar.var.enums.type.PointOriginType;
@@ -26,9 +28,10 @@ import shootingstar.var.entity.User;
 import shootingstar.var.enums.type.UserType;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
+import shootingstar.var.repository.AuctionReportRepository;
 import shootingstar.var.scheduling.quartz.TicketCreationJob;
 import shootingstar.var.repository.AuctionRepository;
-import shootingstar.var.repository.PointLogRepository;
+import shootingstar.var.repository.log.PointLogRepository;
 import shootingstar.var.repository.ScheduledTaskRepository;
 import shootingstar.var.repository.user.UserRepository;
 import shootingstar.var.dto.req.AuctionCreateReqDto;
@@ -44,6 +47,7 @@ public class AuctionService {
     private final UserRepository userRepository;
     private final PointLogRepository pointLogRepository;
     private final ScheduledTaskRepository scheduledTaskRepository;
+    private final AuctionReportRepository auctionReportRepository;
     private final Scheduler scheduler;
 
     @Transactional
@@ -80,7 +84,7 @@ public class AuctionService {
     }
 
     private void validateMinBidAmount(AuctionCreateReqDto reqDto, User findUser) {
-        // 최소 입찰 금액이 10000원 단위가 아닐 경우
+        // 최소 입찰 금액이 10000원으로 나누어 떨어지지 않을 경우
         if (reqDto.getMinBidAmount() % 10000 != 0) {
             throw new CustomException(ErrorCode.INCORRECT_FORMAT_MIN_BID_AMOUNT);
         }
@@ -92,7 +96,7 @@ public class AuctionService {
     }
 
     public void schedulingCreateTicket(Auction auction, User findUser) {
-        LocalDateTime scheduleTime = LocalDateTime.now().plusMinutes(1);
+        LocalDateTime scheduleTime = LocalDateTime.now().plusMinutes(2);
         ScheduledTask task = ScheduledTask.builder()
                 .auctionId(auction.getAuctionId())
                 .userId(auction.getUser().getUserId())
@@ -137,10 +141,24 @@ public class AuctionService {
         findAuction.changeAuctionType(AuctionType.CANCEL);
         log.info("경매가 취소되었습니다. auctionUUID : {}", findAuction.getAuctionUUID());
 
-        PointLog pointLog;
         PointOriginType pointOriginType = userType.equals(UserType.ROLE_VIP.toString()) ? PointOriginType.VIP_AUCTION_CANCEL : PointOriginType.ADMIN_AUCTION_CANCEL;
 
         // 입찰에 참여한 유저가 있을 때, 현재 최고 입찰자에게 현재 최고 입찰 금액 반환
+        refundHighestBidderOnAuctionCancellation(findAuction, pointOriginType);
+
+        // 사용자 포인트에 += 최소입찰금액
+        refundDepositToOrganizer(findAuction, pointOriginType);
+
+        deleteScheduling(findAuction);
+    }
+
+    private void checkAuctionCancelAccess(String userUUID, String userType, Auction auction) {
+        if (!auction.isOwner(userUUID) && !userType.equals(UserType.ROLE_ADMIN.toString())) {
+            throw new CustomException(ErrorCode.AUCTION_ACCESS_DENIED);
+        }
+    }
+
+    public void refundHighestBidderOnAuctionCancellation(Auction findAuction, PointOriginType pointOriginType) {
         if (findAuction.getCurrentHighestBidderUUID() != null) {
             User findCurrentHighestBidder = userRepository.findByUserUUIDWithPessimisticLock(findAuction.getCurrentHighestBidderUUID())
                     .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
@@ -152,40 +170,22 @@ public class AuctionService {
 
             log.info("최고입찰자 uuid : {}, 추가 후 포인트 : {}", findCurrentHighestBidder.getUserUUID(), findCurrentHighestBidder.getPoint());
 
-            pointLog = PointLog.createPointLogWithDeposit(findCurrentHighestBidder, pointOriginType, BigDecimal.valueOf(findAuction.getCurrentHighestBidAmount()));
+            PointLog pointLog = PointLog.createPointLogWithDeposit(findCurrentHighestBidder,
+                    pointOriginType, BigDecimal.valueOf(findAuction.getCurrentHighestBidAmount()));
             pointLogRepository.save(pointLog);
         }
+    }
 
-        // 사용자 포인트에 += 최소입찰금액
-        User findVIP = userRepository.findByUserUUIDWithPessimisticLock(findAuction.getUser().getUserUUID())
-                        .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+    public void refundDepositToOrganizer(Auction findAuction, PointOriginType pointOriginType) {
+        User organizer = userRepository.findByUserUUIDWithPessimisticLock(findAuction.getUser().getUserUUID())
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         log.info("경매 취소로 인해 경매 주최자에게 포인트가 반환될 예정입니다.");
-        log.info("경매 주최자 id : {}, 추가 전 포인트 : {}", findVIP.getUserId(), findVIP.getPoint());
-        findVIP.increasePoint(BigDecimal.valueOf(findAuction.getMinBidAmount()));
-        log.info("경매 주최자 id : {}, 추가 후 포인트 : {}", findVIP.getUserId(), findVIP.getPoint());
+        log.info("경매 주최자 id : {}, 추가 전 포인트 : {}", organizer.getUserId(), organizer.getPoint());
+        organizer.increasePoint(BigDecimal.valueOf(findAuction.getMinBidAmount()));
+        log.info("경매 주최자 id : {}, 추가 후 포인트 : {}", organizer.getUserId(), organizer.getPoint());
 
-        pointLog = PointLog.createPointLogWithDeposit(findVIP, pointOriginType, BigDecimal.valueOf(findAuction.getMinBidAmount()));
+        PointLog pointLog = PointLog.createPointLogWithDeposit(organizer, pointOriginType, BigDecimal.valueOf(findAuction.getMinBidAmount()));
         pointLogRepository.save(pointLog);
-
-        deleteScheduling(findAuction);
-    }
-
-    private Auction findAuctionByAuctionUUID(String auctionUUID) {
-        Auction findAuction = auctionRepository.findByAuctionUUID(auctionUUID)
-                .orElseThrow(() -> new CustomException(ErrorCode.AUCTION_NOT_FOUND));
-        return findAuction;
-    }
-
-    private void checkAuctionCancelAccess(String userUUID, String userType, Auction auction) {
-        if (!auction.isOwner(userUUID) && !userType.equals(UserType.ROLE_ADMIN.toString())) {
-            throw new CustomException(ErrorCode.AUCTION_ACCESS_DENIED);
-        }
-    }
-
-    private void validateAuctionType(Auction findAuction) {
-        if (!findAuction.isProgress()) {
-            throw new CustomException(ErrorCode.AUCTION_CONFLICT);
-        }
     }
 
     public void deleteScheduling(Auction findAuction) {
@@ -207,6 +207,38 @@ public class AuctionService {
 
         // 스케줄링 타입 CANCEL로 변경
         task.changeTaskType(TaskType.CANCEL);
+    }
+
+    @Transactional
+    public void reportAuction(AuctionReportReqDto reqDto, String userUUID) {
+        // 경매 존재 여부
+        Auction auction = findAuctionByAuctionUUID(reqDto.getAuctionUUID());
+
+        // 경매 타입이 PROGRESS인지 확인
+        validateAuctionType(auction);
+
+        User user = userRepository.findByUserUUID(userUUID)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        AuctionReport auctionReport = AuctionReport.builder()
+                .auction(auction)
+                .auctionReportNickname(user.getNickname())
+                .auctionReportContent(reqDto.getAuctionReportContent())
+                .build();
+
+        auctionReportRepository.save(auctionReport);
+    }
+
+    private Auction findAuctionByAuctionUUID(String auctionUUID) {
+        Auction findAuction = auctionRepository.findByAuctionUUID(auctionUUID)
+                .orElseThrow(() -> new CustomException(ErrorCode.AUCTION_NOT_FOUND));
+        return findAuction;
+    }
+
+    private void validateAuctionType(Auction findAuction) {
+        if (!findAuction.isProgress()) {
+            throw new CustomException(ErrorCode.AUCTION_CONFLICT);
+        }
     }
 }
 
