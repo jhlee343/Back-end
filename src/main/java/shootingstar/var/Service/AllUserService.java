@@ -128,7 +128,12 @@ public class AllUserService {
 
         String location = auction.getMeetingLocation();
         String[] parts = location.split(" ");
-        String trimmedLocation = parts[0] + " " + parts[1];
+        String trimmedLocation;
+        try {
+            trimmedLocation = parts[0] + " " + parts[1];
+        } catch (Exception e) {
+            trimmedLocation = location;
+        }
 
         return AuctionDetailResDto.builder()
                 .vipUUID(vip.getUserUUID())
