@@ -38,4 +38,8 @@ public class ScheduledTask extends BaseTimeEntity {
     public void changeTaskType(TaskType taskType) {
         this.taskType = taskType;
     }
+
+    public void changeScheduledTime(LocalDateTime scheduledTime) {
+        this.scheduledTime = scheduledTime;
+    }
 }
