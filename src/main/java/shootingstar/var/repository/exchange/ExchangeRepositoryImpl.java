@@ -14,6 +14,7 @@ import java.util.List;
 
 import static org.springframework.util.StringUtils.hasText;
 import static shootingstar.var.entity.QExchange.exchange;
+import static shootingstar.var.enums.status.ExchangeStatus.STANDBY;
 
 public class ExchangeRepositoryImpl implements ExchangeRepositoryCustom {
 
@@ -28,15 +29,16 @@ public class ExchangeRepositoryImpl implements ExchangeRepositoryCustom {
         List<AllExchangesDto> content = queryFactory
                 .select(new QAllExchangesDto(
                         exchange.exchangeUUID,
-                        exchange.user.nickname,
                         exchange.user.name,
+                        exchange.user.nickname,
                         exchange.exchangePoint,
                         exchange.exchangeBank,
                         exchange.exchangeAccount,
-                        exchange.exchangeStatus
+                        exchange.exchangeAccountHolder,
+                        exchange.createdTime
                 ))
                 .from(exchange)
-                .where(checkSearch(search))
+                .where(exchange.exchangeStatus.eq(STANDBY), checkSearch(search))
                 .orderBy(exchange.exchangeId.asc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -45,7 +47,7 @@ public class ExchangeRepositoryImpl implements ExchangeRepositoryCustom {
         JPAQuery<Long> countQuery = queryFactory
                 .select(exchange.count())
                 .from(exchange)
-                .where(checkSearch(search));
+                .where(exchange.exchangeStatus.eq(STANDBY), checkSearch(search));
 
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
@@ -55,6 +57,7 @@ public class ExchangeRepositoryImpl implements ExchangeRepositoryCustom {
             return null;
         }
 
-        return exchange.user.name.eq(search);
+        return exchange.user.name.eq(search)
+                .or(exchange.user.nickname.eq(search));
     }
 }

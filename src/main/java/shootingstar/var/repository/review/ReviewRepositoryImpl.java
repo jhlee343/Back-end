@@ -89,12 +89,14 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
                 .select(new QAllReviewsDto(
                         review.reviewUUID,
                         review.writer.nickname,
+                        review.receiver.nickname,
                         review.reviewContent,
+                        review.createdTime,
                         review.isShowed
                 ))
                 .from(review)
                 .where(checkSearch(search))
-                .orderBy(review.reviewId.asc())
+                .orderBy(review.reviewId.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -120,7 +122,8 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
             return null;
         }
 
-        return review.writer.name.eq(search);
+        return review.writer.nickname.eq(search)
+                .or(review.receiver.nickname.eq(search));
     }
 
 

@@ -53,4 +53,7 @@ public class Review extends BaseTimeEntity {
         this.reviewRating = reviewRating;
         this.isShowed = true;
     }
+    public void changeIsShowed(boolean isShowed) {
+        this.isShowed = isShowed;
+    }
 }
