@@ -56,7 +56,6 @@ public class BasicUserService {
         VipInfo vipInfo = findVipInfoByUser(user);
         VipApprovalType vipApproval = vipInfo.getVipApproval();
         return String.valueOf(vipApproval);
-
     }
 
     public Page<TicketListResDto> getAllTicketList(String userUUID, TicketSortType ticketSortType, String search, Pageable pageable){

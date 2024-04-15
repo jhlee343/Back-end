@@ -195,7 +195,7 @@ public class AllUserController {
                                     "- 존재하지 않는 VIP 정보 : 7200",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
     })
-    @GetMapping("/auction/{vipUUID}")
+    @GetMapping("/auction/{vipUUID}/progressList")
     public ResponseEntity<Page<ProgressAuctionResDto>> vipProgressAuction(@NotBlank @PathVariable("vipUUID") String vipUUID, @PageableDefault(size = 10) Pageable pageable) {
         Page<ProgressAuctionResDto> vipProgressAuction = allUserService.getVipProgressAuction(vipUUID, pageable);
         return ResponseEntity.ok().body(vipProgressAuction);
@@ -242,7 +242,7 @@ public class AllUserController {
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
     })
     @GetMapping("/auction/general/{auctionUUID}")
-    public ResponseEntity<AuctionDetailResDto> auctionDetail(@NotEmpty @PathVariable("auctionUUID") String auctionUUID) {
+    public ResponseEntity<AuctionDetailResDto> auctionDetail(@NotBlank @PathVariable("auctionUUID") String auctionUUID) {
         AuctionDetailResDto auctionDetail = allUserService.getAuctionDetail(auctionUUID);
         return ResponseEntity.ok().body(auctionDetail);
     }

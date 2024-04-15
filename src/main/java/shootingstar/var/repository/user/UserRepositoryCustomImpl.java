@@ -155,11 +155,13 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom{
     public Page<AllUsersDto> findAllUsers(String search, Pageable pageable) {
         List<AllUsersDto> content = queryFactory
                 .select(new QAllUsersDto(
+                        user.kakaoId,
                         user.userUUID,
                         user.name,
                         user.nickname,
                         user.email,
                         user.phone,
+                        user.point,
                         user.userType,
                         user.warningCount
                 ))

@@ -34,4 +34,8 @@ public class Banner {
         this.bannerImgUrl = bannerImgUrl;
         this.targetUrl = targetUrl;
     }
+
+    public void changeTargetUrl(String targetUrl) {
+        this.targetUrl = targetUrl;
+    }
 }
