@@ -28,9 +28,15 @@ public class KakaoUserInfo {
     }
 
     public String getName() {
+        if (kakaoAccountAttributes.get("name").toString().isEmpty()) {
+            return null;
+        }
         return kakaoAccountAttributes.get("name").toString();
     }
     public String getPhoneNumber() {
+        if (kakaoAccountAttributes.get("phone_number").toString().isEmpty()) {
+            return null;
+        }
         return kakaoAccountAttributes.get("phone_number").toString();
     }
 }
