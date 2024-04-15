@@ -64,12 +64,16 @@ public class Auction extends BaseTimeEntity {
     @Enumerated(value = EnumType.STRING)
     private AuctionType auctionType;
 
+    private LocalDateTime auctionCloseTime;
+
+    private boolean isExtended;
+
     @OneToMany(mappedBy = "auction")
     private List<Bid> bids = new ArrayList<>();
 
     @Builder
     public Auction(User user, long minBidAmount, LocalDateTime meetingDate, String meetingLocation,
-                   String meetingInfoText, String meetingPromiseText, String meetingInfoImg, String meetingPromiseImg) {
+                   String meetingInfoText, String meetingPromiseText, String meetingInfoImg, String meetingPromiseImg, LocalDateTime auctionCloseTime) {
         this.auctionUUID = UUID.randomUUID().toString();
         this.user = user;
         this.minBidAmount = minBidAmount;
@@ -80,6 +84,8 @@ public class Auction extends BaseTimeEntity {
         this.meetingInfoImg = meetingInfoImg;
         this.meetingPromiseImg = meetingPromiseImg;
         this.auctionType = AuctionType.PROGRESS;
+        this.auctionCloseTime = auctionCloseTime;
+        this.isExtended = false;
     }
 
     public void changeAuctionType(AuctionType auctionType) {
@@ -106,5 +112,13 @@ public class Auction extends BaseTimeEntity {
 
     public void changeCurrentHighestBidAmount(long price) {
         this.currentHighestBidAmount = price;
+    }
+
+    public void changeAuctionCloseTime(LocalDateTime auctionCloseTime) {
+        this.auctionCloseTime = auctionCloseTime;
+    }
+
+    public void changeIsExtended(boolean isExtended) {
+        this.isExtended = isExtended;
     }
 }

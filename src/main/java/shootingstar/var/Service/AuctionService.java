@@ -57,6 +57,8 @@ public class AuctionService {
 
         validateMinBidAmount(reqDto, findUser);
 
+        LocalDateTime auctionCloseTime = LocalDateTime.now().plusDays(3);
+
         // 경매 생성
         Auction auction = Auction.builder()
                 .user(findUser)
@@ -67,6 +69,7 @@ public class AuctionService {
                 .meetingPromiseText(reqDto.getMeetingPromiseText())
                 .meetingInfoImg(reqDto.getMeetingInfoImg())
                 .meetingPromiseImg(reqDto.getMeetingPromiseImg())
+                .auctionCloseTime(auctionCloseTime)
                 .build();
 
         auctionRepository.save(auction);
@@ -96,7 +99,7 @@ public class AuctionService {
     }
 
     public void schedulingCreateTicket(Auction auction, User findUser) {
-        LocalDateTime scheduleTime = LocalDateTime.now().plusMinutes(2);
+        LocalDateTime scheduleTime = auction.getAuctionCloseTime();
         ScheduledTask task = ScheduledTask.builder()
                 .auctionId(auction.getAuctionId())
                 .userId(auction.getUser().getUserId())
