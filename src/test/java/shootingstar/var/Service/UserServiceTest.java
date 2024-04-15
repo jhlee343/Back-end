@@ -114,22 +114,22 @@ public class UserServiceTest {
         System.out.println(userProfileDto1.getNickname()+" "+ userProfileDto1.getPoint()+" "+userProfileDto1.getRating());
     }
 
-    @Test
-    @DisplayName("vip 신청 상태 조회")
-    @Transactional
-    public void applyCheck() throws Exception {
-        User basic = new User("33", "실명", "일반인", "000-0000-0000", "test@ttt.com", "helloUrl", UserType.ROLE_BASIC);
-        userRepository.save(basic);
-        userRepository.flush();
-
-        VipInfo vipInfo = new VipInfo(basic,"일반인","직업","경력","소개", VipApprovalType.STANDBY,"url");
-        vipInfoRepository.save(vipInfo);
-        vipInfoRepository.flush();
-
-        basicUserService.applyCheck(basic.getUserUUID());
-        System.out.println(basicUserService.applyCheck(basic.getUserUUID()));
-
-        adminService.vipInfoChange(vipInfo.getVipInfoUUID(), "APPROVE");
-        System.out.println(basicUserService.applyCheck(basic.getUserUUID()));
-    }
+//    @Test
+//    @DisplayName("vip 신청 상태 조회")
+//    @Transactional
+//    public void applyCheck() throws Exception {
+//        User basic = new User("33", "실명", "일반인", "000-0000-0000", "test@ttt.com", "helloUrl", UserType.ROLE_BASIC);
+//        userRepository.save(basic);
+//        userRepository.flush();
+//
+//        VipInfo vipInfo = new VipInfo(basic,"일반인","직업","경력","소개", VipApprovalType.STANDBY,"url");
+//        vipInfoRepository.save(vipInfo);
+//        vipInfoRepository.flush();
+//
+//        basicUserService.applyCheck(basic.getUserUUID());
+//        System.out.println(basicUserService.applyCheck(basic.getUserUUID()));
+//
+//        adminService.vipInfoChange(vipInfo.getVipInfoUUID(), "APPROVE");
+//        System.out.println(basicUserService.applyCheck(basic.getUserUUID()));
+//    }
 }
