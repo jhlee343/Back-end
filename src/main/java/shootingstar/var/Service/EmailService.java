@@ -2,6 +2,8 @@ package shootingstar.var.Service;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,6 +12,8 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
+import shootingstar.var.entity.auction.Auction;
+import shootingstar.var.entity.ticket.Ticket;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
 import shootingstar.var.util.MailRedisUtil;
@@ -82,5 +86,35 @@ public class EmailService {
             }
         }
         return key.toString();
+    }
+
+    public void sendCompleteTicketNotification(String email, LocalDateTime meetingDate, String meetingLocation, String organizerNickname, String winnerNickname) {
+        log.info("메세지가 전송되었습니다.");
+        String title = "식사권이 생성되었습니다!"; // 제목
+        MimeMessage message = mailSender.createMimeMessage();
+        Context context = new Context();
+
+        // 원하는 출력 포맷 설정
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 M월 d일 HH:mm");
+        String formattedMeetingDate = meetingDate.format(formatter);
+
+        context.setVariable("meetingDate", formattedMeetingDate);
+        context.setVariable("meetingLocation", meetingLocation);
+        context.setVariable("organizerNickname", organizerNickname);
+        context.setVariable("winnerNickname", winnerNickname);
+
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            helper.setTo(email);
+            helper.setSubject(title);
+            helper.setFrom(fromEmail);
+            helper.setText(templateEngine.process("CreateTicketMailTemplate", context), true);
+
+            // 메시지 전송
+            mailSender.send(message);
+        } catch (MessagingException e) {
+            log.info(e.getMessage());
+            throw new RuntimeException("메일 전송 실패");
+        }
     }
 }

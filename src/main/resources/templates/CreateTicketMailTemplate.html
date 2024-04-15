@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        .container {
+            width: 90%;
+            max-width: 500px;
+            margin: auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .header {
+            background-color: #4CAF50; /* Green theme for food voucher */
+            color: #ffffff;
+            padding: 20px;
+            font-size: 1.5em;
+        }
+        .content {
+            padding: 30px;
+            text-align: center;
+            line-height: 1.6;
+        }
+        .voucher-details {
+            padding: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #dcdcdc;
+            display: inline-block;
+            margin: 20px auto;
+            font-size: 16px;
+            color: #333;
+        }
+        .footer {
+            background-color: #f1f1f1;
+            color: #777;
+            font-size: 0.9em;
+            padding: 15px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        식사권이 생성되었습니다!
+    </div>
+
+    <div class="content">
+        <p>안녕하세요, 여기 귀하의 식사권 정보가 포함되어 있습니다:</p>
+        <p><strong>식사 날짜:</strong> <span th:text="${meetingDate}">식사 날짜</span></p>
+        <p><strong>식사 장소:</strong> <span th:text="${meetingLocation}">식사 장소</span></p>
+        <p><strong>VIP 닉네임:</strong> <span th:text="${organizerNickname}">VIP 닉네임</span></p>
+        <p><strong>낙찰자 닉네임:</strong> <span th:text="${winnerNickname}">낙찰자 닉네임</span></p>
+    </div>
+
+    <div class="footer">
+        <p>이 메일은 발신 전용입니다. 문의사항이 있으시면 고객센터로 연락주세요.</p>
+    </div>
+</div>
+
+</body>
+</html>
