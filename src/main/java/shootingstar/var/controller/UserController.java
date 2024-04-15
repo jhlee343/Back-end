@@ -109,7 +109,7 @@ public class UserController {
     @Operation(summary = "사용자페이지 쓴 리뷰 불러오기")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "쓴 리뷰 불러오기 성공", content = {
-                    @Content(mediaType = "application/json" , schema = @Schema(implementation = UserReceiveReviewDto.class))
+                    @Content(mediaType = "application/json" , schema = @Schema(implementation = UserSendReviewDto.class))
             })
     })
     @GetMapping("/review/send")
