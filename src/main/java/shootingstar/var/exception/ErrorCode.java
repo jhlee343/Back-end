@@ -70,11 +70,15 @@ public enum ErrorCode {
     EXCHANGE_AMOUNT_INCORRECT_FORMAT(BAD_REQUEST, "3000", "환전 포인트는 보유 포인트보다 적어야 합니다."),
     PORTONE_SERVER_RESPONSE_ERROR(INTERNAL_SERVER_ERROR, "3001", "결제 서버 응답 오류가 발생했습니다."),
     PORTONE_SERVER_DISCONNECTED(INTERNAL_SERVER_ERROR, "3002", "결제 서버와 연결이 끊어졌습니다."),
+    INCORRECT_FORMAT_EXCHANGE(BAD_REQUEST, "3003", "잘못된 형식의 환전 신청서 고유번호입니다."),
+
     PAYMENT_ACCESS_DENIED(FORBIDDEN, "3100", "잘못된 결제 요청입니다."),
     DIFFERENT_ACCOUNT_HOLDER(FORBIDDEN, "3101", "본인 명의의 계좌가 아닙니다."),
     PORTONE_AUTHENTICATION_ERROR(UNAUTHORIZED, "3102", "포트원 ACCESS 토큰 발급에 실패했습니다."),
     PORTONE_PAYMENT_NOT_FOUND(NOT_FOUND, "3200", "해당하는 거래내역이 존재하지 않습니다."),
+    EXCHANGE_NOT_FOUND(NOT_FOUND, "3201", "존재하지 않는 환전 신청서입니다."),
 
+    EXCHANGE_ALREADY_HANDLED(CONFLICT, "3300", "이미 승인 또는 반려된 환전 신청서입니다."),
 
     SCHEDULING_SERVER_ERROR(INTERNAL_SERVER_ERROR, "4000", "알 수 없는 오류가 발생했습니다."),
     TASK_NOT_FOUND(NOT_FOUND, "4200", "존재하지 않는 task입니다."),
@@ -109,9 +113,7 @@ public enum ErrorCode {
     VIP_AUCTION_SUCCESS_ACCESS_DENIED(FORBIDDEN,"7100", "잘못된 VIP 옥션 조회 경로입니다."),
     VIP_INFO_NOT_FOUND(NOT_FOUND,"7200", "존재하지 않는 VIP 정보입니다."),
     VIP_INFO_DUPLICATE(CONFLICT,"7300","중복된 VIP신청입니다."),
-
-
-    VIP_INFO_ALREADY_HANDLED(CONFLICT, "7300", "이미 승인 또는 반려된 VIP 정보입니다."),
+    VIP_INFO_ALREADY_HANDLED(CONFLICT, "7301", "이미 승인 또는 반려된 VIP 정보입니다."),
 
     INCORRECT_FORMAT_CHAT_ROOM_UUID(BAD_REQUEST, "8001", "잘못된 형식의 채팅방 UUID입니다."),
     INCORRECT_FORMAT_CHAT_REPORT_CONTENT(BAD_REQUEST, "8002", "잘못된 형식의 채팅방 신고 내용입니다."),

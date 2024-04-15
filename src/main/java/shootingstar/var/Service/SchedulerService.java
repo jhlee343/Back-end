@@ -42,6 +42,7 @@ public class SchedulerService {
     private final ChatRoomRepository chatRoomRepository;
     private final WalletRepository walletRepository;
     private final DonationLogRepository donationLogRepository;
+    private final EmailService emailService;
 
     @Transactional
     public void createTicketAndAuctionTypeSuccess(Long auctionId, Long userId, Long scheduledTaskId) {
@@ -96,6 +97,11 @@ public class SchedulerService {
         ScheduledTask task = scheduledTaskRepository.findById(scheduledTaskId)
                 .orElseThrow(() -> new CustomException(ErrorCode.TASK_NOT_FOUND));
         task.changeTaskType(TaskType.COMPLETE);
+
+        // 낙찰자와 경매 주최자에게 이메일 전송
+        User organizer = ticket.getOrganizer();
+        emailService.sendCompleteTicketNotification(organizer.getEmail(), auction.getMeetingDate(), auction.getMeetingLocation(), organizer.getNickname(), winner.getNickname());
+        emailService.sendCompleteTicketNotification(winner.getEmail(), auction.getMeetingDate(), auction.getMeetingLocation(), organizer.getNickname(), winner.getNickname());
     }
 
     @Transactional
