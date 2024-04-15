@@ -174,7 +174,7 @@ public class AdminController {
                     description = "존재하지 않는 VIP 정보 : 7200",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
             @ApiResponse(responseCode = "409",
-                    description = "이미 승인 또는 반려된 VIP 정보 : 7300",
+                    description = "이미 승인 또는 반려된 VIP 정보 : 7301",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
     })
     @PatchMapping("/vip/approve/{vipInfoUUID}")
@@ -195,7 +195,7 @@ public class AdminController {
                     description = "존재하지 않는 VIP 정보 : 7200",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
             @ApiResponse(responseCode = "409",
-                    description = "이미 승인 또는 반려된 VIP 정보 : 7300",
+                    description = "이미 승인 또는 반려된 VIP 정보 : 7301",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
     })
     @PatchMapping("/vip/refusal/{vipInfoUUID}")
@@ -367,6 +367,20 @@ public class AdminController {
     }
 
     @Operation(summary = "환전 신청 승인 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "환전 신청 승인 성공",
+                    content = {@Content(mediaType = "text/plain", schema = @Schema(implementation = String.class))}),
+            @ApiResponse(responseCode = "400",
+                    description = "잘못된 형식의 환전 신청서 고유번호 : 3003",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+            @ApiResponse(responseCode = "404",
+                    description = "존재하지 않는 환전 신청서 : 3201",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+            @ApiResponse(responseCode = "409",
+                    description = "이미 승인 또는 반려된 환전 신청서 : 3300",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+    })
     @PatchMapping("/exchange/approve/{exchangeUUID}")
     public ResponseEntity<String> approveExchange(@NotBlank @PathVariable String exchangeUUID) {
         adminService.approveExchange(exchangeUUID);
@@ -374,20 +388,34 @@ public class AdminController {
     }
 
     @Operation(summary = "환전 신청 반려 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "환전 신청 승인 성공",
+                    content = {@Content(mediaType = "text/plain", schema = @Schema(implementation = String.class))}),
+            @ApiResponse(responseCode = "400",
+                    description = "잘못된 형식의 환전 신청서 고유번호 : 3003",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+            @ApiResponse(responseCode = "404",
+                    description = "존재하지 않는 환전 신청서 : 3201",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+            @ApiResponse(responseCode = "409",
+                    description = "이미 승인 또는 반려된 환전 신청서 : 3300",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+    })
     @PatchMapping("/exchange/refusal/{exchangeUUID}")
     public ResponseEntity<String> refusalExchange(@NotBlank @PathVariable String exchangeUUID) {
         adminService.refusalExchange(exchangeUUID);
         return ResponseEntity.ok().body("환전 신청이 반려되었습니다.");
     }
 
-    // 배너 추가
+    @Operation(summary = "배너 추가 API")
     @PostMapping("/banner/add")
     public ResponseEntity<String> add(@Valid @RequestBody BannerReqDto reqDto) {
         adminService.addBanner(reqDto.getBannerImgUrl(), reqDto.getTargetUrl());
         return ResponseEntity.ok().body("배너가 추가되었습니다.");
     }
 
-    // 배너 URL 수정
+    @Operation(summary = "배너 연결 URL 수정 API")
     @PatchMapping("/banner/edit/{bannerUUID}")
     public ResponseEntity<String> edit(
             @NotBlank @PathVariable String bannerUUID,
@@ -396,35 +424,12 @@ public class AdminController {
         return ResponseEntity.ok().body("배너 연결 URL이 수정되었습니다.");
     }
 
-    // 배너 삭제
+    @Operation(summary = "배너 삭제 API")
     @DeleteMapping("/banner/delete/{bannerUUID}")
     public ResponseEntity<String> delete(@NotBlank @PathVariable String bannerUUID) {
         adminService.deleteBanner(bannerUUID);
         return ResponseEntity.ok().body("배너가 삭제되었습니다.");
     }
-
-//    // 경매 신고 조회
-//    @GetMapping("/report/auctionList")
-//    public ResponseEntity<Page<AllReportsDto>> getReportList(
-//            @RequestParam(value = "search", required = false, defaultValue = "") String search,
-//            @PageableDefault(size = 10) Pageable pageable, HttpServletRequest request) {
-//        Page<AllReportsDto> reportList = adminService.getAllAuctionReports(search, pageable);
-//        return ResponseEntity.ok().body(reportList);
-//    }
-//
-//    // 경매 신고 승인
-//    @PatchMapping("/report/auction/approve/{reportUUID}")
-//    public ResponseEntity<String> approveAuctionReport(@NotBlank @PathVariable String exchangeUUID) {
-//        adminService.changeExchange(exchangeUUID);
-//        return ResponseEntity.ok().body("환전 상태가 변경되었습니다.");
-//    }
-//
-//    // 경매 신고 반려
-//    @PatchMapping("/report/auction/refusal/{exchangeUUID}")
-//    public ResponseEntity<String> refusalAuctionReport(@NotBlank @PathVariable String exchangeUUID) {
-//        adminService.changeExchange(exchangeUUID);
-//        return ResponseEntity.ok().body("환전 상태가 변경되었습니다.");
-//    }
 
 
 }
