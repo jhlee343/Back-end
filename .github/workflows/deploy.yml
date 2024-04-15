@@ -24,6 +24,16 @@ jobs:
         with:
           java-version: '21'
           distribution: 'corretto'
+      - name: Download config files from S3
+        run: |
+          aws s3 cp s3://$AWS_S3_BUCKET/ssl/keystore.p12 src/main/resources/ssl/keystore.p12
+          aws s3 cp s3://$AWS_S3_BUCKET/yml/application-database.yml src/main/resources/application-database.yml
+          aws s3 cp s3://$AWS_S3_BUCKET/yml/application-iamport.yml src/main/resources/application-iamport.yml
+          aws s3 cp s3://$AWS_S3_BUCKET/yml/application-jwt.yml src/main/resources/application-jwt.yml
+          aws s3 cp s3://$AWS_S3_BUCKET/yml/application-mail.yml src/main/resources/application-mail.yml
+          aws s3 cp s3://$AWS_S3_BUCKET/yml/application-oauth.yml src/main/resources/application-oauth.yml
+          aws s3 cp s3://$AWS_S3_BUCKET/yml/application-port.yml src/main/resources/application-port.yml
+          aws s3 cp s3://$AWS_S3_BUCKET/yml/application-redis.yml src/main/resources/application-redis.yml
       - name: gradlew에 실행 권한 부여
         run: chmod +x ./gradlew
       - name: 프로젝트 빌드
