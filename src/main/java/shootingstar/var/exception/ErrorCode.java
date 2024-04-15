@@ -72,7 +72,11 @@ public enum ErrorCode {
     TASK_NOT_FOUND(NOT_FOUND, "4200", "존재하지 않는 task입니다."),
     FAIL_TASK_DELETE(NOT_FOUND, "4201", "스케줄링된 task를 취소하는데 실패했습니다."),
 
+    INCORRECT_FORMAT_REVIEW_UUID(BAD_REQUEST, "5001", "잘못된 형식의 리뷰 고유번호입니다."),
+
     REVIEW_NOT_FOUND(NOT_FOUND, "5201","존재하지 않는 리뷰입니다."),
+
+    REVIEW_ALREADY_HIDDEN(CONFLICT, "5300", "이미 숨겨진 리뷰입니다."),
 
     INCORRECT_FORMAT_TICKET_UUID(BAD_REQUEST, "6001", "잘못된 형식의 식사권 UUID입니다."),
     INCORRECT_FORMAT_START_MEETING_TIME(BAD_REQUEST, "6002", "잘못된 형식의 만남 시작 시간입니다."),
@@ -96,6 +100,8 @@ public enum ErrorCode {
     INCORRECT_FORMAT_VIP_INFO_UUID(BAD_REQUEST, "7001", "잘못된 형식의 VIP 정보 고유번호입니다."),
     VIP_INFO_NOT_FOUND(NOT_FOUND,"7200", "존재하지 않는 VIP 정보입니다."),
 
+    VIP_INFO_ALREADY_HANDLED(CONFLICT, "7300", "이미 승인 또는 반려된 VIP 정보입니다."),
+
     INCORRECT_FORMAT_CHAT_ROOM_UUID(BAD_REQUEST, "8001", "잘못된 형식의 채팅방 UUID입니다."),
     INCORRECT_FORMAT_CHAT_REPORT_CONTENT(BAD_REQUEST, "8002", "잘못된 형식의 채팅방 신고 내용입니다."),
 
@@ -114,6 +120,7 @@ public enum ErrorCode {
     DUPLICATE_ADMIN_ID(CONFLICT, "9301", "해당 관리자 아이디는 사용할 수 없습니다."),
     DUPLICATE_ADMIN_NICKNAME(CONFLICT, "9302", "해당 관리자 닉네임은 사용할 수 없습니다."),
     INCORRECT_VALUE_ADMIN_SECRET_KEY(CONFLICT, "9303", "잘못된 관리자 비밀 키 입니다."),
+    ALREADY_BANNED_USER(CONFLICT, "9304", "이미 정지된 사용자입니다."),
 
     WALLET_NOT_FOUND(NOT_FOUND, "10200", "지갑을 찾을 수 없습니다."),
     ;

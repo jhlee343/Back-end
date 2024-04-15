@@ -13,7 +13,7 @@ import java.util.UUID;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Exchange {
+public class Exchange extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long exchangeId;
@@ -33,6 +33,7 @@ public class Exchange {
 
     private String exchangeAccountHolder;
 
+    @Enumerated(EnumType.STRING)
     private ExchangeStatus exchangeStatus;
 
     @Builder
@@ -44,5 +45,9 @@ public class Exchange {
         this.exchangeBank = exchangeBank;
         this.exchangeAccountHolder = exchangeAccountHolder;
         this.exchangeStatus = ExchangeStatus.STANDBY;
+    }
+
+    public void changeExchangeStatus(ExchangeStatus exchangeStatus) {
+        this.exchangeStatus = exchangeStatus;
     }
 }

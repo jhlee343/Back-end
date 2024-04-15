@@ -71,14 +71,16 @@ public class TicketRepositoryImpl implements TicketRepositoryCustom{
         List<AllTicketsDto> content = queryFactory
                 .select(new QAllTicketsDto(
                         ticket.ticketUUID,
+                        ticket.organizer.name,
                         ticket.organizer.nickname,
+                        ticket.winner.name,
                         ticket.winner.nickname,
-                        ticket.ticketIsOpened,
-                        ticket.auction.meetingDate
+                        ticket.auction.meetingDate,
+                        ticket.ticketIsOpened
                 ))
                 .from(ticket)
                 .where(checkSearch(search))
-                .orderBy(ticket.ticketId.asc())
+                .orderBy(ticket.ticketId.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -109,7 +111,9 @@ public class TicketRepositoryImpl implements TicketRepositoryCustom{
             return null;
         }
 
-        return ticket.organizer.nickname.eq(search)
+        return ticket.organizer.name.eq(search)
+                .or(ticket.organizer.nickname.eq(search))
+                .or(ticket.winner.name.eq(search))
                 .or(ticket.winner.nickname.eq(search));
     }
 }

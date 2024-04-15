@@ -6,23 +6,23 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-public class AllTicketsDto {
-    private String ticketUUID;
+public class AllChatRoomsDto {
+    private String chatRoomUUID;
     private String organizerName;
     private String organizerNickname;
     private String winnerName;
     private String winnerNickname;
     private LocalDateTime meetingDate;
-    private boolean ticketIsOpened;
+    private boolean chatRoomIsOpened;
 
     @QueryProjection
-    public AllTicketsDto(String ticketUUID, String organizerName, String organizerNickname, String winnerName, String winnerNickname, LocalDateTime meetingDate, boolean ticketIsOpened) {
-        this.ticketUUID = ticketUUID;
+    public AllChatRoomsDto(String chatRoomUUID, String organizerName, String organizerNickname, String winnerName, String winnerNickname, LocalDateTime meetingDate, boolean chatRoomIsOpened) {
+        this.chatRoomUUID = chatRoomUUID;
         this.organizerName = organizerName;
         this.organizerNickname = organizerNickname;
         this.winnerName = winnerName;
         this.winnerNickname = winnerNickname;
         this.meetingDate = meetingDate;
-        this.ticketIsOpened = ticketIsOpened;
+        this.chatRoomIsOpened = chatRoomIsOpened;
     }
 }

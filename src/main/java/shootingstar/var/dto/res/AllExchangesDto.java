@@ -4,24 +4,28 @@ import com.querydsl.core.annotations.QueryProjection;
 import lombok.Data;
 import shootingstar.var.enums.status.ExchangeStatus;
 
+import java.time.LocalDateTime;
+
 @Data
 public class AllExchangesDto {
     private String exchangeUUID;
-    private String nickname;
     private String name;
+    private String nickname;
     private Long exchangePoint;
     private String exchangeBank;
     private String exchangeAccount;
-    private ExchangeStatus exchangeStatus;
+    private String exchangeAccountHolder;
+    private LocalDateTime createdTime;
 
     @QueryProjection
-    public AllExchangesDto(String exchangeUUID, String nickname, String name, Long exchangePoint, String exchangeBank, String exchangeAccount, ExchangeStatus exchangeStatus) {
+    public AllExchangesDto(String exchangeUUID, String name, String nickname, Long exchangePoint, String exchangeBank, String exchangeAccount, String exchangeAccountHolder, LocalDateTime createdTime) {
         this.exchangeUUID = exchangeUUID;
-        this.nickname = nickname;
         this.name = name;
+        this.nickname = nickname;
         this.exchangePoint = exchangePoint;
         this.exchangeBank = exchangeBank;
         this.exchangeAccount = exchangeAccount;
-        this.exchangeStatus = exchangeStatus;
+        this.exchangeAccountHolder = exchangeAccountHolder;
+        this.createdTime = createdTime;
     }
 }

@@ -120,4 +120,8 @@ public class User extends BaseTimeEntity {
     public void setWarningCount(int warningCount) {
         this.warningCount = warningCount;
     }
+
+    public void changeUserType(UserType userType) {
+        this.userType = userType;
+    }
 }

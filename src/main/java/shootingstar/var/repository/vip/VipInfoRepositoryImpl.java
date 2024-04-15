@@ -32,7 +32,8 @@ public class VipInfoRepositoryImpl implements VipInfoRepositoryCustom{
                         vipInfo.vipName,
                         vipInfo.vipJob,
                         vipInfo.vipCareer,
-                        vipInfo.vipIntroduce
+                        vipInfo.vipIntroduce,
+                        vipInfo.vipEvidenceUrl
                 ))
                 .from(vipInfo)
                 .where(vipInfo.vipApproval.eq(STANDBY), checkSearch(search))
