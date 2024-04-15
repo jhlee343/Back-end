@@ -132,4 +132,8 @@ public class User extends BaseTimeEntity {
             throw new CustomException(ErrorCode.EXPIRED_SUBSCRIPTION);
         }
     }
+
+    public void changeUserType(UserType userType) {
+        this.userType = userType;
+    }
 }

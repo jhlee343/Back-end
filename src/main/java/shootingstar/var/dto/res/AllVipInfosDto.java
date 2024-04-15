@@ -10,13 +10,15 @@ public class AllVipInfosDto {
     private String vipJob;
     private String vipCareer;
     private String vipIntroduce;
+    private String vipEvidenceUrl;
 
     @QueryProjection
-    public AllVipInfosDto(String vipInfoUUID, String vipName, String vipJob, String vipCareer, String vipIntroduce) {
+    public AllVipInfosDto(String vipInfoUUID, String vipName, String vipJob, String vipCareer, String vipIntroduce, String vipEvidenceUrl) {
         this.vipInfoUUID = vipInfoUUID;
         this.vipName = vipName;
         this.vipJob = vipJob;
         this.vipCareer = vipCareer;
         this.vipIntroduce = vipIntroduce;
+        this.vipEvidenceUrl = vipEvidenceUrl;
     }
 }
