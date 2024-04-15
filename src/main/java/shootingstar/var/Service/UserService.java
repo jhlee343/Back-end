@@ -11,6 +11,7 @@ import shootingstar.var.dto.req.WarningListDto;
 import shootingstar.var.dto.res.UserReceiveReviewDto;
 import shootingstar.var.dto.res.UserSendReviewDto;
 import shootingstar.var.entity.*;
+import shootingstar.var.entity.auction.Auction;
 import shootingstar.var.enums.type.UserType;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.repository.follow.FollowRepository;
