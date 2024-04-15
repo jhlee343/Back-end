@@ -33,7 +33,11 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         String token = TokenUtil.getTokenFromHeader(httpRequest);
         String requestURI = httpRequest.getRequestURI();
-        log.info("JwtAuthenticationFilter requestURI :  {}, addr : {}", requestURI, httpRequest.getRemoteAddr());
+        String clientIP = httpRequest.getHeader("X-Forwarded-For");
+        if (clientIP == null) {
+            clientIP = httpRequest.getHeader("X-Real-IP");
+        }
+        log.info("JwtAuthenticationFilter requestURI :  {}, addr : {}", requestURI, clientIP);
         /*
           /error 엔드 포인트는 JWT 검증을 하지 않는다
          */
