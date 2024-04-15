@@ -13,8 +13,10 @@ import org.springframework.stereotype.Service;
 import shootingstar.var.dto.res.*;
 import shootingstar.var.entity.*;
 import shootingstar.var.entity.chat.ChatRoom;
+import shootingstar.var.entity.log.PointLog;
 import shootingstar.var.entity.ticket.Ticket;
 import shootingstar.var.enums.status.ExchangeStatus;
+import shootingstar.var.enums.type.PointOriginType;
 import shootingstar.var.enums.type.UserType;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
@@ -25,6 +27,7 @@ import shootingstar.var.repository.admin.AdminRepository;
 import shootingstar.var.repository.banner.BannerRepository;
 import shootingstar.var.repository.chat.ChatRoomRepository;
 import shootingstar.var.repository.exchange.ExchangeRepository;
+import shootingstar.var.repository.log.PointLogRepository;
 import shootingstar.var.repository.review.ReviewRepository;
 import shootingstar.var.repository.ticket.TicketRepository;
 import shootingstar.var.repository.user.UserRepository;
@@ -49,6 +52,7 @@ public class AdminService {
     private final ChatRoomRepository chatRoomRepository;
     private final BannerRepository bannerRepository;
     private final WalletRepository walletRepository;
+    private final PointLogRepository pointLogRepository;
 
     @Value("${admin-secret-signup-key}")
     private String adminSignupSecretKey;
@@ -212,31 +216,21 @@ public class AdminService {
     @Transactional
     public void approveExchange(String exchangeUUID) {
         Exchange exchange = exchangeRepository.findByExchangeUUID(exchangeUUID)
-                .orElseThrow(RuntimeException::new); // EXCHANGE_NOT_FOUND
+                .orElseThrow(() -> new CustomException(ErrorCode.EXCHANGE_NOT_FOUND));
 
         Wallet wallet = walletRepository.findWithPessimisticLock()
                 .orElseThrow(() -> new CustomException(ErrorCode.WALLET_NOT_FOUND));
 
-        User user = exchange.getUser();
         BigDecimal exchangePoint = BigDecimal.valueOf(exchange.getExchangePoint());
-        BigDecimal userPoint = user.getPoint();
-
-        if (userPoint.compareTo(exchangePoint) < 0) {
-            throw new RuntimeException(); // 유저의 보유 포인트가 환전 신청할 포인트보다 작을 때
-        }
 
         if (exchange.getExchangeStatus() != ExchangeStatus.STANDBY) {
-            throw new RuntimeException(); // 이미 승인 또는 반려된 환전 신청
+            throw new CustomException(ErrorCode.EXCHANGE_ALREADY_HANDLED);
         }
 
         exchange.changeExchangeStatus(ExchangeStatus.APPROVE);
         exchangeRepository.save(exchange);
 
-        // 유저 포인트 차감
-        user.decreasePoint(exchangePoint);
-        userRepository.save(user);
-
-        // 관리자 포인트 차감
+        // 관리자 지갑 포인트 차감
         wallet.decreaseCash(exchangePoint);
         walletRepository.save(wallet);
     }
@@ -244,13 +238,25 @@ public class AdminService {
     @Transactional
     public void refusalExchange(String exchangeUUID) {
         Exchange exchange = exchangeRepository.findByExchangeUUID(exchangeUUID)
-                .orElseThrow(RuntimeException::new); // EXCHANGE_NOT_FOUND
+                .orElseThrow(() -> new CustomException(ErrorCode.EXCHANGE_NOT_FOUND));
+
+        User user = exchange.getUser();
+        BigDecimal exchangePoint = BigDecimal.valueOf(exchange.getExchangePoint());
 
         if (exchange.getExchangeStatus() != ExchangeStatus.STANDBY) {
-            throw new RuntimeException(); // 이미 승인 또는 반려된 환전 신청
+            throw new CustomException(ErrorCode.EXCHANGE_ALREADY_HANDLED);
         }
 
         exchange.changeExchangeStatus(ExchangeStatus.REFUSAL);
+        exchangeRepository.save(exchange);
+
+        // 환전 신청 반려 시 유저한테 포인트 돌려주기
+        user.increasePoint(exchangePoint);
+        userRepository.save(user);
+
+        // 포인트 로그
+        PointLog pointLog = PointLog.createPointLogWithDeposit(user, PointOriginType.EXCHANGE, exchangePoint);
+        pointLogRepository.save(pointLog);
     }
 
     public void addBanner(String bannerImgUrl, String targetUrl) {
