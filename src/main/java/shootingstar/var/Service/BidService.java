@@ -40,6 +40,7 @@ import shootingstar.var.repository.BidRepository;
 import shootingstar.var.repository.ScheduledTaskRepository;
 import shootingstar.var.repository.log.PointLogRepository;
 import shootingstar.var.repository.user.UserRepository;
+import shootingstar.var.util.ParticipatingAuctionRedisUtil;
 
 @Slf4j
 @Service
@@ -51,6 +52,7 @@ public class BidService {
     private final PointLogRepository pointLogRepository;
     private final ScheduledTaskRepository scheduledTaskRepository;
     private final Scheduler scheduler;
+    private final ParticipatingAuctionRedisUtil participatingAuctionRedisUtil;
 
     @Transactional
     public BidResDto participateAuction(String userUUID, BidReqDto bidDto) {
@@ -97,6 +99,11 @@ public class BidService {
                 .bidAmount(bidDto.getPrice())
                 .build();
         bidRepository.save(bid);
+
+        // 레디스에 추가
+        LocalDateTime localDateTime = auction.getAuctionCloseTime();
+        Instant instant = localDateTime.atZone(ZoneId.systemDefault()).toInstant();
+        participatingAuctionRedisUtil.addParticipation(currentUser.getUserUUID(), auction.getAuctionUUID(), instant.toEpochMilli());
 
         return BidResDto.builder()
                 .currentHighestBidderNickname(currentUser.getNickname())
