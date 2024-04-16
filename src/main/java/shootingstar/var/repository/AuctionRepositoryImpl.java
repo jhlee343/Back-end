@@ -11,11 +11,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 import shootingstar.var.dto.res.*;
+import shootingstar.var.entity.User;
 import shootingstar.var.enums.type.AuctionSortType;
 import shootingstar.var.enums.type.AuctionType;
 
 import java.time.LocalDateTime;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import static shootingstar.var.entity.QUser.user;
 import static shootingstar.var.entity.auction.QAuction.auction;
@@ -75,8 +78,29 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
 
 
     @Override
-    public Page<UserAuctionParticipateResDto> findAllParticipateByUserUUID(String userUUID, Pageable pageable) {
-        return null;
+    public Page<UserAuctionParticipateResDto> findAllParticipateByUserUUID(String userUUID, Set<String> participateAuctionUUID, Pageable pageable) {
+        List<UserAuctionParticipateResDto> content = queryFactory
+                .select(new QUserAuctionParticipateResDto(
+                        auction.user.profileImgUrl,
+                        auction.user.nickname,
+                        auction.createdTime,
+                        auction.bidCount,
+                        auction.currentHighestBidAmount,
+                        auction.auctionUUID
+                ))
+                .from(auction)
+                .where(auction.auctionType.eq(AuctionType.PROGRESS), auctionUUIDEq(participateAuctionUUID))
+                .orderBy()
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        JPAQuery<Long> countQuery = queryFactory
+                .select(auction.count())
+                .from(auction)
+                .where(auction.auctionType.eq(AuctionType.PROGRESS), auctionUUIDEq(participateAuctionUUID));
+
+        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
 
 
@@ -221,6 +245,11 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
     private BooleanExpression vipUserUUIDEq(String userUUID){
         return userUUID != null ? auction.user.userUUID.eq(userUUID) : null;
     }
-
+    private  BooleanExpression auctionUUIDEq(Set<String> participateAuctionUUID){
+        for (String participateUUID : participateAuctionUUID) {
+            return participateUUID !=null ? auction.auctionUUID.eq(participateUUID) : null;
+        }
+        return null;
+    }
 
 }
