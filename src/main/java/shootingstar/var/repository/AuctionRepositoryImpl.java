@@ -91,8 +91,6 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
                 .from(auction)
                 .where(auction.auctionType.eq(AuctionType.PROGRESS), auctionUUIDEq(participateAuctionUUID))
                 .orderBy()
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
                 .fetch();
 
         JPAQuery<Long> countQuery = queryFactory

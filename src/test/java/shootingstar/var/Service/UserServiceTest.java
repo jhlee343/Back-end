@@ -5,17 +5,25 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import shootingstar.var.dto.req.FollowingDto;
 import shootingstar.var.dto.req.UserProfileDto;
+import shootingstar.var.dto.res.UserAuctionParticipateResDto;
 import shootingstar.var.entity.Follow;
 import shootingstar.var.entity.User;
 import shootingstar.var.entity.VipApprovalType;
 import shootingstar.var.entity.VipInfo;
+import shootingstar.var.entity.auction.Auction;
 import shootingstar.var.enums.type.UserType;
+import shootingstar.var.repository.AuctionRepository;
 import shootingstar.var.repository.follow.FollowRepository;
 import shootingstar.var.repository.user.UserRepository;
 import shootingstar.var.repository.vip.VipInfoRepository;
+import shootingstar.var.util.ParticipatingAuctionRedisUtil;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 @SpringBootTest
@@ -33,6 +41,10 @@ public class UserServiceTest {
     private AdminService adminService;
     @Autowired
     private FollowRepository followRepository;
+    @Autowired
+    private AuctionRepository auctionRepository;
+    @Autowired
+    private ParticipatingAuctionRedisUtil participatingAuctionRedisUtil;
 
     @Test
     @DisplayName("팔로우리스트 가져오기")
@@ -132,4 +144,43 @@ public class UserServiceTest {
 //        adminService.vipInfoChange(vipInfo.getVipInfoUUID(), "APPROVE");
 //        System.out.println(basicUserService.applyCheck(basic.getUserUUID()));
 //    }
+
+    @Test
+    @DisplayName("참여중인 경매 조회")
+    public void getParticipateList() throws Exception{
+        User vip = new User("22", "실명", "유명인", "000-0000-0000", "test@ttt.com", "helloUrl", UserType.ROLE_VIP);
+        User basic = new User("33", "실명", "일반인", "000-0000-0000", "test@ttt.com", "helloUrl", UserType.ROLE_BASIC);
+
+        userRepository.save(vip);
+        userRepository.save(basic);
+
+        userRepository.flush();
+
+        Auction progressAuction = new Auction(vip, 100000L, LocalDateTime.now(), "위치", "정보", "약속", "img", "img", LocalDateTime.now().plusDays(3));
+        Auction progressAuction1 = new Auction(vip, 100000L, LocalDateTime.now(), "위치", "정보", "약속", "img", "img", LocalDateTime.now().plusDays(3));
+        Auction progressAuction2 = new Auction(vip, 100000L, LocalDateTime.now(), "위치", "정보", "약속", "img", "img", LocalDateTime.now().plusDays(3));
+        Auction progressAuction3 = new Auction(vip, 100000L, LocalDateTime.now(), "위치", "정보", "약속", "img", "img", LocalDateTime.now().plusDays(3));
+        Auction progressAuction4 = new Auction(vip, 100000L, LocalDateTime.now(), "위치", "정보", "약속", "img", "img", LocalDateTime.now().plusDays(3));
+
+        auctionRepository.save(progressAuction);
+        auctionRepository.save(progressAuction1);
+        auctionRepository.save(progressAuction2);
+        auctionRepository.save(progressAuction3);
+        auctionRepository.save(progressAuction4);
+
+        auctionRepository.flush();
+
+        LocalDateTime closeTime = progressAuction.getAuctionCloseTime();
+        long expiredMilliSeconds = closeTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        System.out.println(progressAuction.getAuctionUUID());
+        participatingAuctionRedisUtil.addParticipation(basic.getUserUUID(), progressAuction.getAuctionUUID(), expiredMilliSeconds);
+
+        LocalDateTime closeTime1 = progressAuction1.getAuctionCloseTime();
+        long expiredMilliSeconds1 = closeTime1.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        System.out.println(progressAuction1.getAuctionUUID());
+        participatingAuctionRedisUtil.addParticipation(basic.getUserUUID(), progressAuction1.getAuctionUUID(), expiredMilliSeconds1);
+
+        Page<UserAuctionParticipateResDto> userAuctionParticipateResDtos = basicUserService.participateAuctionList(basic.getUserUUID(), Pageable.unpaged());
+        System.out.print(userAuctionParticipateResDtos.stream().toList());
+    }
 }
