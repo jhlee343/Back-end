@@ -52,4 +52,8 @@ public class ChatReport extends BaseTimeEntity {
         this.chatReportContent = chatReportContent;
         this.chatReportStatus = ChatReportStatus.STANDBY;
     }
+
+    public void changeChatReportStatus(ChatReportStatus chatReportStatus) {
+        this.chatReportStatus = chatReportStatus;
+    }
 }

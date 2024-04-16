@@ -12,10 +12,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import shootingstar.var.dto.res.*;
 import shootingstar.var.entity.*;
+import shootingstar.var.entity.chat.ChatReport;
 import shootingstar.var.entity.chat.ChatRoom;
 import shootingstar.var.entity.log.PointLog;
 import shootingstar.var.entity.ticket.Ticket;
+import shootingstar.var.entity.ticket.TicketReport;
+import shootingstar.var.enums.status.ChatReportStatus;
 import shootingstar.var.enums.status.ExchangeStatus;
+import shootingstar.var.enums.status.TicketReportStatus;
 import shootingstar.var.enums.type.PointOriginType;
 import shootingstar.var.enums.type.UserType;
 import shootingstar.var.exception.CustomException;
@@ -25,14 +29,18 @@ import shootingstar.var.jwt.TokenInfo;
 import shootingstar.var.repository.BanRepository;
 import shootingstar.var.repository.admin.AdminRepository;
 import shootingstar.var.repository.banner.BannerRepository;
+import shootingstar.var.repository.chat.ChatReportRepository;
 import shootingstar.var.repository.chat.ChatRoomRepository;
 import shootingstar.var.repository.exchange.ExchangeRepository;
 import shootingstar.var.repository.log.PointLogRepository;
 import shootingstar.var.repository.review.ReviewRepository;
+import shootingstar.var.repository.reviewReport.ReviewReportRepository;
+import shootingstar.var.repository.ticket.TicketReportRepository;
 import shootingstar.var.repository.ticket.TicketRepository;
 import shootingstar.var.repository.user.UserRepository;
 import shootingstar.var.repository.vip.VipInfoRepository;
 import shootingstar.var.repository.wallet.WalletRepository;
+import shootingstar.var.repository.warning.WarningRepository;
 
 import java.math.BigDecimal;
 
@@ -53,6 +61,10 @@ public class AdminService {
     private final BannerRepository bannerRepository;
     private final WalletRepository walletRepository;
     private final PointLogRepository pointLogRepository;
+    private final ReviewReportRepository reviewReportRepository;
+    private final ChatReportRepository chatReportRepository;
+    private final TicketReportRepository ticketReportRepository;
+    private final WarningRepository warningRepository;
 
     @Value("${admin-secret-signup-key}")
     private String adminSignupSecretKey;
@@ -266,15 +278,213 @@ public class AdminService {
 
     public void editBanner(String bannerUUID, String targetUrl) {
         Banner banner = bannerRepository.findByBannerUUID(bannerUUID)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(() -> new CustomException(ErrorCode.BANNER_NOT_FOUND));
         banner.changeTargetUrl(targetUrl);
         bannerRepository.save(banner);
     }
 
     public void deleteBanner(String bannerUUID) {
         Banner banner = bannerRepository.findByBannerUUID(bannerUUID)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(() -> new CustomException(ErrorCode.BANNER_NOT_FOUND));
         bannerRepository.delete(banner);
+    }
+
+    public Page<AllReviewReportsDto> getAllReviewReports(String search, Pageable pageable) {
+        return reviewReportRepository.findAllReviewReports(search, pageable);
+    }
+
+    @Transactional
+    public void approveReviewReport(String reviewReportUUID) {
+        ReviewReport reviewReport = reviewReportRepository.findByReviewReportUUID(reviewReportUUID)
+                .orElseThrow(() -> new CustomException(ErrorCode.REVIEW_REPORT_NOT_FOUND));
+
+        Review review = reviewReport.getReview();
+        User user = review.getWriter();
+
+        if (reviewReport.getReviewReportStatus() != ReviewReportStatus.STANDBY) {
+            throw new CustomException(ErrorCode.REVIEW_REPORT_ALREADY_HANDLED);
+        }
+
+        reviewReport.changeReviewReportStatus(ReviewReportStatus.APPROVE);
+        reviewReportRepository.save(reviewReport);
+
+        // 신고 승인 시 리뷰 숨김처리
+        review.changeIsShowed(false);
+        reviewRepository.save(review);
+
+        // 유저의 경고 내역에 추가
+        Warning warning = Warning.builder()
+                .user(user)
+                .warningContent(reviewReport.getReviewReportContent())
+                .build();
+
+        warningRepository.save(warning);
+
+        // 경고 횟수 + 1
+        user.setWarningCount(user.getWarningCount() + 1);
+        userRepository.save(user);
+
+        // 경고 3회 시 유저 밴
+        if (user.getWarningCount() >= 3) {
+            Ban ban = new Ban(
+                    user,
+                    user.getKakaoId()
+            );
+            banRepository.save(ban);
+        }
+    }
+
+    @Transactional
+    public void refusalReviewReport(String reviewReportUUID) {
+        ReviewReport reviewReport = reviewReportRepository.findByReviewReportUUID(reviewReportUUID)
+                .orElseThrow(() -> new CustomException(ErrorCode.REVIEW_REPORT_NOT_FOUND));
+
+        if (reviewReport.getReviewReportStatus() != ReviewReportStatus.STANDBY) {
+            throw new CustomException(ErrorCode.REVIEW_REPORT_ALREADY_HANDLED);
+        }
+
+        reviewReport.changeReviewReportStatus(ReviewReportStatus.REFUSAL);
+        reviewReportRepository.save(reviewReport);
+    }
+
+    public Page<AllChatReportsDto> getAllChatReports(String search, Pageable pageable) {
+        return chatReportRepository.findAllChatReports(search, pageable);
+    }
+
+    @Transactional
+    public void approveChatReport(String chatReportUUID) {
+        ChatReport chatReport = chatReportRepository.findByChatReportUUID(chatReportUUID)
+                .orElseThrow(() -> new CustomException(ErrorCode.CHAT_REPORT_NOT_FOUND));
+
+        ChatRoom chatRoom = chatReport.getChatRoom();
+        User winner = chatRoom.getTicket().getWinner();
+        User organizer = chatRoom.getTicket().getOrganizer();
+        // 신고자가 낙찰자면 주최자 신고, 신고자가 주최자면 낙찰자 신고
+        User user = (chatReport.getChatReportNickname().equals(winner.getNickname())) ?
+                organizer : winner;
+
+        if (chatReport.getChatReportStatus() != ChatReportStatus.STANDBY) {
+            throw new CustomException(ErrorCode.CHAT_REPORT_ALREADY_HANDLED);
+        }
+
+        chatReport.changeChatReportStatus(ChatReportStatus.APPROVE);
+        chatReportRepository.save(chatReport);
+
+        // 신고 승인 시 채팅방 닫음
+        chatRoom.changeChatRoomIsOpened(false);
+        chatRoomRepository.save(chatRoom);
+
+        // 유저의 경고 내역에 추가
+        Warning warning = Warning.builder()
+                .user(user)
+                .warningContent(chatReport.getChatReportContent())
+                .build();
+
+        warningRepository.save(warning);
+
+        // 경고 횟수 + 1
+        user.setWarningCount(user.getWarningCount() + 1);
+        userRepository.save(user);
+
+        // 경고 3회 시 유저 밴
+        if (user.getWarningCount() >= 3) {
+            Ban ban = new Ban(
+                    user,
+                    user.getKakaoId()
+            );
+            banRepository.save(ban);
+        }
+    }
+
+    @Transactional
+    public void refusalChatReport(String chatReportUUID) {
+        ChatReport chatReport = chatReportRepository.findByChatReportUUID(chatReportUUID)
+                .orElseThrow(() -> new CustomException(ErrorCode.CHAT_REPORT_NOT_FOUND));
+
+        if (chatReport.getChatReportStatus() != ChatReportStatus.STANDBY) {
+            throw new CustomException(ErrorCode.CHAT_REPORT_ALREADY_HANDLED);
+        }
+
+        chatReport.changeChatReportStatus(ChatReportStatus.REFUSAL);
+        chatReportRepository.save(chatReport);
+    }
+
+    public Page<AllTicketReportsDto> getAllTicketReports(String search, Pageable pageable) {
+        return ticketReportRepository.findAllTicketReports(search, pageable);
+    }
+
+    @Transactional
+    public void approveTicketReport(String ticketReportUUID) {
+        TicketReport ticketReport = ticketReportRepository.findByTicketReportUUID(ticketReportUUID)
+                .orElseThrow(() -> new CustomException(ErrorCode.TICKET_REPORT_NOT_FOUND));
+
+        Ticket ticket = ticketReport.getTicket();
+        User winner = ticket.getWinner();
+        User organizer = ticket.getOrganizer();
+
+        if (ticketReport.getTicketReportStatus() != TicketReportStatus.STANDBY) {
+            throw new CustomException(ErrorCode.TICKET_REPORT_ALREADY_HANDLED);
+        }
+
+        ticketReport.changeTicketReportStatus(TicketReportStatus.APPROVE);
+        ticketReportRepository.save(ticketReport);
+
+        // 신고 승인 시 식사권 닫음
+        ticket.changeTicketIsOpened(false);
+        ticketRepository.save(ticket);
+
+        // 신고자가 낙찰자면 낙찰자에게 낙찰금 100% 전달
+        if (ticketReport.getTicketReportNickname().equals(winner.getNickname())) {
+            BigDecimal point = BigDecimal.valueOf(ticket.getAuction().getCurrentHighestBidAmount());
+            winner.increasePoint(point);
+            PointLog pointLog = PointLog.createPointLogWithDeposit(winner, PointOriginType.WINNER_TICKET_REPORT, point);
+            pointLogRepository.save(pointLog);
+        }
+        // 신고자가 주최자면 주최자에게 낙찰금 70% 전달
+        else if (ticketReport.getTicketReportNickname().equals(organizer.getNickname())) {
+            BigDecimal point = BigDecimal.valueOf(ticket.getAuction().getCurrentHighestBidAmount()).multiply(BigDecimal.valueOf(0.7));
+            organizer.increasePoint(point);
+            PointLog pointLog = PointLog.createPointLogWithDeposit(organizer, PointOriginType.ORGANIZER_TICKET_REPORT, point);
+            pointLogRepository.save(pointLog);
+        }
+
+        // 신고자가 낙찰자면 주최자 신고, 주최자면 낙찰자 신고
+        User user = (ticketReport.getTicketReportNickname().equals(winner.getNickname())) ?
+                organizer : winner;
+
+        // 유저의 경고 내역에 추가
+        Warning warning = Warning.builder()
+                .user(user)
+                .warningContent(ticketReport.getTicketReportContent())
+                .build();
+
+        warningRepository.save(warning);
+
+        // 경고 횟수 + 1
+        user.setWarningCount(user.getWarningCount() + 1);
+        userRepository.save(user);
+
+        // 경고 3회 시 유저 밴
+        if (user.getWarningCount() >= 3) {
+            Ban ban = new Ban(
+                    user,
+                    user.getKakaoId()
+            );
+            banRepository.save(ban);
+        }
+    }
+
+    @Transactional
+    public void refusalTicketReport(String ticketReportUUID) {
+        TicketReport ticketReport = ticketReportRepository.findByTicketReportUUID(ticketReportUUID)
+                .orElseThrow(() -> new CustomException(ErrorCode.TICKET_REPORT_NOT_FOUND));
+
+        if (ticketReport.getTicketReportStatus() != TicketReportStatus.STANDBY) {
+            throw new CustomException(ErrorCode.TICKET_REPORT_ALREADY_HANDLED);
+        }
+
+        ticketReport.changeTicketReportStatus(TicketReportStatus.REFUSAL);
+        ticketReportRepository.save(ticketReport);
     }
 
 }
