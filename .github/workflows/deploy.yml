@@ -32,7 +32,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.CICD_SECRET_KEY }}
       - name: Download config files from S3
         run: |
-          aws s3 cp s3://$AWS_S3_BUCKET/ssl/keystore.p12 src/main/resources/ssl/keystore.p12
           aws s3 cp s3://$AWS_S3_BUCKET/yml/application-database.yml src/main/resources/application-database.yml
           aws s3 cp s3://$AWS_S3_BUCKET/yml/application-iamport.yml src/main/resources/application-iamport.yml
           aws s3 cp s3://$AWS_S3_BUCKET/yml/application-jwt.yml src/main/resources/application-jwt.yml
