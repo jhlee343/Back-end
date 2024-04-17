@@ -68,14 +68,14 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
                 ))
                 .from(auction)
                 .leftJoin(ticket).on(ticket.auction.eq(auction))
-                .where(currentHighestBidderIdEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS),auction.meetingDate.after(LocalDateTime.now()), ticket.ticketUUID.isNotNull())
+                .where(currentHighestBidderIdEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS),auction.meetingDate.after(LocalDateTime.now()))
                 .orderBy(auction.meetingDate.desc())
                 .fetch();
 
         JPAQuery<Long> countQuery = queryFactory
                 .select(auction.count())
                 .from(auction)
-                .where(currentHighestBidderIdEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS),auction.meetingDate.after(LocalDateTime.now()), ticket.ticketUUID.isNotNull());
+                .where(currentHighestBidderIdEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS),auction.meetingDate.after(LocalDateTime.now()));
 
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
