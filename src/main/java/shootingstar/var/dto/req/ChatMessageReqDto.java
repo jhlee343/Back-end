@@ -7,4 +7,5 @@ public class ChatMessageReqDto {
     private String accessToken;
     private String chatRoomUUID;
     private String message;
+    private Boolean isChatMessage;
 }
