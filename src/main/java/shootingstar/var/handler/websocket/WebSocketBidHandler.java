@@ -88,8 +88,10 @@ public class WebSocketBidHandler extends TextWebSocketHandler {
 
         if (bidReqDto.getAuctionUUID() == null || bidReqDto.getAuctionUUID().equals("")) {
             throw new CustomException(ErrorCode.INCORRECT_FORMAT_AUCTION_UUID);
-        } else if (bidReqDto.getPrice() == 0) {
-            throw new CustomException(ErrorCode.INCORRECT_FORMAT_PRICE);
+        } else if (bidReqDto.getIsBidMessage()) {
+            if ((bidReqDto.getPrice() == 0 || bidReqDto.getPrice() == null)) {
+                throw new CustomException(ErrorCode.INCORRECT_FORMAT_PRICE);
+            }
         }
         return bidReqDto;
     }
@@ -143,6 +145,7 @@ public class WebSocketBidHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
+        log.info("bid 세션 {} 연결 끊김", session.getId());
         sessions.remove(session);
     }
 }
