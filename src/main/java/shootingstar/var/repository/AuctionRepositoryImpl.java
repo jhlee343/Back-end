@@ -36,11 +36,12 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
                         auction.user.profileImgUrl,
                         auction.user.nickname,
                         auction.meetingDate,
-                        user.nickname,
+                        ticket.winner.nickname,
                         auction.auctionUUID,
                         ticket.ticketUUID
                 ))
                 .from(auction)
+                .leftJoin(ticket).on(ticket.auction.eq(auction))
                 .where(currentHighestBidderIdEq(userUUID), auction.auctionType.eq(AuctionType.SUCCESS), auction.meetingDate.before(LocalDateTime.now()))
                 .orderBy(auction.meetingDate.asc())
                 .fetch();
@@ -61,19 +62,20 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
                         auction.user.profileImgUrl,
                         auction.user.nickname,
                         auction.meetingDate,
-                        user.nickname,
+                        ticket.winner.nickname,
                         auction.auctionUUID,
                         ticket.ticketUUID
                 ))
                 .from(auction)
-                .where(currentHighestBidderIdEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS),auction.meetingDate.after(LocalDateTime.now()))
+                .leftJoin(ticket).on(ticket.auction.eq(auction))
+                .where(currentHighestBidderIdEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS),auction.meetingDate.after(LocalDateTime.now()), ticket.ticketUUID.isNotNull())
                 .orderBy(auction.meetingDate.desc())
                 .fetch();
 
         JPAQuery<Long> countQuery = queryFactory
                 .select(auction.count())
                 .from(auction)
-                .where(currentHighestBidderIdEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS),auction.meetingDate.after(LocalDateTime.now()));
+                .where(currentHighestBidderIdEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS),auction.meetingDate.after(LocalDateTime.now()), ticket.ticketUUID.isNotNull());
 
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
@@ -119,8 +121,8 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
                         ticket.ticketUUID
                 ))
                 .from(auction)
-                .where(vipUserUUIDEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS),auction.meetingDate.before(LocalDateTime.now()),
-                        ticketEqUUID(userUUID))
+                .leftJoin(ticket).on(ticket.auction.eq(auction))
+                .where(vipUserUUIDEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS),auction.meetingDate.before(LocalDateTime.now()))
                 .orderBy(auction.meetingDate.asc())
                 .fetch();
 
@@ -145,6 +147,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
                         ticket.ticketUUID
                 ))
                 .from(auction)
+                .leftJoin(ticket).on(ticket.auction.eq(auction))
                 .where(vipUserUUIDEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS),auction.meetingDate.after(LocalDateTime.now()))
                 .orderBy(auction.meetingDate.desc())
                 .fetch();
@@ -249,8 +252,5 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
         return userUUID != null ? auction.user.userUUID.eq(userUUID) : null;
     }
 
-    private BooleanExpression ticketEqUUID(String userUUID){
-      return ticket.ticketUUID != null ? ticket.winner.userUUID.eq(userUUID) : null;
-    }
 
 }

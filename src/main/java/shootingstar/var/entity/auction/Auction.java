@@ -72,6 +72,10 @@ public class Auction extends BaseTimeEntity {
     @OneToMany(mappedBy = "auction")
     private List<Bid> bids = new ArrayList<>();
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ticket_id")
+    private Ticket ticket;
+
     @Builder
     public Auction(User user, long minBidAmount, LocalDateTime meetingDate, String meetingLocation,
                    String meetingInfoText, String meetingPromiseText, String meetingInfoImg, String meetingPromiseImg, LocalDateTime auctionCloseTime) {
