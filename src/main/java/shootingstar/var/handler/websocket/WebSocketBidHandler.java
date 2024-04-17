@@ -56,8 +56,6 @@ public class WebSocketBidHandler extends TextWebSocketHandler {
             addSessionToBid(session, auctionUUID);
 
             String messageJson;
-            validateIsBidMessage(bidReqDto);
-
             if (bidReqDto.getIsBidMessage()) {
                 // 응찰 정보 저장
                 BidResDto resDto = bidService.participateAuction(getUserUUID(bidReqDto), bidReqDto);
@@ -88,6 +86,8 @@ public class WebSocketBidHandler extends TextWebSocketHandler {
 
         if (bidReqDto.getAuctionUUID() == null || bidReqDto.getAuctionUUID().equals("")) {
             throw new CustomException(ErrorCode.INCORRECT_FORMAT_AUCTION_UUID);
+        } else if (bidReqDto.getIsBidMessage() == null) {
+            throw new CustomException(ErrorCode.INCORRECT_FORMAT_IS_BID_MESSAGE);
         } else if (bidReqDto.getIsBidMessage()) {
             if ((bidReqDto.getPrice() == 0 || bidReqDto.getPrice() == null)) {
                 throw new CustomException(ErrorCode.INCORRECT_FORMAT_PRICE);
@@ -107,12 +107,6 @@ public class WebSocketBidHandler extends TextWebSocketHandler {
             bidSessionMap.put(auctionUUID, new HashSet<>());
         }
         bidSessionMap.get(auctionUUID).add(session);
-    }
-
-    private void validateIsBidMessage(BidReqDto bidReqDto) {
-        if (bidReqDto.getIsBidMessage() == null) {
-            throw new CustomException(ErrorCode.INCORRECT_FORMAT_IS_BID_MESSAGE);
-        }
     }
 
     private String getUserUUID(BidReqDto bidReqDto) {
