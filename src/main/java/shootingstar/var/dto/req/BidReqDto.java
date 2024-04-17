@@ -7,4 +7,5 @@ public class BidReqDto {
     private String accessToken;
     private String auctionUUID;
     private long price;
+    private Boolean isBidMessage;
 }
