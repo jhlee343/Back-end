@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: var
+  web:
+    resources:
+      add-mappings: false
+
+  profiles:
+#    include: database, redis, mail, jwt, storage, port
+    include: database, mail, jwt, port, oauth, redis, iamport
+
+logging:
+  level:
+    org.hibernate.sql: debug
