@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import shootingstar.var.Service.ChatService;
 import shootingstar.var.dto.req.BidReqDto;
 import shootingstar.var.dto.req.ChatMessageReqDto;
 import shootingstar.var.dto.res.SaveChatMessageResDto;
+import shootingstar.var.enums.type.UserType;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
 import shootingstar.var.jwt.JwtTokenProvider;
@@ -55,11 +57,18 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
             String chatRoomUUID = chatMessageDto.getChatRoomUUID();
             addSessionToChatRoom(session, chatRoomUUID);
 
-            // 채팅 메세지 저장
-            SaveChatMessageResDto resDto = chatService.saveChatMessage(getUserUUID(chatMessageDto), chatMessageDto);
+            String messageJson;
+            if (chatMessageDto.getIsChatMessage()) {
+                // 채팅 메세지 저장
+                SaveChatMessageResDto resDto = chatService.saveChatMessage(getUserUUID(chatMessageDto), chatMessageDto);
+                messageJson = objectMapper.writeValueAsString(resDto);
+            } else {
+                List<SaveChatMessageResDto> resDto = chatService.findMessageListByChatRoomUUID(
+                        chatRoomUUID, getUserUUID(chatMessageDto), "");
+                messageJson = objectMapper.writeValueAsString(resDto);
+            }
 
             // key가 chatRoomUUID인 session에 메세지 전송
-            String messageJson = objectMapper.writeValueAsString(resDto);
             broadcastMessage(chatRoomUUID, messageJson);
 
         } catch (CustomException e) {
@@ -79,8 +88,12 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
 
         if (chatMessageReqDto.getChatRoomUUID() == null || chatMessageReqDto.getChatRoomUUID().equals("")) {
             throw new CustomException(ErrorCode.INCORRECT_FORMAT_CHAT_ROOM_UUID);
-        } else if (chatMessageReqDto.getMessage() == null || chatMessageReqDto.getMessage().equals("")) {
-            throw new CustomException(ErrorCode.INCORRECT_FORMAT_CHAT_MESSAGE);
+        } else if (chatMessageReqDto.getIsChatMessage() == null) {
+            throw new CustomException(ErrorCode.INCORRECT_FORMAT_IS_CHAT_MESSAGE);
+        } else if (chatMessageReqDto.getIsChatMessage()) {
+            if (chatMessageReqDto.getMessage() == null || chatMessageReqDto.getMessage().equals("")) {
+                throw new CustomException(ErrorCode.INCORRECT_FORMAT_CHAT_MESSAGE);
+            }
         }
         return chatMessageReqDto;
     }
@@ -91,16 +104,16 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
         jwtTokenProvider.validateAccessToken(accessToken);
     }
 
-    private String getUserUUID(ChatMessageReqDto chatMessageDto) {
-        Authentication authentication = jwtTokenProvider.getAuthenticationFromAccessToken(chatMessageDto.getAccessToken());
-        return authentication.getName();
-    }
-
     private void addSessionToChatRoom(WebSocketSession session, String chatRoomUUID) {
         if (!chatRoomSessionMap.containsKey(chatRoomUUID)) {
             chatRoomSessionMap.put(chatRoomUUID, new HashSet<>());
         }
         chatRoomSessionMap.get(chatRoomUUID).add(session);
+    }
+
+    private String getUserUUID(ChatMessageReqDto chatMessageDto) {
+        Authentication authentication = jwtTokenProvider.getAuthenticationFromAccessToken(chatMessageDto.getAccessToken());
+        return authentication.getName();
     }
 
     private void broadcastMessage(String chatRoomUUID, String messageJson) throws IOException {
@@ -128,6 +141,7 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
+        log.info("chat 세션 {} 연결 끊김", session.getId());
         sessions.remove(session);
     }
 }
