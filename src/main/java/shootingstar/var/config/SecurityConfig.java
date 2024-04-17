@@ -67,7 +67,6 @@ public class SecurityConfig {
                                 .requestMatchers(
                                         "/api/ticket/**",
                                         "/api/chat/**",
-                                        "/api/bid/**",
                                         "/api/auction/report"
                                 ).hasAnyRole("BASIC", "VIP")
 
