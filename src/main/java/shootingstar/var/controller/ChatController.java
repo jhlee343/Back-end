@@ -35,26 +35,26 @@ public class ChatController {
     private final ChatService chatService;
     private final JwtTokenProvider jwtTokenProvider;
 
-    @Operation(summary = "채팅방UUID에 해당하는 채팅 메세지 전체 조회 API")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200",
-                    description = "- 사용자 타입이 VIP, BASIC일 때",
-                    content = {@Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = SaveChatMessageResDto.class)))}),
-            @ApiResponse(responseCode = "404",
-                    description = "- 채팅방 정보 조회 실패 : 8200",
-                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
-            @ApiResponse(responseCode = "403",
-                    description =
-                                    "- 로그인한 사용자가 경매의 낙찰자도 주최자도 권한이 어드민도 아닐 때 : 8101\n" +
-                                    "- 채팅방이 닫혀 있는 경우 : 8100",
-                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
-    })
-    @GetMapping("/messageList/{chatRoomUUID}")
-    public ResponseEntity<List<SaveChatMessageResDto>> findMessageListByChatRoomUUID(@PathVariable("chatRoomUUID") String chatRoomUUID, HttpServletRequest request) {
-        String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
-        List<SaveChatMessageResDto> messages = chatService.findMessageListByChatRoomUUID(chatRoomUUID, userUUID, null);
-        return ResponseEntity.ok().body(messages);
-    }
+//    @Operation(summary = "채팅방UUID에 해당하는 채팅 메세지 전체 조회 API")
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200",
+//                    description = "- 사용자 타입이 VIP, BASIC일 때",
+//                    content = {@Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = SaveChatMessageResDto.class)))}),
+//            @ApiResponse(responseCode = "404",
+//                    description = "- 채팅방 정보 조회 실패 : 8200",
+//                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+//            @ApiResponse(responseCode = "403",
+//                    description =
+//                                    "- 로그인한 사용자가 경매의 낙찰자도 주최자도 권한이 어드민도 아닐 때 : 8101\n" +
+//                                    "- 채팅방이 닫혀 있는 경우 : 8100",
+//                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+//    })
+//    @GetMapping("/messageList/{chatRoomUUID}")
+//    public ResponseEntity<List<SaveChatMessageResDto>> findMessageListByChatRoomUUID(@PathVariable("chatRoomUUID") String chatRoomUUID, HttpServletRequest request) {
+//        String userUUID = jwtTokenProvider.getUserUUIDByRequest(request);
+//        List<SaveChatMessageResDto> messages = chatService.findMessageListByChatRoomUUID(chatRoomUUID, userUUID, null);
+//        return ResponseEntity.ok().body(messages);
+//    }
 
     @Operation(summary = "채팅방 신고하는 API")
     @ApiResponses(value = {

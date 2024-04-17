@@ -128,17 +128,31 @@ public enum ErrorCode {
     INCORRECT_FORMAT_ADMIN_PASSWORD(BAD_REQUEST, "9002", "잘못된 형식의 관리자 비밀번호 입니다."),
     INCORRECT_FORMAT_ADMIN_NICKNAME(BAD_REQUEST, "9003", "잘못된 형식의 관리자 닉네임입니다."),
     INCORRECT_FORMAT_ADMIN_SECRET_KEY(BAD_REQUEST, "9004", "잘못된 형식의 관리자 비밀 키 입니다."),
+    INCORRECT_FORMAT_REVIEW_REPORT_UUID(BAD_REQUEST, "9005", "잘못된 형식의 리뷰 신고 고유번호입니다."),
+    INCORRECT_FORMAT_CHAT_REPORT_UUID(BAD_REQUEST, "9006", "잘못된 형식의 채팅 신고 고유번호입니다."),
+    INCORRECT_FORMAT_TICKET_REPORT_UUID(BAD_REQUEST, "9007", "잘못된 형식의 식사권 신고 고유번호입니다."),
+
 
     ADMIN_LOGIN_FAILED(FORBIDDEN, "9101", "잘못된 관라자 아이디 혹은 패스워드입니다."),
+
+    REVIEW_REPORT_NOT_FOUND(NOT_FOUND, "9200", "존재하지 않는 리뷰 신고입니다."),
+    CHAT_REPORT_NOT_FOUND(NOT_FOUND, "9201", "존재하지 않는 채팅 신고입니다."),
+    TICKET_REPORT_NOT_FOUND(NOT_FOUND, "9202", "존재하지 않는 식사권 신고입니다."),
+    BANNER_NOT_FOUND(NOT_FOUND, "9203", "존재하지 않는 배너입니다."),
 
     DUPLICATE_ADMIN_ID(CONFLICT, "9301", "해당 관리자 아이디는 사용할 수 없습니다."),
     DUPLICATE_ADMIN_NICKNAME(CONFLICT, "9302", "해당 관리자 닉네임은 사용할 수 없습니다."),
     INCORRECT_VALUE_ADMIN_SECRET_KEY(CONFLICT, "9303", "잘못된 관리자 비밀 키 입니다."),
     ALREADY_BANNED_USER(CONFLICT, "9304", "이미 정지된 사용자입니다."),
+    REVIEW_REPORT_ALREADY_HANDLED(CONFLICT, "9305", "이미 승인 혹은 반려된 리뷰 신고입니다."),
+    CHAT_REPORT_ALREADY_HANDLED(CONFLICT, "9306", "이미 승인 혹은 반려된 채팅 신고입니다."),
+    TICKET_REPORT_ALREADY_HANDLED(CONFLICT, "9307", "이미 승인 혹은 반려된 식사권 신고입니다."),
 
     WALLET_NOT_FOUND(NOT_FOUND, "10200", "지갑을 찾을 수 없습니다."),
 
-    INCORRECT_FORMAT_JSON(BAD_REQUEST, "11000", "잘못된 형식의 JSON 데이터 입니다.")
+    INCORRECT_FORMAT_JSON(BAD_REQUEST, "11000", "잘못된 형식의 JSON 데이터 입니다."),
+    INCORRECT_FORMAT_IS_BID_MESSAGE(BAD_REQUEST, "11001", "잘못된 형식의 isBidMessage 입니다."),
+    INCORRECT_FORMAT_IS_CHAT_MESSAGE(BAD_REQUEST, "11002", "잘못된 형식의 isChatMessage 입니다."),
     ;
 
     private final HttpStatus httpStatus;
