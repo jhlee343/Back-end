@@ -431,5 +431,172 @@ public class AdminController {
         return ResponseEntity.ok().body("배너가 삭제되었습니다.");
     }
 
+    @Operation(summary = "리뷰 신고 리스트 조회 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "리뷰 신고 리스트 조회 성공",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = AllReviewReportsDto.class))}),
+    })
+    @GetMapping("/report/reviewList")
+    public ResponseEntity<Page<AllReviewReportsDto>> getReviewReportList(
+            @RequestParam(value = "search", required = false, defaultValue = "") String search,
+            @PageableDefault(size = 10) Pageable pageable) {
+        Page<AllReviewReportsDto> reviewReportList = adminService.getAllReviewReports(search, pageable);
+        return ResponseEntity.ok().body(reviewReportList);
+    }
+
+    @Operation(summary = "리뷰 신고 승인 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "리뷰 신고 승인 성공",
+                    content = {@Content(mediaType = "text/plain", schema = @Schema(implementation = String.class))}),
+            @ApiResponse(responseCode = "400",
+                    description = "잘못된 형식의 리뷰 신고 고유번호 : 9005",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+            @ApiResponse(responseCode = "404",
+                    description = "존재하지 않는 리뷰 신고 : 9200",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+            @ApiResponse(responseCode = "409",
+                    description = "이미 승인 또는 반려된 리뷰 신고 : 9305",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+    })
+    @PatchMapping("/report/review/approve/{reviewReportUUID}")
+    public ResponseEntity<String> approveReviewReport(@NotBlank @PathVariable String reviewReportUUID) {
+        adminService.approveReviewReport(reviewReportUUID);
+        return ResponseEntity.ok().body("리뷰 신고가 승인되었습니다.");
+    }
+
+    @Operation(summary = "리뷰 신고 반려 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "리뷰 신고 반려 성공",
+                    content = {@Content(mediaType = "text/plain", schema = @Schema(implementation = String.class))}),
+            @ApiResponse(responseCode = "400",
+                    description = "잘못된 형식의 리뷰 신고 고유번호 : 9005",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+            @ApiResponse(responseCode = "404",
+                    description = "존재하지 않는 리뷰 신고 : 9200",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+            @ApiResponse(responseCode = "409",
+                    description = "이미 승인 또는 반려된 리뷰 신고 : 9305",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+    })
+    @PatchMapping("/report/review/refusal/{reviewReportUUID}")
+    public ResponseEntity<String> refusalReviewReport(@NotBlank @PathVariable String reviewReportUUID) {
+        adminService.refusalReviewReport(reviewReportUUID);
+        return ResponseEntity.ok().body("리뷰 신고가 반려되었습니다.");
+    }
+
+    @Operation(summary = "채팅 신고 리스트 조회 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "채팅 신고 리스트 조회 성공",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = AllChatReportsDto.class))}),
+    })
+    @GetMapping("/report/chatList")
+    public ResponseEntity<Page<AllChatReportsDto>> getChatReportList(
+            @RequestParam(value = "search", required = false, defaultValue = "") String search,
+            @PageableDefault(size = 10) Pageable pageable) {
+        Page<AllChatReportsDto> chatReportList = adminService.getAllChatReports(search, pageable);
+        return ResponseEntity.ok().body(chatReportList);
+    }
+
+    @Operation(summary = "채팅 신고 승인 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "채팅 신고 승인 성공",
+                    content = {@Content(mediaType = "text/plain", schema = @Schema(implementation = String.class))}),
+            @ApiResponse(responseCode = "400",
+                    description = "잘못된 형식의 채팅 신고 고유번호 : 9006",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+            @ApiResponse(responseCode = "404",
+                    description = "존재하지 않는 채팅 신고 : 9201",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+            @ApiResponse(responseCode = "409",
+                    description = "이미 승인 또는 반려된 채팅 신고 : 9306",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+    })
+    @PatchMapping("/report/chat/approve/{chatReportUUID}")
+    public ResponseEntity<String> approveChatReport(@NotBlank @PathVariable String chatReportUUID) {
+        adminService.approveChatReport(chatReportUUID);
+        return ResponseEntity.ok().body("채팅 신고가 승인되었습니다.");
+    }
+
+    @Operation(summary = "채팅 신고 반려 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "채팅 신고 반려 성공",
+                    content = {@Content(mediaType = "text/plain", schema = @Schema(implementation = String.class))}),
+            @ApiResponse(responseCode = "400",
+                    description = "잘못된 형식의 채팅 신고 고유번호 : 9006",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+            @ApiResponse(responseCode = "404",
+                    description = "존재하지 않는 채팅 신고 : 9201",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+            @ApiResponse(responseCode = "409",
+                    description = "이미 승인 또는 반려된 채팅 신고 : 9306",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+    })
+    @PatchMapping("/report/chat/refusal/{chatReportUUID}")
+    public ResponseEntity<String> refusalChatReport(@NotBlank @PathVariable String chatReportUUID) {
+        adminService.refusalChatReport(chatReportUUID);
+        return ResponseEntity.ok().body("채팅 신고가 반려되었습니다.");
+    }
+
+    @Operation(summary = "식사권 신고 리스트 조회 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "식사권 신고 리스트 조회 성공",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = AllTicketReportsDto.class))}),
+    })
+    @GetMapping("/report/ticketList")
+    public ResponseEntity<Page<AllTicketReportsDto>> getTicketReportList(
+            @RequestParam(value = "search", required = false, defaultValue = "") String search,
+            @PageableDefault(size = 10) Pageable pageable) {
+        Page<AllTicketReportsDto> ticketReportList = adminService.getAllTicketReports(search, pageable);
+        return ResponseEntity.ok().body(ticketReportList);
+    }
+
+    @Operation(summary = "식사권 신고 승인 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "식사권 신고 승인 성공",
+                    content = {@Content(mediaType = "text/plain", schema = @Schema(implementation = String.class))}),
+            @ApiResponse(responseCode = "400",
+                    description = "잘못된 형식의 식사권 신고 고유번호 : 9007",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+            @ApiResponse(responseCode = "404",
+                    description = "존재하지 않는 식사권 신고 : 9202",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+            @ApiResponse(responseCode = "409",
+                    description = "이미 승인 또는 반려된 식사권ㄴ 신고 : 9307",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+    })
+    @PatchMapping("/report/ticket/approve/{ticketReportUUID}")
+    public ResponseEntity<String> approveTicketReport(@NotBlank @PathVariable String ticketReportUUID) {
+        adminService.approveTicketReport(ticketReportUUID);
+        return ResponseEntity.ok().body("식사권 신고가 승인되었습니다.");
+    }
+
+    @Operation(summary = "식사권 신고 반려 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "식사권 신고 반려 성공",
+                    content = {@Content(mediaType = "text/plain", schema = @Schema(implementation = String.class))}),
+            @ApiResponse(responseCode = "400",
+                    description = "잘못된 형식의 식사권 신고 고유번호 : 9007",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+            @ApiResponse(responseCode = "404",
+                    description = "존재하지 않는 식사권 신고 : 9202",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+            @ApiResponse(responseCode = "409",
+                    description = "이미 승인 또는 반려된 식사권 신고 : 9307",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+    })
+    @PatchMapping("/report/ticket/refusal/{ticketReportUUID}")
+    public ResponseEntity<String> refusalTicketReport(@NotBlank @PathVariable String ticketReportUUID) {
+        adminService.refusalTicketReport(ticketReportUUID);
+        return ResponseEntity.ok().body("식사권 신고가 반려되었습니다.");
+    }
 
 }

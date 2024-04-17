@@ -39,4 +39,8 @@ public class ReviewReport {
         this.reviewReportContent=reviewReportContent;
         this.reviewReportStatus = reviewReportStatus;
     }
+
+    public void changeReviewReportStatus(ReviewReportStatus reviewReportStatus) {
+        this.reviewReportStatus = reviewReportStatus;
+    }
 }
