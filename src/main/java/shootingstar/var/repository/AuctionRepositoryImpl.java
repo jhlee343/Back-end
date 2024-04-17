@@ -4,6 +4,7 @@ import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.StringPath;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
@@ -11,18 +12,17 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 import shootingstar.var.dto.res.*;
-import shootingstar.var.entity.User;
 import shootingstar.var.enums.type.AuctionSortType;
 import shootingstar.var.enums.type.AuctionType;
 
 import java.time.LocalDateTime;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 import static shootingstar.var.entity.QUser.user;
 import static shootingstar.var.entity.auction.QAuction.auction;
 import static shootingstar.var.entity.QBid.bid;
+import static shootingstar.var.entity.ticket.QTicket.ticket;
 
 public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
     private final JPAQueryFactory queryFactory;
@@ -37,7 +37,8 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
                         auction.user.nickname,
                         auction.meetingDate,
                         user.nickname,
-                        auction.auctionUUID
+                        auction.auctionUUID,
+                        ticket.ticketUUID
                 ))
                 .from(auction)
                 .where(currentHighestBidderIdEq(userUUID), auction.auctionType.eq(AuctionType.SUCCESS), auction.meetingDate.before(LocalDateTime.now()))
@@ -61,7 +62,8 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
                         auction.user.nickname,
                         auction.meetingDate,
                         user.nickname,
-                        auction.auctionUUID
+                        auction.auctionUUID,
+                        ticket.ticketUUID
                 ))
                 .from(auction)
                 .where(currentHighestBidderIdEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS),auction.meetingDate.after(LocalDateTime.now()))
@@ -113,10 +115,12 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
                         auction.user.nickname,
                         auction.meetingDate,
                         bid.bidderNickname,
-                        auction.auctionUUID
+                        auction.auctionUUID,
+                        ticket.ticketUUID
                 ))
                 .from(auction)
-                .where(vipUserUUIDEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS),auction.meetingDate.before(LocalDateTime.now()))
+                .where(vipUserUUIDEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS),auction.meetingDate.before(LocalDateTime.now()),
+                        ticketEqUUID(userUUID))
                 .orderBy(auction.meetingDate.asc())
                 .fetch();
 
@@ -137,7 +141,8 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
                         auction.user.nickname,
                         auction.meetingDate,
                         bid.bidderNickname,
-                        auction.auctionUUID
+                        auction.auctionUUID,
+                        ticket.ticketUUID
                 ))
                 .from(auction)
                 .where(vipUserUUIDEq(userUUID),auction.auctionType.eq(AuctionType.SUCCESS),auction.meetingDate.after(LocalDateTime.now()))
@@ -242,6 +247,10 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
 
     private BooleanExpression vipUserUUIDEq(String userUUID){
         return userUUID != null ? auction.user.userUUID.eq(userUUID) : null;
+    }
+
+    private BooleanExpression ticketEqUUID(String userUUID){
+      return ticket.ticketUUID != null ? ticket.winner.userUUID.eq(userUUID) : null;
     }
 
 }

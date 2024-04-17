@@ -75,11 +75,6 @@ public class BasicUserService {
     public Page<UserAuctionSuccessResDto> successAfterAuctionList(String userUUID, Pageable pageable){
         return auctionRepository.findAllSuccessAfterByUserUUID(userUUID, pageable);
     }
-//    public Page<UserAuctionParticipateResDto> participateAuctionList(String userUUID, Pageable pageable){
-//       //auctin uuid 반환
-//        Set<String> participateAuctionUUID = participatingAuctionRedisUtil.getParticipationList(userUUID);
-//       return auctionRepository.findAllParticipateByUserUUID(userUUID,participateAuctionUUID, pageable);
-//    }
 
     public Page<UserAuctionParticipateResDto> participateAuctionList(String userUUID, Pageable pageable){
         //auctin uuid 반환
