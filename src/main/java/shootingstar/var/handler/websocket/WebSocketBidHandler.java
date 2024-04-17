@@ -17,6 +17,7 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import shootingstar.var.Service.BidService;
 import shootingstar.var.dto.req.BidReqDto;
+import shootingstar.var.dto.res.BidInfoResDto;
 import shootingstar.var.dto.res.BidResDto;
 import shootingstar.var.exception.CustomException;
 import shootingstar.var.exception.ErrorCode;
@@ -54,11 +55,18 @@ public class WebSocketBidHandler extends TextWebSocketHandler {
             String auctionUUID = bidReqDto.getAuctionUUID();
             addSessionToBid(session, auctionUUID);
 
-            // 응찰 정보 저장
-            BidResDto resDto = bidService.participateAuction(getUserUUID(bidReqDto), bidReqDto);
+            String messageJson;
+            if (bidReqDto.getIsBidMessage()) {
+                // 응찰 정보 저장
+                BidResDto resDto = bidService.participateAuction(getUserUUID(bidReqDto), bidReqDto);
+                messageJson = objectMapper.writeValueAsString(resDto);
+
+            } else {
+                BidInfoResDto resDto = bidService.findBidInfo(auctionUUID);
+                messageJson = objectMapper.writeValueAsString(resDto);
+            }
 
             // key가 auctionUUID인 session에 메세지 전송
-            String messageJson = objectMapper.writeValueAsString(resDto);
             broadcastMessage(auctionUUID, messageJson);
 
         } catch (CustomException e) {
@@ -67,8 +75,6 @@ public class WebSocketBidHandler extends TextWebSocketHandler {
             session.close();
         }
     }
-
-
 
     private BidReqDto getBidReqDto(String payload) {
         BidReqDto bidReqDto;
@@ -80,8 +86,12 @@ public class WebSocketBidHandler extends TextWebSocketHandler {
 
         if (bidReqDto.getAuctionUUID() == null || bidReqDto.getAuctionUUID().equals("")) {
             throw new CustomException(ErrorCode.INCORRECT_FORMAT_AUCTION_UUID);
-        } else if (bidReqDto.getPrice() == 0) {
-            throw new CustomException(ErrorCode.INCORRECT_FORMAT_PRICE);
+        } else if (bidReqDto.getIsBidMessage() == null) {
+            throw new CustomException(ErrorCode.INCORRECT_FORMAT_IS_BID_MESSAGE);
+        } else if (bidReqDto.getIsBidMessage()) {
+            if ((bidReqDto.getPrice() == 0 || bidReqDto.getPrice() == null)) {
+                throw new CustomException(ErrorCode.INCORRECT_FORMAT_PRICE);
+            }
         }
         return bidReqDto;
     }
@@ -129,6 +139,7 @@ public class WebSocketBidHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
+        log.info("bid 세션 {} 연결 끊김", session.getId());
         sessions.remove(session);
     }
 }

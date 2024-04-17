@@ -6,5 +6,6 @@ import lombok.Data;
 public class BidReqDto {
     private String accessToken;
     private String auctionUUID;
-    private long price;
+    private Long price;
+    private Boolean isBidMessage;
 }

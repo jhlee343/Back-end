@@ -150,7 +150,8 @@ public enum ErrorCode {
 
     WALLET_NOT_FOUND(NOT_FOUND, "10200", "지갑을 찾을 수 없습니다."),
 
-    INCORRECT_FORMAT_JSON(BAD_REQUEST, "11000", "잘못된 형식의 JSON 데이터 입니다.")
+    INCORRECT_FORMAT_JSON(BAD_REQUEST, "11000", "잘못된 형식의 JSON 데이터 입니다."),
+    INCORRECT_FORMAT_IS_BID_MESSAGE(BAD_REQUEST, "11001", "잘못된 형식의 isBidMessage 입니다.")
     ;
 
     private final HttpStatus httpStatus;
