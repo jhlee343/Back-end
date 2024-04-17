@@ -89,14 +89,14 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
                         auction.auctionUUID
                 ))
                 .from(auction)
-                .where(auction.auctionType.eq(AuctionType.PROGRESS), auctionUUIDEq(participateAuctionUUID))
+                .where(auction.auctionType.eq(AuctionType.PROGRESS), auction.auctionUUID.in(participateAuctionUUID))
                 .orderBy()
                 .fetch();
 
         JPAQuery<Long> countQuery = queryFactory
                 .select(auction.count())
                 .from(auction)
-                .where(auction.auctionType.eq(AuctionType.PROGRESS), auctionUUIDEq(participateAuctionUUID));
+                .where(auction.auctionType.eq(AuctionType.PROGRESS), auction.auctionUUID.in(participateAuctionUUID));
 
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
@@ -242,12 +242,6 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
 
     private BooleanExpression vipUserUUIDEq(String userUUID){
         return userUUID != null ? auction.user.userUUID.eq(userUUID) : null;
-    }
-    private  BooleanExpression auctionUUIDEq(Set<String> participateAuctionUUID){
-        for (String participateUUID : participateAuctionUUID) {
-            return participateUUID !=null ? auction.auctionUUID.eq(participateUUID) : null;
-        }
-        return null;
     }
 
 }

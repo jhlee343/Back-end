@@ -25,6 +25,7 @@ import shootingstar.var.util.ParticipatingAuctionRedisUtil;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Set;
 
 @SpringBootTest
 public class UserServiceTest {
@@ -147,6 +148,7 @@ public class UserServiceTest {
 
     @Test
     @DisplayName("참여중인 경매 조회")
+    @Transactional
     public void getParticipateList() throws Exception{
         User vip = new User("22", "실명", "유명인", "000-0000-0000", "test@ttt.com", "helloUrl", UserType.ROLE_VIP);
         User basic = new User("33", "실명", "일반인", "000-0000-0000", "test@ttt.com", "helloUrl", UserType.ROLE_BASIC);
@@ -180,7 +182,15 @@ public class UserServiceTest {
         System.out.println(progressAuction1.getAuctionUUID());
         participatingAuctionRedisUtil.addParticipation(basic.getUserUUID(), progressAuction1.getAuctionUUID(), expiredMilliSeconds1);
 
+        Set<String> participationList = participatingAuctionRedisUtil.getParticipationList(basic.getUserUUID());
+        System.out.println(participationList);
         Page<UserAuctionParticipateResDto> userAuctionParticipateResDtos = basicUserService.participateAuctionList(basic.getUserUUID(), Pageable.unpaged());
         System.out.print(userAuctionParticipateResDtos.stream().toList());
+
+        participatingAuctionRedisUtil.removeParticipation(basic.getUserUUID(), progressAuction.getAuctionUUID());
+        participatingAuctionRedisUtil.removeParticipation(basic.getUserUUID(), progressAuction1.getAuctionUUID());
+
+
+
     }
 }
