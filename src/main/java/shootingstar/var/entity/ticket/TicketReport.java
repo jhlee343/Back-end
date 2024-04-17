@@ -55,4 +55,8 @@ public class TicketReport extends BaseTimeEntity {
         this.ticketReportEvidenceUrl = ticketReportEvidenceUrl;
         this.ticketReportStatus = TicketReportStatus.STANDBY;
     }
+
+    public void changeTicketReportStatus(TicketReportStatus ticketReportStatus) {
+        this.ticketReportStatus = ticketReportStatus;
+    }
 }
